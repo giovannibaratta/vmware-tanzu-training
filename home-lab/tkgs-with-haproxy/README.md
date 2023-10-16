@@ -1,0 +1,1 @@
+* It the haproxy is deployed without a custom certificate, the self signed certificate generate during the deployment can be found in `/etc/haproxy/ca.crt`.
