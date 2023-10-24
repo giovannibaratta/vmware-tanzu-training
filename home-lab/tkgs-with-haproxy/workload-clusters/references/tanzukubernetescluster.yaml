@@ -1,0 +1,262 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: ClusterClass
+metadata:
+  name: tanzukubernetescluster
+  annotations:
+    run.tanzu.vmware.com/resolve-tkr: ""
+spec:
+  controlPlane:
+    metadata:
+      annotations:
+        run.tanzu.vmware.com/resolve-os-image: os-name=photon
+    ref:
+      apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+      kind: KubeadmControlPlaneTemplate
+      name: "tkc-control-plane"
+    machineInfrastructure:
+      ref:
+        kind: VSphereMachineTemplate
+        apiVersion: vmware.infrastructure.cluster.x-k8s.io/v1beta1
+        name: "tkc-control-plane"
+    machineHealthCheck:
+      maxUnhealthy: 100%
+      nodeStartupTimeout: 2h0m0s
+      unhealthyConditions:
+        - status: Unknown
+          timeout: 5m0s
+          type: Ready
+        - status: "False"
+          timeout: 12m0s
+          type: Ready
+  infrastructure:
+    ref:
+      apiVersion: vmware.infrastructure.cluster.x-k8s.io/v1beta1
+      kind: VSphereClusterTemplate
+      name: "tkc-infrastructure"
+  workers:
+    machineDeployments:
+      - class: node-pool  
+        template:
+          metadata:
+            annotations:
+              run.tanzu.vmware.com/resolve-os-image: os-name=photon            
+          bootstrap:
+            ref:
+              kind: KubeadmConfigTemplate
+              apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+              name: "tkc-md"
+          infrastructure:
+            ref:
+              kind: VSphereMachineTemplate
+              apiVersion: vmware.infrastructure.cluster.x-k8s.io/v1beta1
+              name: "tkc-md"
+        machineHealthCheck:
+          maxUnhealthy: 100%
+          nodeStartupTimeout: 2h0m0s
+          unhealthyConditions:
+            - status: Unknown
+              timeout: 5m0s
+              type: Ready
+            - status: "False"
+              timeout: 12m0s
+              type: Ready
+  variables:
+    - name: TKR_DATA
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              kubernetesSpec:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  imageRepository:
+                    type: string
+                  etcd:
+                    type: object
+                    properties:
+                      imageTag:
+                        type: string
+                  coredns:
+                    type: object
+                    properties:
+                      imageTag:
+                        type: string
+              osImageRef:
+                type: object
+                properties:
+                  name:
+                    type: string
+              labels:
+                type: object
+                additionalProperties:
+                  type: string
+    - name: vmClass
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: storageClass
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: storageClasses
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: array
+          items:
+            type: string
+    - name: defaultStorageClass
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: extensionCert
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            contentSecret:
+              type: object
+              properties:
+                name:
+                  type: string
+                key:
+                  type: string
+    - name: clusterEncryptionConfigYaml
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: defaultRegistrySecret
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            namespace:
+              type: string
+            name:
+              type: string
+            data:
+              type: string
+    - name: ntp
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: user
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            passwordSecret:
+              type: object
+              properties:
+                name:
+                  type: string
+                key:
+                  type: string
+            sshAuthorizedKey:
+              type: string
+    - name: nodePoolTaints
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+              effect:
+                type: string
+              timeAdded:
+                type: integer
+    - name: nodePoolLabels
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+    - name: proxy
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            httpProxy:
+              type: string
+            httpsProxy:
+              type: string
+            noProxy:
+              type: array
+              items:
+                type: string
+    - name: trust
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            additionalTrustedCAs:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+    - name: controlPlaneVolumes
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: array
+          items:
+            type: object
+            properties:
+              storageClass:
+                type: string
+              mountPath:
+                type: string
+              name:
+                type: string
+              capacity:
+                type: object
+                properties:
+                  storage:
+                    type: string                   
+    - name: nodePoolVolumes
+      required: false
+      schema:
+        openAPIV3Schema:
+          type: array
+          items:
+            type: object
+            properties:
+              storageClass:
+                type: string
+              mountPath:
+                type: string
+              name:
+                type: string
+              capacity:
+                type: object
+                properties:
+                  storage:
+                    type: string
