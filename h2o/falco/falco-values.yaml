@@ -1,0 +1,43 @@
+image:
+  # Avoid rate limiting
+  registry: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+scc:
+  # -- Create OpenShift's Security Context Constraint.
+  create: false
+
+driver:
+  enabled: true
+  # Available options: module (kernel driver), ebpf (eBPF probe), modern-bpf (modern eBPF probe).
+  kind: module
+  loader:
+    initContainer:
+      image:
+        # Avoid rate limiting
+        registry: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+falco:
+  time_format_iso_8601: true
+  priority: info
+
+  http_output:
+    # Falco sidekick url (svcname.namespace)
+    url: http://falcosidekick.falcosidekick:2801
+    # Echo server answers to stdout. Disable in prod
+    echo: true
+    insecure: true
+
+falcoctl:
+  image:
+    # Avoid rate limiting
+    registry: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+# Push events to Falco sidekick
+falcosidekick:
+  enabled: true
+
+customRules:
+  {}
+  # Example
+  # rules-traefik.yaml: |-
+  #   [ rule body ]

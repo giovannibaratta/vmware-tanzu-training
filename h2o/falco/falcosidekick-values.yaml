@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  # Avoid rate limiting
+  registry: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+webui:
+  enabled: true
+  replicaCount: 1
+  user: "admin:REPLACE_ME"
+  image:
+    # Avoid rate limiting
+    registry: harbor-repo.vmware.com/dockerhub-proxy-cache
+  
+  service:
+    type: LoadBalancer
+
+  redis:
+    registry: harbor-repo.vmware.com/dockerhub-proxy-cache
+    securityContext:
+      # Do not run as root
+      runAsUser: 1000
+      runAsGroup: 3000

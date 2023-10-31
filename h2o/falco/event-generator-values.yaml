@@ -1,0 +1,3 @@
+image:
+  # Avoid rate limiting
+  repository: harbor-repo.vmware.com/dockerhub-proxy-cache/falcosecurity/event-generator

@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: psp:vmware-system-restricted:falcosidekick
+  namespace: falcosidekick
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  # ClusterRole created during the deployment
+  name: psp:vmware-system-restricted
+subjects:
+- kind: ServiceAccount
+  name: falcosidekick
+  namespace: falcosidekick
+- kind: ServiceAccount
+  name: falcosidekick-ui
+  namespace: falcosidekick
