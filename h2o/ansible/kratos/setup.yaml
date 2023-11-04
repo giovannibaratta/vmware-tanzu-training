@@ -1,0 +1,45 @@
+---
+- name: Install Kratos
+  hosts: default
+  become: true
+
+  tasks:
+  - name: Check if Kratos is already installed
+    stat:
+      path: /usr/local/bin/kratos
+    register: kratos_file_stats
+
+  - name: Download install script
+    when: not kratos_file_stats.stat.exists
+    ansible.builtin.get_url:
+      url: https://raw.githubusercontent.com/ory/meta/master/install.sh
+      dest: /tmp/install.sh
+
+  - name: Assign X permission to installer
+    when: not kratos_file_stats.stat.exists
+    ansible.builtin.file:
+      path: /tmp/install.sh
+      owner: root
+      group: root
+      mode: '0700'
+
+  # The install script will create a file named kratos in /tmp
+  - name: Run install script
+    when: not kratos_file_stats.stat.exists
+    ansible.builtin.shell: /tmp/install.sh -b /tmp kratos v1.0.0
+    args:
+      executable: /bin/bash
+
+  - name: Move installer to bin folder
+    when: not kratos_file_stats.stat.exists
+    ansible.builtin.copy:
+      remote_src: true
+      src: /tmp/kratos  
+      dest: /usr/local/bin/kratos
+
+  - name: Assign X permission to kratos
+    ansible.builtin.file:
+      path: /usr/local/bin/kratos
+      owner: root
+      group: root
+      mode: '0700'
