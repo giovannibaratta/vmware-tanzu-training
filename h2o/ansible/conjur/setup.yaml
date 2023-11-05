@@ -1,0 +1,138 @@
+---
+- name: Prepare host
+  hosts: conjur
+  become: true
+
+  vars:
+    docker_edition: 'ce'
+    docker_install_compose: true
+    docker_users:
+    - debian 
+
+  pre_tasks:
+    - name: Update cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+  roles:
+    - geerlingguy.docker
+
+# Ref https://www.conjur.org/get-started/quick-start/oss-environment/
+- name: Install Conjur
+  hosts: conjur
+  vars:
+    conjur_root: "/conjur"
+    conjur_conf: "{{ conjur_root }}/conf"
+    conjur_data: "{{ conjur_root }}/data"
+
+  tasks:
+
+  - name: Create folders
+    become: true
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      mode: '0700'
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+    with_items:
+      - "{{ conjur_root }}"
+      - "{{ conjur_conf }}"
+      - "{{ conjur_data }}"
+      - "{{ conjur_conf }}/tls"
+
+  - name: Generate docker compose
+    ansible.builtin.template:
+      src: "templates/docker-compose.yaml.j2"
+      dest: "{{ conjur_conf }}/docker-compose.yaml"
+
+  - name: Generate nginx TLS conf
+    ansible.builtin.template:
+      src: "templates/nginx-tls.conf.j2"
+      dest: "{{ conjur_conf }}/tls/tls.conf"
+
+  - name: Check if nginx cert is already present
+    stat:
+      path: "{{ conjur_conf }}/tls/nginx.crt"
+    register: nginxcert_file_stats
+
+  - name: Generate cert
+    when: not nginxcert_file_stats.stat.exists
+    ansible.builtin.shell: openssl req -newkey rsa:2048 -days "365" -nodes -x509 -config "{{ conjur_conf }}/tls/tls.conf" -extensions v3_ca -keyout "{{ conjur_conf }}/tls/nginx.key" -out "{{ conjur_conf }}/tls/nginx.crt"
+    args:
+      chdir: "{{ conjur_conf }}/tls"
+      executable: /bin/bash
+
+  - name: Copy nginx conf
+    ansible.builtin.copy:
+      src: files/nginx.conf
+      dest: "{{ conjur_conf }}/nginx.conf"
+
+  - name: Pull images
+    ansible.builtin.shell: docker-compose pull
+    args:
+      chdir: "{{ conjur_conf }}"
+
+  - name: Check if master key is already present
+    stat:
+      path: "{{ conjur_conf }}/masterkey"
+    register: masterkey_file_stats
+
+  - name: Generate master key if not present
+    when: not masterkey_file_stats.stat.exists
+    ansible.builtin.shell: docker-compose run --no-deps --rm conjur data-key generate > "{{ conjur_conf }}/masterkey"
+    args:
+      chdir: "{{ conjur_conf }}"
+      executable: /bin/bash
+
+  - name: Register master key
+    ansible.builtin.slurp:
+      src: "{{conjur_conf}}/masterkey"
+    register: conjur_masterkey
+
+  # This file is used to load the masterkey in Conjur
+  # The file is reference in the systemd unit service
+  - name: Generate environment file
+    ansible.builtin.template:
+      src: "templates/environment.j2"
+      dest: "{{ conjur_conf }}/environment"
+
+  - name: Generate conjur service
+    become: true
+    ansible.builtin.template:
+      src: "templates/conjur-service.j2"
+      dest: "/etc/systemd/system/conjur.service"
+
+  - name: Start conjur service
+    become: true
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: conjur
+      state: started
+      enabled: true
+
+  - name: Wait for port
+    ansible.builtin.wait_for:
+      port: 443
+      delay: 5
+      timeout: 600 # 10 minutes
+
+  - name: Wait for server to be ready
+    ansible.builtin.shell: docker-compose exec conjur conjurctl wait
+    args:
+      chdir: "{{ conjur_conf }}"
+
+  - name: Check if account has already been created
+    stat:
+      path: "{{ conjur_conf }}/admin"
+    register: admin_file_stats
+
+  # This step generates a file in the remote host that contains the
+  # API key for the admin user. The API key can be used when conjurctl
+  # prompts for a password.
+  - name: Create account
+    when: not admin_file_stats.stat.exists
+    ansible.builtin.shell: docker-compose exec conjur conjurctl account create lab > "{{ conjur_conf }}/admin"
+    args:
+      chdir: "{{ conjur_conf }}"
+      executable: /bin/bash

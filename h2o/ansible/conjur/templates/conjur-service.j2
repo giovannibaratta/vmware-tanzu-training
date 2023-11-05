@@ -1,0 +1,16 @@
+[Unit]
+Description=Conjur service
+After=docker.service
+
+[Service]
+Type=simple
+User={{ ansible_user }}
+group={{ ansible_user }}
+Restart=on_failure
+WorkingDirectory={{conjur_conf}}
+ExecStart=/usr/local/bin/docker-compose up --remove-orphans
+ExecStop=/usr/local/bin/docker-compose stop
+EnvironmentFile={{conjur_conf}}/environment
+
+[Install]
+WantedBy=multi-user.target

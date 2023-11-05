@@ -1,0 +1,37 @@
+version: '3'
+services:
+
+  database:
+    image: postgres:10.16
+    container_name: postgres_database
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: password
+      POSTGRES_PASSWORD: {{ postgres_password }}
+    
+    volumes:
+      - {{ conjur_data }}:/var/lib/postgresql/data
+
+  conjur:
+    image: cyberark/conjur
+    container_name: conjur_server
+    command: server
+    environment:
+      DATABASE_URL: postgres://postgres:{{ postgres_password }}@database/postgres
+      CONJUR_DATA_KEY:
+      CONJUR_AUTHENTICATORS:
+      CONJUR_LOG_LEVEL: info
+    depends_on:
+    - database
+    restart: on-failure
+
+  proxy:
+    image: nginx:1.13.6-alpine
+    container_name: nginx_proxy
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
+      - ./tls/:/etc/nginx/tls/:ro
+    depends_on:
+    - conjur
+    restart: on-failure
