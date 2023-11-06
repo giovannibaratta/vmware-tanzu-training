@@ -1,0 +1,11 @@
+- !policy
+  id: automation
+  body:
+    - !layer
+      id: mgmt-layer
+
+    - !host-factory
+        id: mgmt-appliances
+        annotations:
+          description: Factory to create mgmt VMs
+        layers: [ !layer mgmt-layer ]

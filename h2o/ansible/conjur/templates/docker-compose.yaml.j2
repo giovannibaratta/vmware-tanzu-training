@@ -4,10 +4,12 @@ services:
   database:
     image: postgres:10.16
     container_name: postgres_database
+    # 999:999 is postgres:postgres
+    user: "999:999"
     environment:
       POSTGRES_HOST_AUTH_METHOD: password
       POSTGRES_PASSWORD: {{ postgres_password }}
-    
+
     volumes:
       - {{ conjur_data }}:/var/lib/postgresql/data
 
@@ -20,6 +22,8 @@ services:
       CONJUR_DATA_KEY:
       CONJUR_AUTHENTICATORS:
       CONJUR_LOG_LEVEL: info
+    volumes:
+      - ./policies/:/policies/:ro
     depends_on:
     - database
     restart: on-failure

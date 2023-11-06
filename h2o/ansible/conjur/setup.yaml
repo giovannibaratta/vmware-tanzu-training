@@ -17,6 +17,18 @@
   roles:
     - geerlingguy.docker
 
+  post_tasks:
+    # The postgres image creates files in the mounted volume using the user postgres (999).
+    # If we create the dir to mount with a different user, the container will change the owner
+    # and a subsequent run of ansible might change the user again causing issue in the container.
+    # The proper solution would be to adapt the postgresql image but for now we will use this
+    # workaround.
+    - name: Add the user postgres
+      ansible.builtin.user:
+        name: postgres
+        uid: 999
+        system: true
+
 # Ref https://www.conjur.org/get-started/quick-start/oss-environment/
 - name: Install Conjur
   hosts: conjur
@@ -27,7 +39,7 @@
 
   tasks:
 
-  - name: Create folders
+  - name: Create config folders
     become: true
     ansible.builtin.file:
       path: "{{ item }}"
@@ -38,13 +50,23 @@
     with_items:
       - "{{ conjur_root }}"
       - "{{ conjur_conf }}"
-      - "{{ conjur_data }}"
       - "{{ conjur_conf }}/tls"
+      - "{{ conjur_conf }}/policies"
+
+  - name: Create PostgreSQL folder
+    become: true
+    ansible.builtin.file:
+      path: "{{ conjur_data }}"
+      state: directory
+      mode: '0700'
+      owner: "postgres"
 
   - name: Generate docker compose
     ansible.builtin.template:
       src: "templates/docker-compose.yaml.j2"
       dest: "{{ conjur_conf }}/docker-compose.yaml"
+    notify:
+      - Restart conjur service
 
   - name: Generate nginx TLS conf
     ansible.builtin.template:
@@ -102,6 +124,8 @@
     ansible.builtin.template:
       src: "templates/conjur-service.j2"
       dest: "/etc/systemd/system/conjur.service"
+    notify:
+      - Restart conjur service
 
   - name: Start conjur service
     become: true
@@ -136,3 +160,24 @@
     args:
       chdir: "{{ conjur_conf }}"
       executable: /bin/bash
+
+  - name: Copy policy on remote host
+    ansible.builtin.copy:
+      src: files/conjur-automation-policy.yml
+      dest: "{{ conjur_conf }}/policies/automation-policy.yml"
+
+  - name: Load policy
+    when: 
+    # Policies are safe to be re-applied
+    ansible.builtin.shell: docker-compose exec conjur conjurctl policy load lab /policies/automation-policy.yml
+                           
+    args:
+      chdir: "{{ conjur_conf }}"
+
+  handlers:
+  - name: Restart conjur service
+    become: true
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: conjur
+      state: restarted

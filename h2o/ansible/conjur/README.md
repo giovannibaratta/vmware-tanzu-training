@@ -22,6 +22,11 @@ Run the ansible playbook to configure the remote host. This README assume that a
 ansible-playbook setup.yaml -i ../../terraform/outputs/ansible_inventory --u debian --extra-vars "@secrets.yaml"
 ```
 
+## Connect to Conjur
+
+1. install Conjur CLI.
+1. `conjur init --url https://<CONJUR_IP_ADDR> --account lab --self-signed`
+1. `conjur login -i admin`, it will prompt for a password. Use the API key stored in the VM in `/conjur/config/admin`
 
 ## Limitations
 open source version does not have an UI
