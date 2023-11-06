@@ -14,7 +14,7 @@ file: secrets.yaml
 
 ---
 postgres_password: <REPLACE_ME>
-``````
+```
 
 Run the ansible playbook to configure the remote host. This README assume that a debian VM has been provisioned with Terraform using the code in this repository. If this is not the case, adjust the parameters of the following command as needed.
 
