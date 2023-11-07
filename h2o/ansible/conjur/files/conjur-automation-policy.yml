@@ -1,11 +1,37 @@
 - !policy
   id: automation
   body:
-    - !layer
-      id: mgmt-layer
+    - !layer mgmt-layer
 
+    - !host
+      id: ansible
+      annotations:
+        description: Ansible controller
+
+    # The host factory is used by Ansible to
+    # generate new hosts dynamically
     - !host-factory
-        id: mgmt-appliances
+      id: mgmt-appliances
+      annotations:
+        description: Factory to create mgmt VMs
+      layers: [ !layer mgmt-layer ]
+
+    # This is just a group of resources. The name secrets is arbitrary.
+    - &secrets
+      - !variable
+        id: keycloak/db_pass
+        kind: password
         annotations:
-          description: Factory to create mgmt VMs
-        layers: [ !layer mgmt-layer ]
+          description: Database password used by Keycloak
+
+    - !group secrets-reader
+
+    - !grant
+      role: !group secrets-reader
+      members: 
+        - !host ansible
+    
+    - !permit
+      role: !group secrets-reader
+      privileges: [read, execute]
+      resource: *secrets

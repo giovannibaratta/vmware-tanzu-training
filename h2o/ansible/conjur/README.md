@@ -30,3 +30,7 @@ ansible-playbook setup.yaml -i ../../terraform/outputs/ansible_inventory --u deb
 
 ## Limitations
 open source version does not have an UI
+
+## Findings
+
+* If you receive the error `Missing required option account` when loading a policy, it might mean that there is a duplicate resource (ex. host, host-factory, variable) in policy.
