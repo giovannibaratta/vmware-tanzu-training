@@ -167,7 +167,6 @@
       dest: "{{ conjur_conf }}/policies/automation-policy.yml"
 
   - name: Load policy
-    when: 
     # Policies are safe to be re-applied
     ansible.builtin.shell: docker-compose exec conjur conjurctl policy load lab /policies/automation-policy.yml
                            
