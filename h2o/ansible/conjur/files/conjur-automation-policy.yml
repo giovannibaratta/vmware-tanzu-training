@@ -24,6 +24,12 @@
         annotations:
           description: Database password used by Keycloak
 
+      - !variable
+        id: keycloak/admin_pass
+        kind: password
+        annotations:
+          description: Admin password to access Keycloak
+
     - !group secrets-reader
 
     - !grant
