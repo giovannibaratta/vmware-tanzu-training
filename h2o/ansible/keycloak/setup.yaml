@@ -1,0 +1,188 @@
+---
+- name: Prepare host
+  hosts: keycloak
+  become: true
+  vars_files:
+    - ./vars/conjur.yml
+
+  roles:
+    - role: cyberark.conjur.conjur_host_identity
+      conjur_host_factory_token: "{{ lookup('env', 'HFTOKEN') }}"
+      conjur_host_name: "{{ inventory_hostname }}"
+
+  post_tasks:
+    - name: Install dependencies
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+        - "openjdk-17-jdk=17.0.8+7-1~deb12u1"
+        - "postgresql=15+248"
+        - "python3-psycopg2=2.9.5-1+b1" # Required by community.postgresql modules
+        - "acl" # Necessary to become unprivileged user
+
+    - name: Add the Keycloak user
+      ansible.builtin.user:
+        name: keycloak
+
+- name: Install and configure Keycloak
+  hosts: keycloak
+  become: true
+
+  vars:
+    keycloak_version: "22.0.5"
+    keycloak_dir: "/opt/keycloak"
+    keycloak_fqdn: "keycloak.local.lan"
+
+  vars_files:
+    - ./vars/conjur.yml
+
+  pre_tasks:
+  - name: Set facts
+    ansible.builtin.set_fact:
+      # These variables are stored in the Conjur server. To be able to retrieve the variables, the Ansible host identity must be configured.
+      # See README for more details.
+      keycloak_db_password: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/keycloak/db_pass', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
+      keycloak_admin_password: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/keycloak/admin_pass', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
+
+  tasks:
+  - name: Install Keycloak
+    block:
+    - name: Download install script
+      ansible.builtin.get_url:
+        url: "https://github.com/keycloak/keycloak/releases/download/{{ keycloak_version }}/keycloak-{{ keycloak_version }}.tar.gz"
+        dest: /tmp/keycloak.tag.gz
+        checksum: sha1:2526daf942086f7700f2cd43d592505ce6b96f3a
+
+    - name: Extract archive
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: /tmp/keycloak.tag.gz
+        dest: /tmp/
+
+    - name: Create Keycloak dirs
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: keycloak
+        group: keycloak
+      with_items:
+        - "{{ keycloak_dir }}"
+        - "{{ keycloak_dir }}/conf"
+        - "{{ keycloak_dir }}/tls"
+        - "{{ keycloak_dir }}/providers"
+        - "/var/log/keycloak"
+
+    - name: Move files
+      ansible.builtin.copy:
+        src: "/tmp/keycloak-{{keycloak_version}}/{{ item }}"
+        dest: "{{ keycloak_dir }}/{{ item }}"
+        remote_src: true
+        owner: keycloak
+        group: keycloak
+      with_items:
+        - "bin/"
+        - "lib/"
+        - "conf/cache-ispn.xml"
+
+  - name: Copy Keycloak configuration file
+    ansible.builtin.template:
+      src: "templates/keycloak.conf.j2"
+      dest: "{{ keycloak_dir }}/conf/keycloak.conf"
+    notify:
+      - Restart Keycloak service
+
+  - name: Check if keycloak cert is already present
+    stat:
+      path: "{{ keycloak_dir }}/tls/keycloak.pem"
+    register: keycloakcert_file_stats
+
+  - name: Generate keycloak TLS conf
+    ansible.builtin.template:
+      src: "templates/keycloak-tls.conf.j2"
+      dest: "{{ keycloak_dir }}/tls/tls.conf"
+      owner: keycloak
+      group: keycloak
+
+  - name: Generate cert
+    when: not keycloakcert_file_stats.stat.exists
+    ansible.builtin.shell: openssl req -newkey rsa:2048 -days "365" -nodes -x509 -config "{{ keycloak_dir }}/tls/tls.conf" -extensions v3_ca -keyout "{{ keycloak_dir }}/tls/key.pem" -out "{{ keycloak_dir }}/tls/cert.pem"
+    args:
+      chdir: "{{ keycloak_dir }}/tls"
+      executable: /bin/bash
+
+  - name: Fix tls permissions
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: file
+      owner: keycloak
+      group: keycloak
+    with_items:
+      - "{{ keycloak_dir }}/tls/key.pem"
+      - "{{ keycloak_dir }}/tls/cert.pem"
+
+  - name: Start PostgreSQL service
+    ansible.builtin.systemd:
+      name: postgresql
+      state: started
+      enabled: true
+
+  - name: Create a keycloak database
+    become: true
+    become_user: postgres
+    community.postgresql.postgresql_db:
+      name: keycloak
+
+  - name: Add user to keycloak database
+    become: true
+    become_user: postgres
+    community.postgresql.postgresql_user:
+      db: keycloak
+      name: keycloak
+      password: "{{ keycloak_db_password }}"
+
+  - name: Grant privileges to keycloak on public schema in keycloak database
+    become: true
+    become_user: postgres
+    community.postgresql.postgresql_privs:
+      db: keycloak
+      privs: ALL
+      type: schema
+      obj: public
+      role: keycloak
+
+  - name: Add capabilities to bind to 443
+    community.general.capabilities:
+      path: "/usr/lib/jvm/java-17-openjdk-amd64/bin/java"
+      capability: cap_net_bind_service=+eip
+      state: present
+
+  # The file is reference in the systemd unit service
+  - name: Generate environment file
+    ansible.builtin.template:
+      src: "templates/keycloak-environment.j2"
+      dest: "{{ keycloak_dir }}/environment"
+
+  - name: Generate Keycloak service
+    become: true
+    ansible.builtin.template:
+      src: "templates/keycloak.service.j2"
+      dest: "/etc/systemd/system/keycloak.service"
+    notify:
+      - Restart Keycloak service
+
+  - name: Start Keycloak service
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: keycloak
+      state: started
+      enabled: true
+    register: start_keycloak_service
+
+  handlers:
+  - name: Restart Keycloak service
+    when: not start_keycloak_service.changed
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: keycloak
+      state: restarted
+

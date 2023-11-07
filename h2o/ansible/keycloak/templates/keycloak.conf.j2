@@ -1,0 +1,19 @@
+# Database configuration
+db=postgres
+db-username=keycloak
+db-password={{ keycloak_db_password }}
+
+# Hostname for the Keycloak server.
+hostname-url=https://{{ keycloak_fqdn }}
+hostname-strict-backchannel=true
+hostname-admin-url=https://{{ keycloak_fqdn }}
+
+# Logging
+log-level=INFO
+log=console,file
+log-file=/var/log/keycloak/logs
+
+# TLS configs
+https-port=443
+https-certificate-file={{ keycloak_dir}}/tls/cert.pem
+https-certificate-key-file={{ keycloak_dir}}/tls/key.pem
