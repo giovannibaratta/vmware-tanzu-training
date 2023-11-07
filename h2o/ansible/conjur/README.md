@@ -28,6 +28,19 @@ ansible-playbook setup.yaml -i ../../terraform/outputs/ansible_inventory --u deb
 1. `conjur init --url https://<CONJUR_IP_ADDR> --account lab --self-signed`
 1. `conjur login -i admin`, it will prompt for a password. Use the API key stored in the VM in `/conjur/config/admin`
 
+## Add a new secret
+1. Add a new variable in `files/conjur-automation-policy.yml`.
+    ```yaml
+    !variable <VARIABLE_PATH>
+    ```
+1. Run ansible to apply the latest policy
+1. Set the value for the secret
+    ```sh
+    conjur variable set -i <VARIABLE_PATH> -v <SECRET_VALUE>
+    ```
+
+> A 404 error has multiple meanings, either the variable does not exist or you don't have enough permissions to see/use it.
+
 ## Limitations
 open source version does not have an UI
 
