@@ -3,11 +3,11 @@ variable "vsphere_server" {
 }
 
 variable "vsphere_user" {
-  type = string
+  type    = string
   default = "administrator@vsphere.local"
 }
 
 variable "vsphere_password" {
-  type = string
+  type      = string
   sensitive = true
 }
