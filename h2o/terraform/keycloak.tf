@@ -9,7 +9,7 @@ resource "vsphere_virtual_machine" "keycloak" {
   guest_id = "other5xLinux64Guest"
 
   network_interface {
-    network_id = data.vsphere_network.mgmt.id
+    network_id = vsphere_distributed_port_group.mgmt_pg_1.id
   }
 
   disk {

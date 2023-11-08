@@ -29,16 +29,6 @@ data "vsphere_network" "frontend" {
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
-data "vsphere_network" "mgmt" {
-  name          = "management-portgroup-1"
-  datacenter_id = data.vsphere_datacenter.datacenter.id
-}
-
-data "vsphere_network" "workload" {
-  name          = "workload-portgroup-1"
-  datacenter_id = data.vsphere_datacenter.datacenter.id
-}
-
 data "vsphere_content_library" "templates" {
   name = "Templates"
 }
@@ -52,4 +42,42 @@ data "vsphere_content_library_item" "debian_goldenimage" {
 resource "vsphere_resource_pool" "mgmt" {
   name                    = "mgmt"
   parent_resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+}
+
+resource "vsphere_distributed_virtual_switch" "management" {
+  name          = "management-vds"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+
+  dynamic "host" {
+    for_each = data.vsphere_host.hosts
+    content {
+      host_system_id = host.value.id
+    }
+  }
+}
+
+resource "vsphere_distributed_port_group" "mgmt_pg_1" {
+  name                            = "management-port-group-1"
+  distributed_virtual_switch_uuid = vsphere_distributed_virtual_switch.management.id
+
+  vlan_id = 0
+}
+
+resource "vsphere_distributed_virtual_switch" "workload" {
+  name          = "workload-vds"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+
+  dynamic "host" {
+    for_each = data.vsphere_host.hosts
+    content {
+      host_system_id = host.value.id
+    }
+  }
+}
+
+resource "vsphere_distributed_port_group" "workload_pg_1" {
+  name                            = "workload-port-group-1"
+  distributed_virtual_switch_uuid = vsphere_distributed_virtual_switch.workload.id
+
+  vlan_id = 0
 }

@@ -21,19 +21,19 @@ resource "vsphere_virtual_machine" "haproxy" {
     enable_hidden_properties  = true
 
     ovf_network_map = {
-      Management = data.vsphere_network.mgmt.id
-      Workload   = data.vsphere_network.workload.id
+      Management = vsphere_distributed_port_group.mgmt_pg_1.id
+      Workload   = vsphere_distributed_port_group.workload_pg_1.id
       Frontend   = data.vsphere_network.frontend.id
     }
   }
 
   network_interface {
-    network_id  = data.vsphere_network.mgmt.id
+    network_id  = vsphere_distributed_port_group.mgmt_pg_1.id
     ovf_mapping = "Management"
   }
 
   network_interface {
-    network_id  = data.vsphere_network.workload.id
+    network_id  = vsphere_distributed_port_group.workload_pg_1.id
     ovf_mapping = "Workload"
   }
 
