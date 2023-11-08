@@ -8,8 +8,8 @@ haproxy_specs = {
   nameservers = "172.16.0.48,1.1.1.1,8.8.8.8"
 
   management = {
-    gateway = "172.17.0.3/16"
-    ip_cidr = "172.17.0.1"
+    gateway = "172.17.0.1"
+    ip_cidr = "172.17.0.3/16"
   }
 
   workload = {
