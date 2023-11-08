@@ -1,5 +1,3 @@
-# cloud init example https://github.com/rgl/terraform-vsphere-ubuntu-example/blob/master/main.tf
-
 resource "vsphere_virtual_machine" "keycloak" {
   name = "keycloak"
 
