@@ -1,0 +1,48 @@
+---
+- name: Configure Keycloak
+  hosts: keycloak
+
+  pre_tasks:
+  - name: Set facts
+    ansible.builtin.set_fact:
+      # These variables are stored in the Conjur server. To be able to retrieve the variables, the Ansible host identity must be configured.
+      # See README for more details.
+      keycloak_admin_password: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/keycloak/admin_pass', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
+      keycloak_server: "https://{{ ansible_default_ipv4.address  }}"
+
+  tasks:
+  - name: Create realm
+    community.general.keycloak_realm:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      id: tanzu
+      realm: tanzu
+      state: present
+      validate_certs: false
+      enabled: true
+    delegate_to: localhost
+
+  - name: Create client
+    community.general.keycloak_client:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      realm: tanzu
+      client_id: oidc-auth
+      name: oidc-auth
+      protocol: "openid-connect"
+      client_authenticator_type: "client-secret"
+      enabled: true
+      # Client authentication setting in the UI.
+      # Public client false equals to confidential access type
+      public_client: false
+      redirect_uris:
+      # See https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/2.4/tkg-deploy-mc/mgmt-iam-configure-id-mgmt.html#idp
+      # for more details
+      - https://pinniped-supervisor.local.lan:31234/callback 
+      state: present
+      validate_certs: false
+    delegate_to: localhost
