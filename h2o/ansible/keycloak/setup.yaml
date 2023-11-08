@@ -5,6 +5,20 @@
   vars_files:
     - ./vars/conjur.yml
 
+  pre_tasks:
+
+    - name: Check if /etc/conjur.identity already exists
+      stat:
+        path: /etc/conjur.identity
+      register: identity_file
+
+    - name: Validate HFTOKEN
+      fail:
+        msg: 'variable HFTOKEN is not defined. It is required to register the host'
+      when:
+        - lookup('env', 'HFTOKEN') == ""
+        - not identity_file.stat.exists
+
   roles:
     - role: cyberark.conjur.conjur_host_identity
       conjur_host_factory_token: "{{ lookup('env', 'HFTOKEN') }}"
@@ -17,8 +31,6 @@
         pkg:
         - "openjdk-17-jdk=17.0.8+7-1~deb12u1"
         - "postgresql=15+248"
-        - "python3-psycopg2=2.9.5-1+b1" # Required by community.postgresql modules
-        - "acl" # Necessary to become unprivileged user
 
     - name: Add the Keycloak user
       ansible.builtin.user:
