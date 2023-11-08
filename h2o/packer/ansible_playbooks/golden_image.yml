@@ -1,0 +1,59 @@
+---
+- name: Prepare host
+  hosts: default
+
+  tasks:
+
+    # During the installation a source pointing to the CD-ROM device is created.
+    # This generates warnings/errors during apt update.
+    - name: Remove installation sources
+      ansible.builtin.replace:
+        path: /etc/apt/sources.list
+        regexp: '^(.+cdrom.+)$'
+        replace: ''
+
+    - name: Add sources
+      ansible.builtin.apt_repository:
+        repo: "{{ item }}"
+        filename: debian
+      with_items:
+      - "deb http://deb.debian.org/debian bookworm main"
+      - "deb-src http://deb.debian.org/debian bookworm main"
+
+    - name: Apt update & upgrade
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: true
+
+    - name: Install packages
+      ansible.builtin.apt:
+        pkg:
+        - "vim"
+        - "python3-psycopg2" # # Required by community.postgresql modules
+        - "acl" # Required by Ansible to impersonate unprivileged users
+        - "sudo"
+
+    - name: Add user to sudoers
+      community.general.sudoers:
+        name: debian
+        user: debian
+        commands: ALL
+        nopassword: true
+
+    - name: Set authorized key
+      ansible.posix.authorized_key:
+        user: debian
+        state: present
+        key: "{{ lookup('file', './files/authorized_key') }}"
+
+    - name: Disable root login
+      lineinfile:
+        path: "/etc/ssh/sshd_config"
+        regexp: "^.+PermitRootLogin"
+        line: "PermitRootLogin no"
+
+    - name: Disable password login
+      lineinfile:
+        path: "/etc/ssh/sshd_config"
+        regexp: "^.+PasswordAuthentication"
+        line: "PasswordAuthentication no"
