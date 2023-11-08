@@ -22,7 +22,7 @@ data "vsphere_content_library" "templates" {
 }
 
 data "vsphere_content_library_item" "debian_goldenimage" {
-  name       = "debian-goldenimage"
+  name       = "debian-goldenimage-20231108-081404"
   type       = "ovf"
   library_id = data.vsphere_content_library.templates.id
 }
