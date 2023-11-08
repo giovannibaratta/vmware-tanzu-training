@@ -37,6 +37,7 @@
       community.general.sudoers:
         name: debian
         user: debian
+        runas: ALL
         commands: ALL
         nopassword: true
 
