@@ -1,20 +1,20 @@
 resource "vsphere_virtual_machine" "conjur" {
-  name             = "conjur"
-  
+  name = "conjur"
+
   resource_pool_id = vsphere_resource_pool.mgmt.id
   datastore_id     = data.vsphere_datastore.datastore.id
-  
-  num_cpus         = 1
-  memory           = 2048
-  guest_id         = "other5xLinux64Guest"
+
+  num_cpus = 1
+  memory   = 2048
+  guest_id = "other5xLinux64Guest"
 
   network_interface {
     network_id = data.vsphere_network.mgmt.id
   }
 
   disk {
-    label = "disk0"
-    size  = 40
+    label            = "disk0"
+    size             = 40
     thin_provisioned = true
   }
 
@@ -27,13 +27,13 @@ resource "vsphere_virtual_machine" "conjur" {
 
       linux_options {
         host_name = "conjur"
-        domain = "local.lan"
+        domain    = "local.lan"
       }
     }
   }
 
   # Perma diff
   lifecycle {
-    ignore_changes = [ ept_rvi_mode, hv_mode ]
+    ignore_changes = [ept_rvi_mode, hv_mode, clone]
   }
 }
