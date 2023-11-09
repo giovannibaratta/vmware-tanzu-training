@@ -44,6 +44,7 @@ function main() {
   done
 
   rm "$TMP_CONFIGURATION_FILE"
+  info "Setup completed"
 }
 
 #######################################
@@ -107,8 +108,8 @@ function update_storagepolicies () {
   local namespace="${1?namespace not set or empty}"
   local required_storage_policies
   local available_storage_policies
-  
-  required_storage_policies=$(yq '.namespaces.[] | select(.name=="'"${namespace}"'") | .storagePolicies.[]' "$TMP_CONFIGURATION_FILE")
+
+  readarray required_storage_policies < <(yq '.namespaces.[] | select(.name=="'"${namespace}"'") | .storagePolicies.[]' "$TMP_CONFIGURATION_FILE")
 
   # https://developer.vmware.com/apis/vsphere-automation/latest/vcenter/api/vcenter/storage/policies/get/
   available_storage_policies=$(curl --config "${CURL_CONFIG}" \
@@ -116,8 +117,10 @@ function update_storagepolicies () {
     --header "${SESSION_HEADER}" | jq '.[] | {id: .policy, name: .name}')
 
   local storage_policies_block="["
+  local storage_policy
 
-  for storage_policy in $required_storage_policies; do
+  for index in "${!required_storage_policies[@]}"; do
+    storage_policy=$(echo "${required_storage_policies[$index]}" | tr -d "\n")
     # Lookup the storage policy id from the available policies
     storage_policy_id=$(echo $available_storage_policies | jq 'select (.name=="'"$storage_policy"'") | .id' --raw-output | head -n 1)
 
