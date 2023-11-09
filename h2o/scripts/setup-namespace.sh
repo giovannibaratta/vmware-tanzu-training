@@ -13,6 +13,10 @@ set -e
 set -u
 set -o pipefail
 
+source ./common/vsphere.sh
+source ./common/logging.sh
+source ./common/curl.sh
+
 function main() {
 
   local host="${1?vsphere host is missing}"
@@ -20,6 +24,8 @@ function main() {
   local configuration_file="${3?configuration file is missing}"
   local TMP_CONFIGURATION_FILE
   local namespaces
+
+  generate_curl_temporary_config
 
   readonly BASE_URL="https://${host}" 
   TMP_CONFIGURATION_FILE="/tmp/setup-namespaces-$(date +%s).tmp"
@@ -74,9 +80,9 @@ function update_vmclasses () {
 
   vm_classes_json_array=$(yq '.namespaces.[] | select(.name=="'"${namespace}"'") | .vmClasses' "$TMP_CONFIGURATION_FILE" -o=json | jq --compact-output)
 
-  curl -X PATCH --silent \
-    --fail-with-body \
-    --location "${BASE_URL}/api/vcenter/namespaces/instances/${namespace}" \
+  curl --config "${CURL_CONFIG}" \
+    -X PATCH \
+    "${BASE_URL}/api/vcenter/namespaces/instances/${namespace}" \
     --header "${SESSION_HEADER}" \
     --header 'Content-Type: application/json' \
     --data '{
@@ -105,9 +111,8 @@ function update_storagepolicies () {
   required_storage_policies=$(yq '.namespaces.[] | select(.name=="'"${namespace}"'") | .storagePolicies.[]' "$TMP_CONFIGURATION_FILE")
 
   # https://developer.vmware.com/apis/vsphere-automation/latest/vcenter/api/vcenter/storage/policies/get/
-  available_storage_policies=$(curl --silent \
-    --fail-with-body \
-    --location "${BASE_URL}/api/vcenter/storage/policies" \
+  available_storage_policies=$(curl --config "${CURL_CONFIG}" \
+    "${BASE_URL}/api/vcenter/storage/policies" \
     --header "${SESSION_HEADER}" | jq '.[] | {id: .policy, name: .name}')
 
   local storage_policies_block="["
@@ -133,9 +138,9 @@ function update_storagepolicies () {
   # Remove extra comma at the beginning ([, -> [)
   storage_policies_block="${storage_policies_block//\[,/\[}"
 
-  curl -X PATCH --silent \
-    --fail-with-body \
-    --location "${BASE_URL}/api/vcenter/namespaces/instances/${namespace}" \
+  curl --config "${CURL_CONFIG}" \
+    -X PATCH \
+    "${BASE_URL}/api/vcenter/namespaces/instances/${namespace}" \
     --header "${SESSION_HEADER}" \
     --header 'Content-Type: application/json' \
     --data '{
@@ -159,7 +164,7 @@ function does_vsphere_namespace_exists () {
   local namespace="${1?namespace not set or empty}"
   local get_ns_status_code
 
-  get_ns_status_code=$(curl --silent --location "${BASE_URL}/api/vcenter/namespaces/instances/v2/$namespace" --header "${SESSION_HEADER}" -w "\n%{http_code}\n" | tail -n 1)
+  get_ns_status_code=$(curl --config "${CURL_CONFIG}" "${BASE_URL}/api/vcenter/namespaces/instances/v2/$namespace" --header "${SESSION_HEADER}" -w "\n%{http_code}\n" | tail -n 1)
 
   if [[ "$get_ns_status_code" -ne 200 && "$get_ns_status_code" -ne 404 ]]; then
     err "Unsupported status code $get_ns_status_code"
@@ -185,9 +190,8 @@ function does_vsphere_namespace_exists () {
 function list_supervisors() {
   # https://developer.vmware.com/apis/vsphere-automation/latest/vcenter/api/vcenter/namespace-management/supervisors/summaries/get/
 
-  curl --silent \
-    --fail-with-body \
-    --location "${BASE_URL}/api/vcenter/namespace-management/supervisors/summaries" \
+  curl --config "${CURL_CONFIG}" \
+    "${BASE_URL}/api/vcenter/namespace-management/supervisors/summaries" \
     --header "${SESSION_HEADER}" | jq '.items.[] | {id: .supervisor, name: .info.name}' \
     --raw-output \
     --compact-output
@@ -229,9 +233,8 @@ function create_vsphere_namespace () {
     exit 1
   fi
 
-  curl --silent \
-    --fail-with-body \
-    --location "${BASE_URL}/api/vcenter/namespaces/instances/v2/" \
+  curl --config "${CURL_CONFIG}" \
+    "${BASE_URL}/api/vcenter/namespaces/instances/v2/" \
     --header "${SESSION_HEADER}" \
     --header 'Content-Type: application/json' \
     --data '{
@@ -240,60 +243,6 @@ function create_vsphere_namespace () {
      }'
 
   info "Namespace ${namespace} created successfully"
-}
-
-#######################################
-# Generate a session token can be used in 
-# subsequent requests. The token is set to
-# a global variable to avoid to pass it around for
-# every REST request.
-# Globals:
-#   BASE_URL
-#   SESSION_HEADER
-# Arguments:
-#   username to use for login
-#######################################
-function login_to_vpshere () {
-  local vsphere_user="${1?vsphere user not set or empty}"
-  local password=""
-  local auth_basic_token
-  local session_token
-
-  echo -n "Password:"
-  IFS= read -rs password
-  echo
-  echo
-
-  auth_basic_token=$(echo -n "$vsphere_user:$password" | base64)
-
-  # Clean password
-  password=""
-
-  # The API return the token wrapped in double quotes.
-  # || true it is necessary to continue for the error handling
-  session_token=$(curl \
-    --silent \
-    --fail-with-body \
-    --location \
-    --request POST "${BASE_URL}/api/session" \
-    --header "Authorization: Basic $auth_basic_token" \
-    | cut -d'"' -f2 \
-    || true)
-
-  if [[ "$?" -ne 0 || -z "${session_token}" ]]; then
-    err "Unable to retrieve session token"
-    exit 1
-  fi
-
-  readonly SESSION_HEADER="vmware-api-session-id: $session_token"
-}
-
-err() {
-  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
-}
-
-info() {
-  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*"
 }
 
 #######################################
