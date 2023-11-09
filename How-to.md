@@ -25,3 +25,21 @@ Option A:
     ```
 
 * Wait for Kubernetes to do the re-provisioning of the nodes (including the control plane)
+
+## Debug failed configuration of ESXI as Kubernetes node
+
+Check  /var/log/vmware/wcp logs in the vCenter appliance
+  * Search for logs using the opID, the op ID contains the host ID (e.g. opID=domain-c8-host-12)
+  * Search for Spherelet, there should be logs regarding the current state. A few examples:
+    * `For node host-12, setting step from configureKubeNode to beginStep``
+    * `For node host-12, setting step from drainKubeNode to stopSphereletService``
+
+Check /var/log/spherelet.log in the esxi host. An example:
+  * `level=fatal msg="nodes \"172.16.0.40\" is forbidden: node \"localhost\" is not allowed to modify node \"172.16.0.40\""``
+
+##### nodes \"172.16.0.40\" is forbidden: node \"localhost\" is not allowed to modify node \"172.16.0.40\"
+
+Fixed using a proper hostname for the ESXi host.
+
+
+
