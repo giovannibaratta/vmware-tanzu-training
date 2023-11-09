@@ -1,0 +1,130 @@
+{
+  "zones": [
+    "${ZONE}"
+  ],
+  "control_plane": {
+    "login_banner": null,
+    "network": {
+      "backing": {
+        "backing": "NETWORK",
+        "network": "${MGMT_NETWORK_ID}"
+      },
+      "floating_IP_address": null,
+      "network": "${MGMT_NETWORK_ID}",
+      "ip_management": {
+        "dhcp_enabled": false,
+        "gateway_address": "${MGMT_GATEWAY_IP_CIDR}",
+        "ip_assignments": [
+          {
+            "assignee": "NODE",
+            "ranges": [
+              {
+                "address": "${SUP_CP_FIRST_NODE_IP}",
+                "count": 5
+              }
+            ]
+          }
+        ]
+      },
+      "proxy": null,
+      "services": {
+        "dns": {
+          "servers": [
+            "${DNS_SERVER}"
+          ],
+          "search_domains": []
+        },
+        "ntp": {
+          "servers": [
+            "${NTP_SERVER}"
+          ]
+        }
+      }
+    },
+    "size": "SMALL",
+    "storage_policy": "${STORAGE_POLICY_ID}"
+  },
+  "name": "${SUPERVISOR_NAME}",
+  "workloads": {
+    "edge": {
+      "haproxy": {
+        "certificate_authority_chain": "${HAPROXY_SINGLE_LINE_CERT}",
+        "password": "${HAPROXY_PASSWORD}",
+        "servers": [
+          {
+            "host": "${HAPROXY_SERVER}",
+            "port": "${HAPROXY_PORT}"
+          }
+        ],
+        "username": "${HAPROXY_USER}"
+      },
+      "id": "virtual-load-balancer",
+      "load_balancer_address_ranges": [
+        {
+          "address": "${EXT_SERVICES_FIRST_IP}",
+          "count": "${SERVICES_IPS_RANGE_SIZE}"
+        }
+      ],
+      "provider": "HAPROXY",
+      "nsx_advanced": null,
+      "nsx": null,
+      "nsx_vpc": null
+    },
+    "images": {
+      "content_libraries": null,
+      "kubernetes_content_library": null,
+      "registry": null,
+      "repository": null
+  },"kube_API_server_options": {"security": {"certificate_dns_names": []}},
+    "network": {
+      "ip_management": {
+        "dhcp_enabled": false,
+        "gateway_address": "${WORKLOAD_GATEWAY_IP_CIDR}",
+        "ip_assignments": [
+          {
+            "assignee": "NODE",
+            "ranges": [
+              {
+                "address": "${WORKLOAD_NODES_FIRST_IP}",
+                "count": "${WORKLOAD_IPS_RANGE_SIZE}"
+              }
+            ]
+          },{
+            "assignee": "SERVICE",
+            "ranges": [
+              {
+                "address": "10.96.0.0",
+                "count": 2048
+              }
+            ]
+          }
+        ]
+      },
+      "network": "${WORKLOAD_NETWORK_ID}",
+      "network_type": "VSPHERE",
+      "nsx": null,
+      "nsx_vpc": null,
+      "vsphere": {
+        "dvpg": "${WORKLOAD_NETWORK_ID}"
+      },
+      "services": {
+        "dns": {
+          "servers": [
+            "${DNS_SERVER}"
+          ],
+          "search_domains": []
+        },
+        "ntp": {
+          "servers": [
+            "${NTP_SERVER}"
+          ]
+        }
+      }
+    },
+    "storage": {
+      "cloud_native_file_volume": null,
+      "ephemeral_storage_policy": "${STORAGE_POLICY_ID}",
+      "image_storage_policy": "${STORAGE_POLICY_ID}"
+    }
+  }
+}

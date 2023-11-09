@@ -1,0 +1,52 @@
+cluster: vc01
+supervisorName: supervisor-01
+zone: domain-c8
+storagePolicy: Kubernetes Storage Policy
+
+supervisorControlPlane:
+  portGroupName: management-port-group-1
+  gatewayCidr: 172.17.0.1/16
+  firstIp: 172.17.0.20
+
+workloadClusters:
+  portGroupName: workload-port-group-1
+  gatewayCidr: 172.18.0.1/16
+  firstIp: 172.18.0.5
+  contiguousUsableIps: 100
+
+services:
+  firstIp: 172.16.100.10
+  contiguousUsableIps: 50
+
+shared:
+  ntp: 172.16.0.48
+  dns: 172.16.0.48
+
+haproxy:
+  user: haproxy
+  server: 172.17.0.3:5556
+  certificate: |
+    -----BEGIN CERTIFICATE-----
+    MIID+zCCAuOgAwIBAgIJAMpwzulVn1dFMA0GCSqGSIb3DQEBCwUAMGsxCzAJBgNV
+    BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRIwEAYDVQQHDAlQYWxvIEFsdG8x
+    DzANBgNVBAoMBlZNd2FyZTENMAsGA1UECwwEQ0FQVjETMBEGA1UEAwwKMTcyLjE3
+    LjAuMzAeFw0yMzExMDgyMDA1MzlaFw0zMzExMDUyMDA1MzlaMHIxCzAJBgNVBAYT
+    AlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRIwEAYDVQQHDAlQYWxvIEFsdG8xDzAN
+    BgNVBAoMBlZNd2FyZTENMAsGA1UECwwEQ0FQVjEaMBgGA1UEAwwRaGFwcm94eS5s
+    b2NhbC5sYW4wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC2pv33zJ5x
+    M/XoJfp4fizK+l3/bWVfPcUzCWTQp6lsGN9XX6TNwFrSPmeOxbpzoCPAg8iVyDKs
+    pq0CwU5RyKra9evTHEh+aXvn9s6uI91Pe2P1Ml0hnwfLMfwn3qf/kcI35oj+We98
+    XcaQ35bgYXV1Oivemxjgcm7CdCsXW/qAtOXcGmTHFK219uc6BGzrgZZKupuU4Vwg
+    s/81M6q92ez7jjt2T9EEjS237DNNO/Owvm+3V7CydGN3qBVezy32jJBV1r3aM4eU
+    G9yQjlfr+W7J+Ny4diFtDbK0UAycBeaVMKHmzUxiilF/u4RNk0vmMwAViMb3zqVz
+    UPznJdDKORa3AgMBAAGjgZowgZcwCQYDVR0TBAIwADALBgNVHQ8EBAMCBaAwHQYD
+    VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMB0GA1UdDgQWBBTauG4fQYiJmhx0
+    eHiDUyHwsVR8UTA/BgNVHREEODA2ghFoYXByb3h5LmxvY2FsLmxhboIJbG9jYWxo
+    b3N0hwR/AAABhwSsEADIhwSsEQADhwSsEgACMA0GCSqGSIb3DQEBCwUAA4IBAQAQ
+    TaD74KjzGFnEeBG6vjNGW1AcYBZY12BxTHAraDJucbUM4ylFUF6zKdStoYC7BCbw
+    OdMtOEoF2pPxG+IfpdjHoacYHZl9dMem0KoLU6eWYpLICLcsziC+UiPhm6gLjme3
+    63078sKZk+fd4A0AebYAieTl7wogcwvGo/T8GK4t+XC38Sw5/q2vBVfixMkJa8gk
+    +39mcIf+nzDNEgUYva2Z1iwhG52f2mrYiNZZVx1Ude2Ncd3VTFoYHL/MM11+TOpH
+    iIV3nC/xFtb0xI3HDI6T3JMiRkaCY/4Zp0t7d7E2+IZDilpzPRgaRk2Ya1La0FkR
+    ZpGN4YiYUFgIjgnUIYWp
+    -----END CERTIFICATE-----
