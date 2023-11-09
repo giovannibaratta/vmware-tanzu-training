@@ -71,7 +71,7 @@ function setup_namespace () {
 function update_vmclasses () {
   local namespace="${1?namespace not set or empty}"
   local vm_classes_json_array
-  
+
   vm_classes_json_array=$(yq '.namespaces.[] | select(.name=="'"${namespace}"'") | .vmClasses' "$TMP_CONFIGURATION_FILE" -o=json | jq --compact-output)
 
   curl -X PATCH --silent \
@@ -111,7 +111,7 @@ function update_storagepolicies () {
     --header "${SESSION_HEADER}" | jq '.[] | {id: .policy, name: .name}')
 
   local storage_policies_block="["
-  
+
   for storage_policy in $required_storage_policies; do
     # Lookup the storage policy id from the available policies
     storage_policy_id=$(echo $available_storage_policies | jq 'select (.name=="'"$storage_policy"'") | .id' --raw-output | head -n 1)
@@ -158,7 +158,7 @@ function update_storagepolicies () {
 function does_vsphere_namespace_exists () {
   local namespace="${1?namespace not set or empty}"
   local get_ns_status_code
-  
+
   get_ns_status_code=$(curl --silent --location "${BASE_URL}/api/vcenter/namespaces/instances/v2/$namespace" --header "${SESSION_HEADER}" -w "\n%{http_code}\n" | tail -n 1)
 
   if [[ "$get_ns_status_code" -ne 200 && "$get_ns_status_code" -ne 404 ]]; then
@@ -208,7 +208,7 @@ function create_vsphere_namespace () {
   local supervisor_name
   local supervisors
   local supervisor_id
-  
+
   # Extract the supervisor name from the configuration file
   supervisor_name=$(yq '.namespaces.[] | select(.name=="'"${namespace}"'") | .supervisor' "$TMP_CONFIGURATION_FILE")
 
@@ -238,11 +238,9 @@ function create_vsphere_namespace () {
        "namespace": "'"${namespace}"'",
        "supervisor": "'"${supervisor_id}"'"
      }'
-  
+
   info "Namespace ${namespace} created successfully"
 }
-
-
 
 #######################################
 # Generate a session token can be used in 
