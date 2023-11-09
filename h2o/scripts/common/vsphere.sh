@@ -15,7 +15,7 @@
 #######################################
 function login_to_vpshere () {
   local vsphere_user="${1?vsphere user not set or empty}"
-  local password="${VSPHERE_PWD}"
+  local password="${VSPHERE_PWD-}"
   local auth_basic_token
   local session_token
 
