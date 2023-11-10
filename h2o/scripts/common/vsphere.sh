@@ -141,7 +141,7 @@ function create_single_zone_supervisor () {
       "${BASE_URL}/api/vcenter/namespace-management/supervisors/${cluster_id}?action=enable_on_compute_cluster" \
       --header "${SESSION_HEADER}" \
       --header 'Content-Type: application/json' \
-      --data "$request_body"
+      --data "$request_body" > /dev/null
 }
 
 #######################################
@@ -152,10 +152,30 @@ function create_single_zone_supervisor () {
 #   CURL_CONFIG
 # Arguments:
 #   supervisor name
-# Return:
-#   0 if the supervisor already exist, 1 otherwise
+# Exit codes:
+#   0 if the supervisor exists
+#   1 otherwise
 #######################################
 function check_if_supervisor_exist () {
+  local supervisor_name="${1?missing supervisor_name}"
+  get_supervisor_id "$supervisor_name" > /dev/null
+}
+
+#######################################
+# Get the supervisor id given the supervisor name
+# Globals:
+#   BASE_URL
+#   SESSION_HEADER
+#   CURL_CONFIG
+# Arguments:
+#   supervisor name
+# Return:
+#   the supervisor id
+# Exit codes:
+#   0 if the output of the command contains the supervisor id
+#   1 otherwise
+#######################################
+function get_supervisor_id () {
   local supervisor_name="${1?missing supervisor_name}"
   local response
   local supervisor_id
@@ -164,13 +184,13 @@ function check_if_supervisor_exist () {
     --header "${SESSION_HEADER}" \
     "${BASE_URL}/api/vcenter/namespace-management/supervisors/summaries")
 
-  supervisor_id=$(jq '.items.[] | select(.info.name=="'"${supervisor_name}"'" ) | .supervisor' <<< "${response}")
+  supervisor_id=$(jq '.items.[] | select(.info.name=="'"${supervisor_name}"'" ) | .supervisor' --raw-output <<< "${response}")
 
   if [[ -z "$supervisor_id" ]]; then
     return 1
   fi
 
-  return 0
+  echo "${supervisor_id}"
 }
 
 #######################################
