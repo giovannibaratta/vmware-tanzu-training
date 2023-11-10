@@ -145,6 +145,35 @@ function create_single_zone_supervisor () {
 }
 
 #######################################
+# Check if a supevisor with the given name already exists
+# Globals:
+#   BASE_URL
+#   SESSION_HEADER
+#   CURL_CONFIG
+# Arguments:
+#   supervisor name
+# Return:
+#   0 if the supervisor already exist, 1 otherwise
+#######################################
+function check_if_supervisor_exist () {
+  local supervisor_name="${1?missing supervisor_name}"
+  local response
+  local supervisor_id
+
+  response=$(curl --config "${CURL_CONFIG}" \
+    --header "${SESSION_HEADER}" \
+    "${BASE_URL}/api/vcenter/namespace-management/supervisors/summaries")
+
+  supervisor_id=$(jq '.items.[] | select(.info.name=="'"${supervisor_name}"'" ) | .supervisor' <<< "${response}")
+
+  if [[ -z "$supervisor_id" ]]; then
+    return 1
+  fi
+
+  return 0
+}
+
+#######################################
 # Retrieve the cluster id for a given cluster name. If the cluster can not be found return 1.
 # Globals:
 #   BASE_URL

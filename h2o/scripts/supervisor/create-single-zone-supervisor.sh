@@ -15,6 +15,7 @@ function main() {
   local supervisor_secrets_definition_file="${4?missing supervisor secrets definition}"
   local cluster_name
   local cluster_id
+  local supervisor_name
 
   generate_curl_temporary_config
 
@@ -25,6 +26,7 @@ function main() {
   supervisor_secrets_definition_file_json=$(convert_yaml_file_to_json "$supervisor_secrets_definition_file")
 
   cluster_name=$( jq '.cluster' --raw-output <<< "${supervisor_definition_file_json}" )
+  supervisor_name=$( jq '.supervisorName' --raw-output <<< "${supervisor_definition_file_json}" )
 
   if ! cluster_id=$(get_cluster_id "${cluster_name}"); then
     err_and_exit "Unable to lookup cluster id for cluster ${cluster_name}"
@@ -32,10 +34,16 @@ function main() {
 
   requestPayload=$(generate_json_payload_from_definition_file "${supervisor_definition_file_json}" "${supervisor_secrets_definition_file_json}")
 
-  if create_single_zone_supervisor "${cluster_id}" "$requestPayload"; then
-    info "Supervisor cluster provisioning started successfully"
+  if ! check_if_supervisor_exist "${supervisor_name}"; then
+    info "Start supervisor provisioning"
+
+    if create_single_zone_supervisor "${cluster_id}" "$requestPayload"; then
+      info "Supervisor cluster provisioning started successfully"
+    else
+      err_and_exit "Supervisor cluster provisioning failed"
+    fi
   else
-    err_and_exit "Supervisor cluster provisioning failed"
+    info "Supervisor ${supervisor_name} already exists. Skipping supervisor provisioning."
   fi
 }
 
