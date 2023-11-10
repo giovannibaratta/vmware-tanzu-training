@@ -2,6 +2,10 @@
 - name: Configure Keycloak
   hosts: keycloak
 
+  vars:
+    # If you already know the supervisor VIP set the value, otherwise comment the variable
+    supervisor_cp_vip: 172.16.100.10
+
   pre_tasks:
   - name: Set facts
     ansible.builtin.set_fact:
@@ -39,10 +43,8 @@
       # Client authentication setting in the UI.
       # Public client false equals to confidential access type
       public_client: false
-      redirect_uris:
-      # See https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/2.4/tkg-deploy-mc/mgmt-iam-configure-id-mgmt.html#idp
-      # for more details
-      - https://pinniped-supervisor.local.lan:31234/callback 
+      # If the supervisor virtual ip is defined, we set the redirect uri to the pinniped callback, otherwise we don't se it.
+      redirect_uris: "{{ (supervisor_cp_vip is defined) | ternary(['https://' + supervisor_cp_vip + '/wcp/pinniped/callback'], []) }}"
       state: present
       validate_certs: false
     delegate_to: localhost

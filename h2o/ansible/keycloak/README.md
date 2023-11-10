@@ -14,6 +14,8 @@ This README assume that a debian VM has been provisioned with Terraform using th
 
 1. Verify that Keycloak portal is up and running (connect to `https://<VM_IP>`).
 
+1. Set the variables in the playbook `configure.yaml``
+
 1. Run ansible to configure Keycloak realm
     ```sh
     ansible-playbook configure.yaml -i ../../terraform/outputs/ansible_inventory --u debian
