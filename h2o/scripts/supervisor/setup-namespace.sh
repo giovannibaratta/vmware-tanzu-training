@@ -13,9 +13,9 @@ set -e
 set -u
 set -o pipefail
 
-source ./common/vsphere.sh
-source ./common/logging.sh
-source ./common/curl.sh
+source ../common/vsphere.sh
+source ../common/logging.sh
+source ../common/curl.sh
 
 function main() {
 

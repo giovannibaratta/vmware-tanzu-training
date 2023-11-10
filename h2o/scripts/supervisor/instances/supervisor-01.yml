@@ -50,3 +50,13 @@ haproxy:
     iIV3nC/xFtb0xI3HDI6T3JMiRkaCY/4Zp0t7d7E2+IZDilpzPRgaRk2Ya1La0FkR
     ZpGN4YiYUFgIjgnUIYWp
     -----END CERTIFICATE-----
+
+namespaces:
+  - name: dev
+    supervisor: supervisor-01
+    storagePolicies:
+      - Kubernetes Storage Policy
+      - Management Storage policy - Thin
+    vmClasses:
+      - best-effort-large
+      - best-effort-medium
