@@ -68,7 +68,7 @@ function convert_yaml_file_to_json () {
 #######################################
 function generate_json_payload_from_definition_file () {
   local json_content="${1?missing definition file}"
-  local json_content_secrets="${1?missing secrets definition file}"
+  local json_content_secrets="${2?missing secrets definition file}"
   local requested_storage_policy_name
   local requested_storage_policy_id
   local requested_mgmt_network_name
