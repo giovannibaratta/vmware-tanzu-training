@@ -9,7 +9,7 @@ function generate_curl_temporary_config () {
   export CURL_CONFIG="/tmp/curl-config-$(date +%s)"
   touch "${CURL_CONFIG}"
 
-  if [[ "${NO_VERIFY_SSL}" == "TRUE" ]]; then
+  if [[ "${NO_VERIFY_SSL-FALSE}" == "TRUE" ]]; then
     echo "insecure" >> "${CURL_CONFIG}"
   fi
 
