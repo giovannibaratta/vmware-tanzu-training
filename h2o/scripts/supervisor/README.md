@@ -1,12 +1,23 @@
-# Create single zone Supervisor cluster
+## Setup a single zone Supervisor cluster
 
-The script uses yaml configurations files to initialize a supervisor cluster. The cluster is created using the vCenter APIs, a minimal validation is performed on the input parameters.
+The script uses yaml configurations files to initialize and configure a supervisor cluster.
 
+The script performs the following steps:
+* create a supervisor cluster if there is not an existing supervisor with the configured name
+* Attach (or update) an identity provider if specified in the configuration file.
+
+>  The script uses vCenter APIs to perform all the operations.
+
+Example of invocation:
 ```sh
 bash ./create-single-zone-supervisor.sh vcenter.local.lan 'administrator@vsphere.local' instances/supervisor-01.yml instances/supervisor-01-secrets.yaml
 ```
 
-The parameters are the vCenter server, vCenter username, the main definition file and the definition file containing secrets.
+The script requires the following parameters:
+1. vCenter server
+1. vCenter username
+1. main definition file containing all the configurations
+1. Additional definition file containing the secrets
 
 The script makes the following assumptions:
 * vDS are used instead of NSX-T
@@ -46,6 +57,12 @@ haproxy:
   user: string
   server: IP_OR_FQDN:PORT
   certificate: SERVER_CERT
+
+identityProvider:
+  clientId: STRING
+  displayName: STRING
+  issuerURL: URL
+  certificateAuthorityData: SERVER_CERT
 ```
 
 The definition file containing the secrets has the following structure:
@@ -53,9 +70,40 @@ The definition file containing the secrets has the following structure:
 ```yaml
 haproxy:
   password: STRING
+
+identityProvider:
+  clientSecret: STRING
 ```
 
-### Environment variables
+## Setup vSphere namespace
+
+The script uses a yaml configuration file to configure one or more vSphere namespaces.
+
+Example of invocation:
+```sh
+bash ./setup-namespaces.sh vcenter.local.lan 'administrator@vsphere.local' instances/supervisor-01.yml
+```
+
+The script requires the following parameters:
+1. vCenter server
+1. vCenter username
+1. main definition file containing all the configurations
+
+The definition file has the following structure:
+
+```yaml
+namespaces:
+  - name: STRING
+    supervisor: STRING
+    storagePolicies:
+      - STRING 1
+      - STRING ...
+    vmClasses:
+      - STRING 1
+      - STRING ...
+```
+
+## Environment variables
 |VARIABLE|ALLOWED VALUES|Description|
 |-|-|-|
 |NO_VERIFY_SSL|TRUE|Do not validate the SSL cert when using vCenter APIs|
