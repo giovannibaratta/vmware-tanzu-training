@@ -27,8 +27,7 @@ function main() {
   cluster_name=$( jq '.cluster' --raw-output <<< "${supervisor_definition_file_json}" )
 
   if ! cluster_id=$(get_cluster_id "${cluster_name}"); then
-    err "Unable to lookup cluster id for cluster ${cluster_name}"
-    exit 1
+    err_and_exit "Unable to lookup cluster id for cluster ${cluster_name}"
   fi
 
   requestPayload=$(generate_json_payload_from_definition_file "${supervisor_definition_file_json}" "${supervisor_secrets_definition_file_json}")
@@ -42,6 +41,10 @@ function main() {
 
 function convert_yaml_file_to_json () {
   local yaml_file_path="${1?missing file path}"
+
+  if [[ ! -f "$yaml_file_path" ]]; then
+    err_and_exit "file $yaml_file_path does not exist"
+  fi
 
   yq -p yaml -o json "$yaml_file_path"
 }
