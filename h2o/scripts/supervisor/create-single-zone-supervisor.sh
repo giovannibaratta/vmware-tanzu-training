@@ -13,31 +13,33 @@ function main() {
   local user="${2?vpshere user is missing}"
   local supervisor_definition_file="${3?missing supervisor definition}"
   local supervisor_secrets_definition_file="${4?missing supervisor secrets definition}"
+
   local cluster_name
   local cluster_id
   local supervisor_name
+  local definition_files_content
 
   generate_curl_temporary_config
 
   readonly BASE_URL="https://${host}" 
   login_to_vpshere "$user"
 
-  supervisor_definition_file_json=$(convert_yaml_file_to_json "$supervisor_definition_file")
-  supervisor_secrets_definition_file_json=$(convert_yaml_file_to_json "$supervisor_secrets_definition_file")
+  definition_files_content=$(merge_yaml_files "$supervisor_definition_file" "$supervisor_secrets_definition_file")
+  definition_json=$(convert_yaml_to_json "$definition_files_content")
 
-  cluster_name=$( jq '.cluster' --raw-output <<< "${supervisor_definition_file_json}" )
-  supervisor_name=$( jq '.supervisorName' --raw-output <<< "${supervisor_definition_file_json}" )
+  cluster_name=$( jq '.cluster' --raw-output <<< "${definition_json}" )
+  supervisor_name=$( jq '.supervisorName' --raw-output <<< "${definition_json}" )
 
   if ! cluster_id=$(get_cluster_id "${cluster_name}"); then
     err_and_exit "Unable to lookup cluster id for cluster ${cluster_name}"
   fi
 
-  requestPayload=$(generate_json_payload_from_definition_file "${supervisor_definition_file_json}" "${supervisor_secrets_definition_file_json}")
+  request_payload=$(generate_json_payload_from_definition_file "${definition_json}")
 
   if ! check_if_supervisor_exist "${supervisor_name}"; then
     info "Start supervisor provisioning"
 
-    if create_single_zone_supervisor "${cluster_id}" "$requestPayload"; then
+    if create_single_zone_supervisor "${cluster_id}" "$request_payload"; then
       info "Supervisor cluster provisioning started successfully"
     else
       err_and_exit "Supervisor cluster provisioning failed"
@@ -47,14 +49,21 @@ function main() {
   fi
 }
 
-function convert_yaml_file_to_json () {
-  local yaml_file_path="${1?missing file path}"
+# Merge two json objects into one
+function merge_yaml_files () {
+  for file in "$@"; do
+    if [[ ! -f "$file" ]]; then
+      err_and_exit "file $file does not exist"
+    fi
+  done
 
-  if [[ ! -f "$yaml_file_path" ]]; then
-    err_and_exit "file $yaml_file_path does not exist"
-  fi
+  yq ea '. as $item ireduce ({}; . * $item )' "$@"
+}
 
-  yq -p yaml -o json "$yaml_file_path"
+# Read a yaml object into a json object
+function convert_yaml_to_json () {
+  local object="${1?missing input}"
+  yq -o json <<< "${object}"
 }
 
 #######################################
@@ -68,7 +77,6 @@ function convert_yaml_file_to_json () {
 #######################################
 function generate_json_payload_from_definition_file () {
   local json_content="${1?missing definition file}"
-  local json_content_secrets="${2?missing secrets definition file}"
   local requested_storage_policy_name
   local requested_storage_policy_id
   local requested_mgmt_network_name
@@ -133,7 +141,7 @@ function generate_json_payload_from_definition_file () {
   # Read certficate and replace new line with \n
   haproxy_cert=$( jq '.haproxy.certificate' --raw-output <<< "${json_content}" | awk '{printf "%s\\n", $0}' )
   haproxy_user=$( jq '.haproxy.user' --raw-output <<< "${json_content}")
-  haproxy_password=$( jq '.haproxy.password' --raw-output <<< "${json_content_secrets}")
+  haproxy_password=$( jq '.haproxy.password' --raw-output <<< "${json_content}")
 
   MGMT_NETWORK_ID="${requested_mgmt_network_id}" \
   WORKLOAD_NETWORK_ID="${requested_workload_network_id}" \
