@@ -18,10 +18,11 @@ function main() {
   local cluster_id
   local supervisor_name
   local definition_files_content
+  local idp_definition
 
   generate_curl_temporary_config
 
-  readonly BASE_URL="https://${host}" 
+  readonly BASE_URL="https://${host}"
   login_to_vpshere "$user"
 
   definition_files_content=$(merge_yaml_files "$supervisor_definition_file" "$supervisor_secrets_definition_file")
@@ -34,7 +35,7 @@ function main() {
     err_and_exit "Unable to lookup cluster id for cluster ${cluster_name}"
   fi
 
-  request_payload=$(generate_json_payload_from_definition_file "${definition_json}")
+  request_payload=$(generate_supervisor_json_payload_from_definition "${definition_json}")
 
   if ! check_if_supervisor_exist "${supervisor_name}"; then
     info "Start supervisor provisioning"
@@ -47,7 +48,79 @@ function main() {
   else
     info "Supervisor ${supervisor_name} already exists. Skipping supervisor provisioning."
   fi
+
+  # '// empty' means return nothing if property is not available
+  idp_definition=$( jq '.identityProvider // empty' --raw-output <<< "${definition_json}" )
+  configure_identity_provider "${supervisor_name}" "${idp_definition}"
 }
+
+function configure_identity_provider () {
+  local supervisor_name="${1?missing supervisor name}"
+  local definition="${2}"
+
+  local supervisor_id
+  local available_idps
+  local idp_name
+  local idp_id
+  local request_payload
+
+  if [[ -z "${definition}" ]]; then
+    info "Skipping identity provider configuration because no definition has been provided."
+    return 0
+  fi
+
+  if ! supervisor_id=$(get_supervisor_id "${supervisor_name}"); then
+    err_and_exit "Unable to find supervisor ${supervisor_name}"
+  fi
+
+  available_idps=$(list_identity_providers "${supervisor_id}")
+  idp_name=$( jq '.displayName' --raw-output <<< "${definition}" )
+  # Check if the idp_name is in the list of available idps attacher to the supervisor.
+  # If the idp is in the list, extract the id.
+  idp_id=$(jq '.[] | select(.name=="'"${idp_name}"'") | .id' --raw-output <<< "${available_idps}")
+
+  request_payload=$(generate_idp_json_payload_from_definition "${definition}")
+
+  if [[ -z "${idp_id}" ]]; then
+    # IDP is not in the list, we have to create it
+    info "Creating IDP configuration for ${idp_name}"
+    if ! create_identity_provider "${supervisor_id}" "${request_payload}"; then
+      err_and_exit "Error while creating IDP configuration"
+    fi
+    info "Provisining of IDP was successful"
+  else
+    # IDP is in the list, we can update it
+    info "Updating IDP configuration for ${idp_name}"
+    if ! update_identity_provider "${supervisor_id}" "${idp_id}" "${request_payload}"; then
+      err_and_exit "Error while updating IDP configuration"
+    fi
+    info "Update of IDP was successful"
+  fi
+}
+
+function generate_idp_json_payload_from_definition () {
+  local json_content="${1?missing definition}"
+  local idp_cert
+  local idp_client_id
+  local idp_client_secret
+  local idp_name
+  local idp_issuer_url
+
+  # Read certficate and replace new line with \n
+  idp_cert=$( jq '.certificateAuthorityData' --raw-output <<< "${json_content}" | awk '{printf "%s\\n", $0}' )
+  idp_client_id=$( jq '.clientId' --raw-output <<< "${json_content}")
+  idp_client_secret=$( jq '.clientSecret' --raw-output <<< "${json_content}")
+  idp_name=$( jq '.displayName' --raw-output <<< "${json_content}")
+  idp_issuer_url=$( jq '.issuerURL' --raw-output <<< "${json_content}")
+
+  IDP_CERTIFICATE="${idp_cert}" \
+  IDP_CLIENT_ID="${idp_client_id}" \
+  IDP_CLIENT_SECRET="${idp_client_secret}" \
+  IDP_NAME="${idp_name}" \
+  IDP_ISSUER_URL="${idp_issuer_url}" \
+    envsubst < "./files/create-or-update-idp.json.stub"
+}
+
 
 # Merge two json objects into one
 function merge_yaml_files () {
@@ -75,8 +148,8 @@ function convert_yaml_to_json () {
 # Returns:
 #   json object complaint to API specs
 #######################################
-function generate_json_payload_from_definition_file () {
-  local json_content="${1?missing definition file}"
+function generate_supervisor_json_payload_from_definition () {
+  local json_content="${1?missing definition}"
   local requested_storage_policy_name
   local requested_storage_policy_id
   local requested_mgmt_network_name

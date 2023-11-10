@@ -222,3 +222,71 @@ function get_cluster_id () {
   # Pick first item of the list and return the cluster field
   jq '.[0].cluster' --raw-output <<< "${response}"
 }
+
+#######################################
+# List of identity providers attached to the supervisor.
+# Globals:
+#   BASE_URL
+#   SESSION_HEADER
+#   CURL_CONFIG
+# Arguments:
+#  supervisor id
+# Return:
+#   JSON array containing the policies: { id, name }[]
+#######################################
+function list_identity_providers () {
+  local supervisor_id="${1?supervisor_id missing}"
+
+  local response
+  response=$(curl --config "${CURL_CONFIG}" \
+    --header "${SESSION_HEADER}" \
+    "${BASE_URL}/api/vcenter/namespace-management/supervisors/${supervisor_id}/identity/providers")
+
+  # Remap properties and return as a JSON array
+  jq '.[] | {id: .provider, name: .display_name}' <<< "${response}" | jq -n '[inputs]'
+}
+
+#######################################
+# Attach a new identity provider to a supervisor.
+# Globals:
+#   BASE_URL
+#   SESSION_HEADER
+#   CURL_CONFIG
+# Arguments:
+#  supervisor id
+#  json payload containing the configuration details. See https://developer.vmware.com/apis/vsphere-automation/latest/vcenter/api/vcenter/namespace-management/supervisors/supervisor/identity/providers/post/
+#######################################
+function create_identity_provider () {
+  local supervisor_id="${1?missing supervisor id}"
+  local request_body="${2?missing request payload}"
+
+  curl --config "${CURL_CONFIG}" \
+      "${BASE_URL}/api/vcenter/namespace-management/supervisors/${supervisor_id}/identity/providers" \
+      --header "${SESSION_HEADER}" \
+      --header 'Content-Type: application/json' \
+      --data "$request_body" > /dev/null
+}
+
+#######################################
+# Update an existing policy identity provider to a supervisor
+# Globals:
+#   BASE_URL
+#   SESSION_HEADER
+#   CURL_CONFIG
+# Arguments:
+#  supervisor id
+#  identity provider id
+#  json payload containing the configuration details. See https://developer.vmware.com/apis/vsphere-automation/latest/vcenter/api/vcenter/namespace-management/supervisors/supervisor/identity/providers/provider/put/
+#######################################
+function update_identity_provider () {
+  local supervisor_id="${1?missing supervisor id}"
+  local provider_id="${2?missing provider id}"
+  local request_body="${3?missing request payload}"
+
+  curl --config "${CURL_CONFIG}" \
+      -X PUT \
+      "${BASE_URL}/api/vcenter/namespace-management/supervisors/${supervisor_id}/identity/providers/${provider_id}" \
+      --header "${SESSION_HEADER}" \
+      --header 'Content-Type: application/json' \
+      --data "$request_body" > /dev/null
+}

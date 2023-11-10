@@ -51,6 +51,32 @@ haproxy:
     ZpGN4YiYUFgIjgnUIYWp
     -----END CERTIFICATE-----
 
+identityProvider:
+  clientId: oidc-auth
+  displayName: Keycloak Auth
+  issuerURL: https://keycloak.local.lan/realms/tanzu
+  certificateAuthorityData: |
+    -----BEGIN CERTIFICATE-----
+    MIIDQDCCAiigAwIBAgIUBvrnxIpZf3KrdTp9PylnetSAmt4wDQYJKoZIhvcNAQEL
+    BQAwMTELMAkGA1UEBhMCSVQxDzANBgNVBAgMBk1vZGVuYTERMA8GA1UEAwwIa2V5
+    Y2xvYWswHhcNMjMxMTA5MTYyODU0WhcNMjQxMTA4MTYyODU0WjAxMQswCQYDVQQG
+    EwJJVDEPMA0GA1UECAwGTW9kZW5hMREwDwYDVQQDDAhrZXljbG9hazCCASIwDQYJ
+    KoZIhvcNAQEBBQADggEPADCCAQoCggEBAMMOHkkHB3GuBG8dDl2qpbcMRlym2gjk
+    J5O72xbOECSdLDziqmG7F3sBXYsbrNHlueXBudWH/fBX7Us8YwYPfu5L8zE66jBg
+    y1pS3nDeKo0us2D8Tgts9oTF4g2VxYBRO2vPWzoef7LPW8vw4TPyNFDB8r8rNCta
+    ZeSCkesVblG7E947pkCt9g57AlMDWr5Q3Y4C86H+/QPST5R9fFxwFqu5olTHzk8v
+    RxD0ULPmomAkKUt8mDAMZRnN9GquYtERmu9oo2meynNBeH4ea0m+SrDejnEqsEzN
+    IcPFRl7mfhrE+rIl+cjtWOtEFw9J+0YW9b0yO5HTTcmc/5S+SJ8oSIkCAwEAAaNQ
+    ME4wLQYDVR0RBCYwJIISa2V5Y2xvYWsubG9jYWwubGFugghrZXljbG9ha4cErBEA
+    DDAdBgNVHQ4EFgQUIrSnYyrb7BiM5A1ES12qdZAyq7swDQYJKoZIhvcNAQELBQAD
+    ggEBADJjzuUD6BN45FHluQhz13UbZ6SWBzDIBQ7oH9KRt9WMOxSqjDsK+d8JGDKE
+    zSRl1DH5PU0FVItNHLVnh7iMfp271J9jWyCulGGa9gpe42iURr0QfvQZQm50RUKP
+    sfeI0Hg1OklhwZaRWqpL/XvBQeEwdblTHkZUFbu0aAOZ0QHCWUmXoYolpoU4XpQO
+    LZE0il9cN2/MPVWoCTw5W5GgxW69Eyw0c1wgM8Rh5asq0OybVZOez9W3DhuAgYvS
+    SY1tEoV6ph4KV6ALTpy2PUHsCGd4w9TyqWZixNTkqWZTfLAK7on8ZLDdRnPeikx/
+    r7UdaWBYhqWIlHv0EBruiiQDa04=
+    -----END CERTIFICATE-----
+
 namespaces:
   - name: dev
     supervisor: supervisor-01

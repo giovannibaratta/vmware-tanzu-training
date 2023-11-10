@@ -1,0 +1,9 @@
+{
+    "certificate_authority_data": "${IDP_CERTIFICATE}",
+    "client_ID": "${IDP_CLIENT_ID}",
+    "client_secret": "${IDP_CLIENT_SECRET}",
+    "display_name": "${IDP_NAME}",
+    "groups_claim": "groups",
+    "issuer_URL": "${IDP_ISSUER_URL}",
+    "username_claim": "email"
+}
