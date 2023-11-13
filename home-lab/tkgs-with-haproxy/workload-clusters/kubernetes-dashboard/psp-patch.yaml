@@ -1,0 +1,4 @@
+#@data/values
+---
+namespace: kubernetes-dashboard
+service_account_name: kubernetes-dashboard
