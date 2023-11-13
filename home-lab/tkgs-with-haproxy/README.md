@@ -19,5 +19,5 @@ Example of IPs allocations:
 
 ## Notes
 
-* If the haproxy is deployed without a custom certificate, the self signed certificate generated during the deployment can be found in `/etc/haproxy/ca.crt`.
+* If the haproxy is deployed without a custom certificate, the self signed certificate generated during the deployment can be found in `/etc/haproxy/server.crt`.
 Access the supervisor nodes: https://mappslearning.wordpress.com/2021/12/01/ssh-login-into-vsphere-with-tanzu-supervisor-cluster-nodes/
