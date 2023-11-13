@@ -1,0 +1,47 @@
+---
+- name: Configure MinIO
+  hosts: minio
+  become: true
+  become_user: minio
+
+  vars_files:
+  - './vars/minio.yaml'
+
+  pre_tasks:
+  - name: Set facts
+    ansible.builtin.set_fact:
+      # These variables are stored in the Conjur server. To be able to retrieve the variables, the Ansible host identity must be configured.
+      # See README for more details.
+      minio_backup_user_secretkey: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/minio/backup_secretkey', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
+
+  tasks:
+  - name: Add backup user
+    ansible.builtin.shell: "mc admin user add {{ minio_alias }} backup {{ minio_backup_user_secretkey }} --insecure"
+
+  - name: Copy policy
+    ansible.builtin.template:
+      src: './templates/backup_policy.json.j2'
+      dest: '/tmp/policy'
+
+  - name: Add backup user
+    ansible.builtin.shell: "mc admin policy create {{ minio_alias }} backup /tmp/policy --insecure"
+
+  # The command to attach policies fails if a policy is already attached, hence we should check for it
+  - name: Check if policy is attached to user
+    ansible.builtin.shell: "mc admin policy entities {{ minio_alias }} --user backup --json --insecure"
+    register: minio_policy_entities
+
+  - name: Set policy_already_attached fact
+    ansible.builtin.set_fact:
+      # The filter extract result.userMappings
+      # select only the mappings relative to the user backups
+      # flatten all the policies into a single array (using [])
+      # return true if the flatten array contains the policy 'backup', otherwise false
+      policy_already_attached: "{{ minio_policy_entities.stdout | from_json |  community.general.json_query('result.userMappings[?user==`backup`].policies[] | contains(@, `backup`)' ) | bool }}"
+
+  - name: Attach policy
+    when: policy_already_attached == false
+    ansible.builtin.shell: "mc admin policy attach {{ minio_alias }} backup --user backup --insecure"
+
+  - name: Create backup bucket
+    ansible.builtin.shell: "mc mb local/{{ backup_bucket_name }} --ignore-existing --insecure"

@@ -17,7 +17,9 @@
     minio_conf_dir: "{{ minio_root_dir }}/conf"
     minio_certs_dir: "{{ minio_conf_dir }}/tls"
     minio_data_dir: "{{ minio_root_dir }}/data"
-    minio_fqdn: "minio.local.lan"
+
+  vars_files:
+  - './vars/minio.yaml'
 
   pre_tasks:
   - name: Set facts
@@ -50,7 +52,7 @@
 
   - name: Check if MinIO cert is already present
     stat:
-      path: "{{ minio_certs_dir }}/minio.pem"
+      path: "{{ minio_certs_dir }}/public.crt"
     register: miniocert_file_stats
 
   - name: Generate MinIO TLS conf
@@ -113,3 +115,35 @@
       daemon_reload: true
       name: minio
       state: restarted
+
+- name: Install and configure MinIO client
+  hosts: minio
+
+  vars_files:
+  - './vars/minio.yaml'
+
+  pre_tasks:
+  - name: Set facts
+    ansible.builtin.set_fact:
+      # These variables are stored in the Conjur server. To be able to retrieve the variables, the Ansible host identity must be configured.
+      # See README for more details.
+      minio_root_password: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/minio/root_password', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
+
+  tasks:
+  - name: Download client executable
+    become: true
+    ansible.builtin.get_url:
+      url: "https://dl.min.io/client/mc/release/linux-amd64/mc"
+      dest: /usr/local/bin/mc
+      checksum: md5:88e85c3f5e428d23269f461dc54ee9d1
+      mode: '0755'
+
+  - name: Add local server credentials
+    become: true
+    become_user: minio
+    ansible.builtin.shell: "mc config host add {{ minio_alias }} https://{{ minio_fqdn }} root {{ minio_root_password }} --insecure"
+
+  - name: Test connection
+    become: true
+    become_user: minio
+    ansible.builtin.shell: "mc admin info {{ minio_alias }} --insecure"

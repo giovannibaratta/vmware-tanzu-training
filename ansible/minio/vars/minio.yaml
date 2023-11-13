@@ -1,0 +1,4 @@
+minio_fqdn: "minio.local.lan"
+minio_alias: "local"
+
+backup_bucket_name: tkg-backups
