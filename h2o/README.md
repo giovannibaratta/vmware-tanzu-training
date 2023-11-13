@@ -1,16 +1,31 @@
-## Prerequisites
+## Workflow
+
+1. Build a golden image for deploying VMs in vSphere. The golden image will be used to deploy services that are required prior to the installation of the supervisor/management cluster.
+1. Deploy the required VMs using Terraform.
+1. Configure the VMs using ansible. The VMs are supposed to be configured in the following order:
+    1. Conjur, used for storing secrets
+    1. Keyclock, used as identity provider
+1. Deploy the supervisor/management cluster
+1. Create one or mode vSphere namespaces
+1. (optional) Deploy the shared services cluster
+1. Deploy the workload cluster
+
+
+## Deploying TKG
+
+### Prerequisites
 1. Define a namespace in vSphere. A Kubernetes namespace should be automatically created in the supervisor cluster.
 1. Attach a storage policy, a content library and a VM class to the vSphere namespace.
 1. (optional) Define a custom ClusterClass using `tanzukubernetescluster` class as a template
 
-## Shared services cluster
+### Shared services cluster
 
 1. Define a Cluster object that reference `tanzukubernetescluster` or the newly created custom class (see here [here](./cluster-shared-services.yaml))
 1. Create the cluster using Tanzu CLI.
 1. Apply the labels (to the supervisor resources)
     `kubectl label cluster.cluster.x-k8s.io/<clusterName> cluster-role.tkg.tanzu.vmware.com/tanzu-services="" --overwrite=true`
 
-## Deploy Harbor in the shared services cluster (not as Supervisor Service)
+### Deploy Harbor in the shared services cluster (not as Supervisor Service)
 
 These steps will deploy an Harbor registry into the shared services cluster
 
