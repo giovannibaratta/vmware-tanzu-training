@@ -1,0 +1,115 @@
+---
+- name: Prepare host
+  hosts: minio
+  become: true
+
+  tasks:
+    - name: Add the MinIO user
+      ansible.builtin.user:
+        name: minio
+
+- name: Install and configure MinIO
+  hosts: minio
+  become: true
+
+  vars:
+    minio_root_dir: "/opt/minio"
+    minio_conf_dir: "{{ minio_root_dir }}/conf"
+    minio_certs_dir: "{{ minio_conf_dir }}/tls"
+    minio_data_dir: "{{ minio_root_dir }}/data"
+    minio_fqdn: "minio.local.lan"
+
+  pre_tasks:
+  - name: Set facts
+    ansible.builtin.set_fact:
+      # These variables are stored in the Conjur server. To be able to retrieve the variables, the Ansible host identity must be configured.
+      # See README for more details.
+      minio_root_password: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/minio/root_password', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
+
+  tasks:
+  - name: Install MinIO
+    block:
+    - name: Download executable
+      ansible.builtin.get_url:
+        url: "https://dl.min.io/server/minio/release/linux-amd64/minio"
+        dest: /usr/local/bin/minio
+        checksum: md5:e8755f5be675a9cf7297831e102e6541
+        mode: '0755'
+
+    - name: Create MinIO dirs
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: minio
+        group: minio
+      with_items:
+        - "{{ minio_root_dir }}"
+        - "{{ minio_conf_dir }}"
+        - "{{ minio_certs_dir }}"
+        - "{{ minio_data_dir }}"
+
+  - name: Check if MinIO cert is already present
+    stat:
+      path: "{{ minio_certs_dir }}/minio.pem"
+    register: miniocert_file_stats
+
+  - name: Generate MinIO TLS conf
+    ansible.builtin.template:
+      src: "templates/minio-tls.conf.j2"
+      dest: "{{ minio_certs_dir }}/tls.conf"
+      owner: minio
+      group: minio
+
+  - name: Generate cert
+    when: not miniocert_file_stats.stat.exists
+    ansible.builtin.shell: openssl req -newkey rsa:2048 -days "365" -nodes -x509 -config "tls.conf" -extensions v3_ca -keyout "private.key" -out "public.crt"
+    args:
+      chdir: "{{ minio_certs_dir }}"
+      executable: /bin/bash
+
+  - name: Fix tls permissions
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: file
+      owner: minio
+      group: minio
+    with_items:
+      - "{{ minio_certs_dir }}/private.key"
+      - "{{ minio_certs_dir }}/public.crt"
+
+  - name: Add capabilities to bind to 443
+    community.general.capabilities:
+      path: "/usr/local/bin/minio"
+      capability: cap_net_bind_service=+eip
+      state: present
+
+  # The file is referenced in the systemd unit service
+  - name: Generate environment file
+    ansible.builtin.template:
+      src: "templates/minio-environment.j2"
+      dest: "{{ minio_conf_dir }}/environment"
+    notify:
+      - Restart MinIO service
+
+  - name: Generate MinIO service
+    ansible.builtin.template:
+      src: "templates/minio.service.j2"
+      dest: "/etc/systemd/system/minio.service"
+    notify:
+      - Restart MinIO service
+
+  - name: Start MinIO service
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: minio
+      state: started
+      enabled: true
+    register: start_minio_service
+
+  handlers:
+  - name: Restart MinIO service
+    when: not start_minio_service.changed
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: minio
+      state: restarted
