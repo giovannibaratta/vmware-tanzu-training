@@ -42,4 +42,7 @@ Check /var/log/spherelet.log in the esxi host. An example:
 Fixed using a proper hostname for the ESXi host.
 
 
+## Force refresh of pinniped credentials
+
+Remove/rename files in `~/.config/tanzu/pinniped`
 
