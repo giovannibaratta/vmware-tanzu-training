@@ -4,7 +4,7 @@
 
   vars:
     # If you already know the supervisor VIP set the value, otherwise comment the variable
-    supervisor_cp_vip: 172.16.100.10
+    supervisor_cp_vip: 172.16.100.11
 
   pre_tasks:
   - name: Set facts
