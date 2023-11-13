@@ -1,5 +1,10 @@
 vsphere_server = "vcenter.local.lan"
-deploy_haproxy = true
+
+deployments = {
+  haproxy = true
+  minio = true
+}
+
 hosts          = ["172.16.0.40"]
 
 haproxy_specs = {

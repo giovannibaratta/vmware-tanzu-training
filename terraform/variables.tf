@@ -16,10 +16,13 @@ variable "hosts" {
   type = set(string)
 }
 
-variable "deploy_haproxy" {
-  type        = bool
-  description = "Set to true to deploy HAProxy Load Balancer"
-  default     = false
+variable "deployments" {
+  type = object({
+    haproxy = optional(bool, false)
+    minio = optional(bool, false)
+  })
+
+  description = "Set to true to deploy the virtual machine"
 }
 
 variable "haproxy_specs" {

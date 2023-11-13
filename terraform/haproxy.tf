@@ -1,6 +1,6 @@
 # Ref https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-with-tanzu-installation-configuration/GUID-5673269F-C147-485B-8706-65E4A87EB7F0.html#GUID-D84AE530-B577-45E0-9DEB-FCD6B75308E6__GUID-A387D97F-B0E5-4E6C-9240-A89D2F9C1DAF
 resource "vsphere_virtual_machine" "haproxy" {
-  count = var.deploy_haproxy ? 1 : 0
+  count = var.deployments.haproxy ? 1 : 0
   name  = "haproxy"
 
   datacenter_id    = data.vsphere_datacenter.datacenter.id
