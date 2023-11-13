@@ -30,13 +30,19 @@
         annotations:
           description: Admin password to access Keycloak
 
+      - !variable
+        id: minio/root_password
+        kind: password
+        annotations:
+          description: Root password to access MinIO
+
     - !group secrets-reader
 
     - !grant
       role: !group secrets-reader
-      members: 
+      members:
         - !host ansible
-    
+
     - !permit
       role: !group secrets-reader
       privileges: [read, execute]
