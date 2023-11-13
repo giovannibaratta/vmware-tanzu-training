@@ -168,7 +168,7 @@
       capability: cap_net_bind_service=+eip
       state: present
 
-  # The file is reference in the systemd unit service
+  # The file is referenced in the systemd unit service
   - name: Generate environment file
     ansible.builtin.template:
       src: "templates/keycloak-environment.j2"

@@ -113,7 +113,7 @@
     register: conjur_masterkey
 
   # This file is used to load the masterkey in Conjur
-  # The file is reference in the systemd unit service
+  # The file is referenced in the systemd unit service
   - name: Generate environment file
     ansible.builtin.template:
       src: "templates/environment.j2"
