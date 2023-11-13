@@ -20,7 +20,7 @@
 
 ### Shared services cluster
 
-1. Define a Cluster object that reference `tanzukubernetescluster` or the newly created custom class (see here [here](./cluster-shared-services.yaml))
+1. Define a Cluster object that reference `tanzukubernetescluster` or the newly created custom class (see here [here](./manifests/cluster-shared-services.yaml))
 1. Create the cluster using Tanzu CLI.
 1. Apply the labels (to the supervisor resources)
     `kubectl label cluster.cluster.x-k8s.io/<clusterName> cluster-role.tkg.tanzu.vmware.com/tanzu-services="" --overwrite=true`
