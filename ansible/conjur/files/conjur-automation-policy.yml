@@ -36,6 +36,12 @@
         annotations:
           description: Root password to access MinIO
 
+      - !variable
+        id: minio/backup_secretkey
+        kind: password
+        annotations:
+          description: Secret key to use for access by the backup user
+
     - !group secrets-reader
 
     - !grant
