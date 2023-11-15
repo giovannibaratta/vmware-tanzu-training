@@ -20,6 +20,11 @@
     kubectl apply -f psp-jenkins.yaml
     ```
 
+1. Create a self-signed issuer for cert-manager or create your own secret to hold TLS cert and private key, in the latter case also adapt the helm values (`controller.ingress.tls`).
+    ```sh
+    kubectl apply -f selfsigned-issuer.yaml
+    ```
+
 1. (optional) If using OIC, add the url `https://<JENKINS_SERVER>/securityRealm/finishLogin` to the valid redirect urls.
 
 1. Install the chart

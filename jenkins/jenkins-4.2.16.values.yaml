@@ -13,7 +13,17 @@ controller:
   serviceType: ClusterIP
   ingress:
     enabled: true
+    annotations:
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+      kubernetes.io/ingress.allow-http: "false"
+      # Delegate certificate generations to cert-manager
+      cert-manager.io/issuer: selfsigned-issuer
     hostName: jenkins.local.lan
+    tls:
+    # The secret is generate by cert-manager
+    - secretName: jenkins-tls
+      hosts:
+      - jenkins.local.lan
 
   JCasC:
     defaultConfig: false
@@ -22,7 +32,7 @@ controller:
       jenkins-config: |
         unclassified:
           location:
-            url: "http://jenkins.local.lan"
+            url: "https://jenkins.local.lan"
       security-realm-config: |
         jenkins:
           securityRealm:
