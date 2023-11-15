@@ -10,7 +10,10 @@ controller:
     - configuration-as-code:1737.v652ee9b_a_e0d9
     - oic-auth:2.6
 
-  serviceType: LoadBalancer
+  serviceType: ClusterIP
+  ingress:
+    enabled: true
+    hostName: jenkins.local.lan
 
   JCasC:
     defaultConfig: false
@@ -19,7 +22,7 @@ controller:
       jenkins-config: |
         unclassified:
           location:
-            url: "http://jenkins.local.lan:8080/"
+            url: "http://jenkins.local.lan"
       security-realm-config: |
         jenkins:
           securityRealm:
