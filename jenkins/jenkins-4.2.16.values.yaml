@@ -1,0 +1,41 @@
+namespaceOverride: jenkins
+clusterZone: "local.lan"
+
+controller:
+  tag: 2.432-jdk17
+
+  installPlugins:
+    - kubernetes:4132.v758a_0c613a_38
+    - git:5.2.1
+    - configuration-as-code:1737.v652ee9b_a_e0d9
+    - oic-auth:2.6
+
+  serviceType: LoadBalancer
+
+  JCasC:
+    defaultConfig: false
+
+    configScripts:
+      jenkins-config: |
+        unclassified:
+          location:
+            url: "http://jenkins.local.lan:8080/"
+      security-realm-config: |
+        jenkins:
+          securityRealm:
+            oic:
+              authorizationServerUrl: "https://keycloak.local.lan/realms/tanzu"
+              clientId: "oidc-auth"
+              clientSecret: "rlXDTWPbkyyrF8AQ8EvTuX2UDHpWe64n"
+              disableSslVerification: true
+              tokenAuthMethod: "client_secret_post"
+              tokenServerUrl: "https://keycloak.local.lan/auth/realms/tanzu/protocol/openid-connect/token"
+              userNameField: "preferred_username"
+              scopes: "email groups profile openid"
+              groupsFieldName: "groups"
+              emailFieldName: "email"
+              wellKnownOpenIDConfigurationUrl: "https://keycloak.local.lan/realms/tanzu/.well-known/openid-configuration"
+
+    authorizationStrategy: |-
+      loggedInUsersCanDoAnything:
+        allowAnonymousRead: false

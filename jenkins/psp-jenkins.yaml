@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: psp:vmware-system-privileged:jenkins
+  namespace: jenkins
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  # ClusterRole created during the deployment
+  name: psp:vmware-system-privileged
+subjects:
+- kind: ServiceAccount
+  name: jenkins
+  namespace: jenkins
