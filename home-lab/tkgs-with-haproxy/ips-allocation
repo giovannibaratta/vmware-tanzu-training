@@ -1,3 +1,0 @@
-haproxy MGMT subnet     172.17.0.2
-haproxy WORKLOAD subnet 172.18.0.2
-LB range                172.16.5.0/24 (this range is a slice of the VM network)

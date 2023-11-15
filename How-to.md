@@ -46,3 +46,6 @@ Fixed using a proper hostname for the ESXi host.
 
 Remove/rename files in `~/.config/tanzu/pinniped`
 
+## Retrieve HAProxy certificate
+
+If the haproxy is deployed without a custom certificate, the self signed certificate generated during the deployment can be found in `/etc/haproxy/server.crt`.
