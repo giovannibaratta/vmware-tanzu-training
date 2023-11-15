@@ -35,22 +35,21 @@ These steps will deploy an Harbor registry into the shared services cluster
 
 
 1. Login to the supervisor cluster. Also switch context in Tanzu CLI
+1. `export STD_PACKAGES_NS=tkg-packages` (adapt the value in needed)
 1. Verify that the <i>kapp-controller</i> is installed
     `kubectl get pods -A | grep kapp-controller`
 1. Deploy cert-manager
     ```bash
-    kubectl create ns cert-manager
-    tanzu package install cert-manager -p cert-manager.tanzu.vmware.com -n cert-manager -v 1.12.2+vmware.1-tkg.1
+    tanzu package install cert-manager -p cert-manager.tanzu.vmware.com -n <STD_PACKAGES_NS> -v 1.12.2+vmware.1-tkg.1
     ```
 1. Verify cert-manager installation
-    `kubectl -n cert-manager get packageinstalls`
+    `kubectl get packageinstalls -n "${STD_PACKAGES_NS}"` or `tanzu package installed list -n "${STD_PACKAGES_NS}"`
 1. Deploy contour
     ```bash
-    kubectl create ns tanzu-system-ingress
-    tanzu package install contour -p contour.tanzu.vmware.com -v 1.25.2+vmware.1-tkg.1 --values-file contour-data-values.yaml -n tanzu-system-ingress
+    tanzu package install contour -p contour.tanzu.vmware.com -v 1.25.2+vmware.1-tkg.1 --values-file contour-data-values.yaml -n <STD_PACKAGES_NS>
     ```
 1. Verify contour installation
-    `tanzu package installed list -n tanzu-system-ingress`
+    `kubectl get packageinstalls -n "${STD_PACKAGES_NS}"` or `tanzu package installed list -n "${STD_PACKAGES_NS}"`
 1. Install Harbor
     ```
     kubectl create ns tanzu-system-registry
