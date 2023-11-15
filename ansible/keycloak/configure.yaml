@@ -5,6 +5,9 @@
   vars:
     # If you already know the supervisor VIP set the value, otherwise comment the variable
     supervisor_cp_vip: 172.16.100.11
+    jenkins:
+      generate_oidc: true
+      redirect_url: https://jenkins.local.lan/securityRealm/finishLogin
 
   pre_tasks:
   - name: Set facts
@@ -28,7 +31,7 @@
       enabled: true
     delegate_to: localhost
 
-  - name: Create client
+  - name: Create vSphere client
     community.general.keycloak_client:
       auth_keycloak_url: "{{ keycloak_server }}"
       auth_realm: master
@@ -47,4 +50,47 @@
       redirect_uris: "{{ (supervisor_cp_vip is defined) | ternary(['https://' + supervisor_cp_vip + '/wcp/pinniped/callback'], []) }}"
       state: present
       validate_certs: false
+    delegate_to: localhost
+
+  - name: Create Jenkins client
+    when: jenkins.generate_oidc
+
+    community.general.keycloak_client:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      realm: tanzu
+      client_id: jenkins-oidc-auth
+      name: jenkins-oidc-auth
+      protocol: "openid-connect"
+      client_authenticator_type: "client-secret"
+      enabled: true
+      # Client authentication setting in the UI.
+      # Public client false equals to confidential access type
+      public_client: false
+      redirect_uris:
+        - "{{ jenkins.redirect_url }}"
+      state: present
+      validate_certs: false
+    delegate_to: localhost
+
+  - name: Get Jenkins client secret
+    community.general.keycloak_clientsecret_info:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      validate_certs: false
+      client_id: jenkins-oidc-auth
+      realm: tanzu
+    delegate_to: localhost
+    register: jenkins_oidc_secret
+    no_log: true
+
+  - name: Copy using inline content
+    ansible.builtin.copy:
+      content: "{{ jenkins_oidc_secret.clientsecret_info.value }}"
+      dest: './outputs/jenkins_secret'
+    no_log: true
     delegate_to: localhost
