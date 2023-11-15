@@ -1,0 +1,13 @@
+# Add security context
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: required-for-kustomize-but-not-used
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001

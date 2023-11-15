@@ -1,0 +1,100 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+# The config map is used to store variables
+# and dynamically inject them in other resources.
+- name: dynamic-variables
+  envs:
+    - .env
+
+images:
+ # Override postgres image to use an image that support non-root users.
+ - name: postgres
+   newName: bitnami/postgresql
+   newTag: "15"
+
+resources:
+- service-account.yaml
+- psp.yaml
+- pvc-db.yaml
+- voting-app/db-deployment.yaml
+- voting-app/db-service.yaml
+- voting-app/redis-deployment.yaml
+- voting-app/redis-service.yaml
+- voting-app/result-deployment.yaml
+- voting-app/result-service.yaml
+- voting-app/vote-deployment.yaml
+- voting-app/vote-service.yaml
+- voting-app/worker-deployment.yaml
+
+patches:
+- target:
+    kind: Deployment
+  path: patch-deploy.yaml
+- target:
+    kind: Deployment
+    labelSelector: app=db
+  path: patch-deploy-database.yaml
+- target:
+    kind: Deployment
+    labelSelector: app=result
+  path: patch-deploy-result.yaml
+- target:
+    kind: Deployment
+    labelSelector: app=vote
+  path: patch-deploy-vote.yaml
+- target:
+    kind: Service
+    labelSelector: app=vote
+  path: patch-service-vote.yaml
+- target:
+    kind: Service
+    labelSelector: app=result
+  path: patch-service-result.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: dynamic-variables
+    fieldPath: data.NAMESPACE
+  targets:
+  - select:
+      kind: RoleBinding
+      name: psp:vmware-system-restricted:TO_BE_REPLACED_DURING_APPLY
+    fieldPaths:
+    - subjects.[kind=ServiceAccount].namespace
+- source:
+    kind: ConfigMap
+    name: dynamic-variables
+    fieldPath: data.SERVICE_ACCOUNT_NAME
+  targets:
+  - select:
+      kind: RoleBinding
+      name: psp:vmware-system-restricted:TO_BE_REPLACED_DURING_APPLY
+    fieldPaths:
+    - subjects.[kind=ServiceAccount].name
+  # The name must be the last to be replaced otherwise the resource
+  # can not be referenced in other replacements.
+  - select:
+      kind: RoleBinding
+      name: psp:vmware-system-restricted:TO_BE_REPLACED_DURING_APPLY
+    fieldPaths:
+    - metadata.name
+    options:
+      delimiter: ":"
+      index: 2
+  # Override the service account of all deployments using
+  # the service account that has the permissions to use
+  # the pod security policy.
+  - select:
+      kind: Deployment
+    fieldPaths:
+    - spec.template.spec.serviceAccountName
+    options:
+      create: true
+  - select:
+      kind: ServiceAccount
+      name: TO_BE_REPLACED_DURING_APPLY
+    fieldPaths:
+    - metadata.name

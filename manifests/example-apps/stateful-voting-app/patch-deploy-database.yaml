@@ -1,0 +1,43 @@
+# Configure db deploy to run as non-root user
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: required-for-kustomize-but-not-used
+spec:
+  template:
+    spec:
+      containers:
+      - name: postgres
+        volumeMounts:
+        - mountPath: /bitnami/postgresql
+          name: db-data
+        # The container tries to write in the following mountPath.
+        # If the container is not running as root it will fail. For
+        # this reason, we force it to an emptyDir in order to assign
+        # the group to the 1001 user.
+        - mountPath: /opt/bitnami/postgresql/conf
+          name: postgres-opt
+        # The container tries to write in the following mountPath.
+        # If the container is not running as root it will fail. For
+        # this reason, we force it to an emptyDir in order to assign
+        # the group to the 1001 user.
+        - mountPath: /opt/bitnami/postgresql/tmp
+          name: postgres-tmp
+        - $patch: replace
+        env:
+          - name: POSTGRESQL_DATA_DIR
+            value: /bitnami/postgresql/data
+          - name: BITNAMI_DEBUG
+            value: "true"
+          - name: PGDATA
+            value: "/bitnami/postgresql/data"
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: voting-app-db
+      - name: postgres-opt
+        emptyDir: {}
+      - name: postgres-tmp
+        emptyDir: {}
+      - $patch: replace

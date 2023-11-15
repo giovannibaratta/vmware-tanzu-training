@@ -1,0 +1,18 @@
+# Expose app on port 8080
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: required-for-kustomize-but-not-used
+spec:
+  template:
+    spec:
+      containers:
+      - name: result
+        env:
+        - value: "8080"
+          name: PORT
+        ports:
+        - containerPort: 8080
+          name: result
+        - $patch: replace
