@@ -29,7 +29,9 @@
 
 1. Install the chart
     ```sh
-    helm install -f jenkins-4.2.16.values.yaml jenkins jenkins/jenkins --version 4.2.16
+    export OIDC_CLIENT_SECRET=$(cat ../ansible/keycloak/outputs/jenkins_secret)
+    envsubst < jenkins-4.2.16.values.yaml | helm install -f - jenkins jenkins/jenkins --version 4.2.16
+    OIDC_CLIENT_SECRET=
     ```
 
 ### Pick a different version
