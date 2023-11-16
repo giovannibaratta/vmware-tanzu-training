@@ -17,12 +17,12 @@
 
 1. Give permissions to use PSP
     ```sh
-    kubectl apply -f psp-jenkins.yaml
+    kubectl apply -f psp-jenkins.yaml 
     ```
 
 1. Create a self-signed issuer for cert-manager or create your own secret to hold TLS cert and private key, in the latter case also adapt the helm values (`controller.ingress.tls`).
     ```sh
-    kubectl apply -f selfsigned-issuer.yaml
+    kubectl apply -f selfsigned-issuer.yaml -n jenkins
     ```
 
 1. (optional) If using OIC, add the url `https://<JENKINS_SERVER>/securityRealm/finishLogin` to the valid redirect urls.
@@ -30,7 +30,7 @@
 1. Install the chart
     ```sh
     export OIDC_CLIENT_SECRET=$(cat ../ansible/keycloak/outputs/jenkins_secret)
-    envsubst < jenkins-4.2.16.values.yaml | helm install -f - jenkins jenkins/jenkins --version 4.2.16
+    envsubst < jenkins-4.2.16.values.yaml | helm install -f - jenkins jenkins/jenkins --version 4.2.16 -n jenkins
     OIDC_CLIENT_SECRET=
     ```
 

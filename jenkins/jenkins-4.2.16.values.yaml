@@ -8,7 +8,8 @@ controller:
     - kubernetes:4132.v758a_0c613a_38
     - git:5.2.1
     - configuration-as-code:1737.v652ee9b_a_e0d9
-    - oic-auth:2.6
+    - oic-auth:2.6 # Enable OIDC authentication
+    - workflow-aggregator:596.v8c21c963d92d # Enable pipeline definitions
 
   serviceType: ClusterIP
   ingress:
@@ -48,7 +49,41 @@ controller:
               groupsFieldName: "groups"
               emailFieldName: "email"
               wellKnownOpenIDConfigurationUrl: "https://keycloak.local.lan/realms/tanzu/.well-known/openid-configuration"
-
+      kubernetes-config: |
+        jenkins:
+          clouds:
+          - kubernetes:
+              jenkinsTunnel: "jenkins-agent.jenkins.svc.cluster.local:50000"
+              jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+              name: "local kubernetes"
+              namespace: "jenkins"
+              podLabels:
+              - key: "jenkins/jenkins-jenkins-agent"
+                value: "true"
+              serverUrl: "https://kubernetes.default"
+              templates:
+              - containers:
+                - args: "^${computer.jnlpmac} ^${computer.name}"
+                  envVars:
+                  - envVar:
+                      key: "JENKINS_URL"
+                      value: "http://jenkins.jenkins.svc.cluster.local:8080/"
+                  image: "jenkins/inbound-agent:3107.v665000b_51092-15"
+                  name: "jnlp"
+                  resourceLimitCpu: "512m"
+                  resourceLimitMemory: "512Mi"
+                  resourceRequestCpu: "512m"
+                  resourceRequestMemory: "512Mi"
+                  workingDir: "/home/jenkins/agent"
+                label: "jenkins-jenkins-agent"
+                name: "default"
+                namespace: "jenkins"
+                nodeUsageMode: "NORMAL"
+                podRetention: "never"
+                serviceAccount: "default"
+                slaveConnectTimeout: 100
+                slaveConnectTimeoutStr: "100"
+                yamlMergeStrategy: "override"
     authorizationStrategy: |-
       loggedInUsersCanDoAnything:
         allowAnonymousRead: false
