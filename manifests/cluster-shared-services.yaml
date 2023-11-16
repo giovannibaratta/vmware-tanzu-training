@@ -24,7 +24,7 @@ spec:
       #CAUTION: must not overlap with Supervisor
       cidrBlocks: ["192.0.2.0/16"]
     #domain name for services; string
-    serviceDomain: "shared-services.local.lan"
+    serviceDomain: "cluster.local"
   #specify the topology for the cluster
   topology:
     #name of the ClusterClass object to derive the topology
