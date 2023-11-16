@@ -17,6 +17,8 @@
 1. Define a namespace in vSphere. A Kubernetes namespace should be automatically created in the supervisor cluster.
 1. Attach a storage policy, a content library and a VM class to the vSphere namespace.
 1. (optional) Define a custom ClusterClass using `tanzukubernetescluster` class as a template
+1. Configure standard repository
+    `tanzu package repository add tanzu-standard --url projects.registry.vmware.com/tkg/packages/standard/repo:v2023.9.19 --namespace tkg-packages``
 
 ### Shared services cluster
 
@@ -40,13 +42,13 @@ These steps will deploy an Harbor registry into the shared services cluster
     `kubectl get pods -A | grep kapp-controller`
 1. Deploy cert-manager
     ```bash
-    tanzu package install cert-manager -p cert-manager.tanzu.vmware.com -n <STD_PACKAGES_NS> -v 1.12.2+vmware.1-tkg.1
+    tanzu package install cert-manager -p cert-manager.tanzu.vmware.com -n "${STD_PACKAGES_NS}" -v 1.12.2+vmware.1-tkg.1
     ```
 1. Verify cert-manager installation
     `kubectl get packageinstalls -n "${STD_PACKAGES_NS}"` or `tanzu package installed list -n "${STD_PACKAGES_NS}"`
 1. Deploy contour
     ```bash
-    tanzu package install contour -p contour.tanzu.vmware.com -v 1.25.2+vmware.1-tkg.1 --values-file contour-data-values.yaml -n <STD_PACKAGES_NS>
+    tanzu package install contour -p contour.tanzu.vmware.com -v 1.25.2+vmware.1-tkg.1 --values-file contour-data-values.yaml -n "${STD_PACKAGES_NS}"
     ```
 1. Verify contour installation
     `kubectl get packageinstalls -n "${STD_PACKAGES_NS}"` or `tanzu package installed list -n "${STD_PACKAGES_NS}"`

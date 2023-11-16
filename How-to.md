@@ -49,3 +49,20 @@ Remove/rename files in `~/.config/tanzu/pinniped`
 ## Retrieve HAProxy certificate
 
 If the haproxy is deployed without a custom certificate, the self signed certificate generated during the deployment can be found in `/etc/haproxy/server.crt`.
+
+## TKG
+
+### Force recreation of a worker node
+
+1. Drain the node
+1. `kubectl delete machine `
+
+## Kubernetes
+
+### Run pod with a shell
+
+`kubectl run -i --tty busybox --image=busybox --restart=Never --rm -- sh`
+
+### Update DNS domain after cluster creation
+
+[KB-91185](https://kb.vmware.com/s/article/91185)
