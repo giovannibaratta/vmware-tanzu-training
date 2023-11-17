@@ -49,6 +49,7 @@ controller:
               userNameField: "preferred_username"
               groupsFieldName: "groups"
               emailFieldName: "email"
+              postLogoutRedirectUrl: "https://jenkins.local.lan/"
               wellKnownOpenIDConfigurationUrl: "https://keycloak.local.lan/realms/tanzu/.well-known/openid-configuration"
 
       authorization-config: |
