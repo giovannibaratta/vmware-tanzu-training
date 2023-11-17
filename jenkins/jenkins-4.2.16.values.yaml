@@ -38,19 +38,15 @@ controller:
         unclassified:
           location:
             url: "https://jenkins.local.lan"
-      security-realm-config: |
+
       authentication-config: |
         jenkins:
           securityRealm:
             oic:
-              authorizationServerUrl: "https://keycloak.local.lan/realms/tanzu"
               clientId: "jenkins-oidc-auth"
               clientSecret: "${OIDC_CLIENT_SECRET}"
               disableSslVerification: true
-              tokenAuthMethod: "client_secret_post"
-              tokenServerUrl: "https://keycloak.local.lan/auth/realms/tanzu/protocol/openid-connect/token"
               userNameField: "preferred_username"
-              scopes: "email groups profile openid"
               groupsFieldName: "groups"
               emailFieldName: "email"
               wellKnownOpenIDConfigurationUrl: "https://keycloak.local.lan/realms/tanzu/.well-known/openid-configuration"
