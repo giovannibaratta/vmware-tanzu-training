@@ -31,6 +31,8 @@ controller:
 
     configScripts:
       jenkins-config: |
+        jenkins:
+          noUsageStatistics: true
         unclassified:
           location:
             url: "https://jenkins.local.lan"
