@@ -8,8 +8,9 @@ controller:
     - kubernetes:4132.v758a_0c613a_38
     - git:5.2.1
     - configuration-as-code:1737.v652ee9b_a_e0d9
-    - oic-auth:2.6 # Enable OIDC authentication
+    - oic-auth:2.6 # Add OIDC authentication capabilities
     - workflow-aggregator:596.v8c21c963d92d # Enable pipeline definitions
+    - role-strategy:689.v731678c3e0eb_ # Add RBAC capabilities
 
   serviceType: ClusterIP
   ingress:
@@ -37,10 +38,8 @@ controller:
           location:
             url: "https://jenkins.local.lan"
       security-realm-config: |
+      authentication-config: |
         jenkins:
-          authorizationStrategy:
-            loggedInUsersCanDoAnything:
-              allowAnonymousRead: false
           securityRealm:
             oic:
               authorizationServerUrl: "https://keycloak.local.lan/realms/tanzu"
@@ -54,6 +53,20 @@ controller:
               groupsFieldName: "groups"
               emailFieldName: "email"
               wellKnownOpenIDConfigurationUrl: "https://keycloak.local.lan/realms/tanzu/.well-known/openid-configuration"
+
+      authorization-config: |
+        jenkins:
+          authorizationStrategy:
+            roleBased:
+              roles:
+                global:
+                - entries:
+                  - user: "bgiovanni@vmware.com"
+                  name: "admin"
+                  pattern: ".*"
+                  permissions:
+                  - "Overall/Administer"
+
       kubernetes-config: |
         jenkins:
           clouds:
