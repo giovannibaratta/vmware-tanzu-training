@@ -64,6 +64,47 @@ controller:
                     - "Overall/Administer"
                   entries:
                     - group: "jenkins-admin"
+                - name: "Readers"
+                  pattern: ".*"
+                  permissions:
+                    - "Overall/Read"
+                  entries:
+                    - group: "authenticated"
+                items:
+                - name: "secret-project-editor"
+                  pattern: "^secret-folder($|/.*)"
+                  permissions:
+                    - "Metrics/ThreadDump"
+                    - "Job/Build"
+                    - "SCM/Tag"
+                    - "Credentials/Delete"
+                    - "Job/Create"
+                    - "Credentials/ManageDomains"
+                    - "View/Create"
+                    - "Job/Read"
+                    - "Credentials/View"
+                    - "Credentials/Update"
+                    - "Run/Delete"
+                    - "Job/Cancel"
+                    - "Run/Update"
+                    - "Job/Delete"
+                    - "Credentials/Create"
+                    - "View/Delete"
+                    - "Job/Configure"
+                    - "Job/Workspace"
+                    - "Metrics/View"
+                    - "View/Read"
+                    - "View/Configure"
+                    - "Metrics/HealthCheck"
+                  entries:
+                    - group: "jenkins-secret-project-editor"
+                - name: "secret-project-reader"
+                  pattern: "^secret-folder($|/.*)"
+                  permissions:
+                    - "Job/Read"
+                    - "View/Read"
+                  entries:
+                    - group: "jenkins-secret-project-reader"
 
       kubernetes-config: |
         jenkins:
