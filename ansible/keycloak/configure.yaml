@@ -31,6 +31,28 @@
       enabled: true
     delegate_to: localhost
 
+  - name: Create groups client scope
+    community.general.keycloak_clientscope:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      validate_certs: false
+      realm: tanzu
+      name: groups
+      protocol: "openid-connect"
+      protocol_mappers:
+        - name: groups
+          # Use oidc-usermodel-realm-role-mapper once https://github.com/ansible-collections/community.general/issues/7424 is fixed
+          protocolMapper: oidc-usermodel-client-role-mapper
+          protocol: "openid-connect"
+          config:
+            multivalued: "true"
+            id.token.claim: "true"
+            access.token.claim: "true"
+            claim.name: "groups"
+    delegate_to: localhost
+
   - name: Create vSphere client
     community.general.keycloak_client:
       auth_keycloak_url: "{{ keycloak_server }}"
@@ -71,8 +93,56 @@
       public_client: false
       redirect_uris:
         - "{{ jenkins.redirect_url }}"
+      # Client scopes are not updated if the client already exists
+      # See https://github.com/ansible-collections/community.general/issues/5495
+      default_client_scopes:
+        - email
+        - profile
+        - roles
+        - groups
       state: present
       validate_certs: false
+    delegate_to: localhost
+
+  # It is not possible to assign Real roles to the group at the moment using the community module.
+  # See https://github.com/ansible-collections/community.general/issues/7424.
+  # For now we will user client roles. Once the issue will be fixed, we can create a realm role 
+  #removing the client_id from the resource below.
+  - name: Create Jenkins role
+    community.general.keycloak_role:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      validate_certs: false
+      realm: tanzu
+      name: jenkins-admin
+      client_id: jenkins-oidc-auth
+    delegate_to: localhost
+
+  - name: Create Jenkins admins group
+    community.general.keycloak_group:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      validate_certs: false
+      realm: tanzu
+      name: jenkins-admins
+    delegate_to: localhost
+
+  - name: Map role to group
+    community.general.keycloak_client_rolemapping:
+      auth_keycloak_url: "{{ keycloak_server }}"
+      auth_realm: master
+      auth_username: admin
+      auth_password: "{{ keycloak_admin_password }}"
+      validate_certs: false
+      realm: tanzu
+      client_id: jenkins-oidc-auth
+      group_name: jenkins-admins
+      roles:
+        - name: jenkins-admin
     delegate_to: localhost
 
   - name: Get Jenkins client secret

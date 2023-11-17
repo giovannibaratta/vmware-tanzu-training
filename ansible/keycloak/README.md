@@ -22,3 +22,15 @@ This README assume that a debian VM has been provisioned with Terraform using th
     ```
 
 1. The client secret of the newly created user can be retrieved from UI
+
+## Groups and roles
+
+The groups used by external applications are named roles in Keycloak. With a role you defined a capability of the user that the external application will check before granting permissions to the user. The group instead is a way to group users and assign roles.
+
+A Keycloak group contains users and can contain multiple roles.
+A role is just a name that represent a capability.
+
+To expose the roles of the user in the token we have to:
+1. create an additional scope
+1. Assign the built-in mapper groups that will add the roles of the user to the property groups in the token (the property name can be changed)
+1. We assign the scope to the OIDC client.
