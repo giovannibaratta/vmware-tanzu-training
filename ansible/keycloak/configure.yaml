@@ -7,7 +7,9 @@
     supervisor_cp_vip: 172.16.100.11
     jenkins:
       generate_oidc: true
-      redirect_url: https://jenkins.local.lan/securityRealm/finishLogin
+      redirect_urls:
+        - https://jenkins.local.lan/securityRealm/finishLogin # Login
+        - https://jenkins.local.lan/ # Logout
 
   pre_tasks:
   - name: Set facts
@@ -91,8 +93,7 @@
       # Client authentication setting in the UI.
       # Public client false equals to confidential access type
       public_client: false
-      redirect_uris:
-        - "{{ jenkins.redirect_url }}"
+      redirect_uris: "{{ jenkins.redirect_urls }}"
       # Client scopes are not updated if the client already exists
       # See https://github.com/ansible-collections/community.general/issues/5495
       default_client_scopes:
