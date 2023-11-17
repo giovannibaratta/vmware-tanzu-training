@@ -57,12 +57,12 @@ controller:
             roleBased:
               roles:
                 global:
-                - entries:
-                  - user: "bgiovanni@vmware.com"
-                  name: "admin"
+                - name: "Jenkins Admins"
                   pattern: ".*"
                   permissions:
-                  - "Overall/Administer"
+                    - "Overall/Administer"
+                  entries:
+                    - group: "jenkins-admin"
 
       kubernetes-config: |
         jenkins:
