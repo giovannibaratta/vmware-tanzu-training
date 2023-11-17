@@ -36,6 +36,9 @@ controller:
             url: "https://jenkins.local.lan"
       security-realm-config: |
         jenkins:
+          authorizationStrategy:
+            loggedInUsersCanDoAnything:
+              allowAnonymousRead: false
           securityRealm:
             oic:
               authorizationServerUrl: "https://keycloak.local.lan/realms/tanzu"
@@ -84,6 +87,3 @@ controller:
                 slaveConnectTimeout: 100
                 slaveConnectTimeoutStr: "100"
                 yamlMergeStrategy: "override"
-    authorizationStrategy: |-
-      loggedInUsersCanDoAnything:
-        allowAnonymousRead: false
