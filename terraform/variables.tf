@@ -65,3 +65,9 @@ variable "haproxy_sensitive_specs" {
   sensitive   = true
   nullable    = true
 }
+
+variable "desec_token" {
+  sensitive = true
+  type = string
+  description = "Token used to generate DNS records and ACME challeneges in desec.io"
+}

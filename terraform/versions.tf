@@ -9,5 +9,15 @@ terraform {
       source  = "hashicorp/local"
       version = "2.2.3"
     }
+
+    desec = {
+      source = "Valodim/desec"
+      version = "0.3.0"
+    }
+
+    acme = {
+      source = "vancluever/acme"
+      version = "2.18.0"
+    }
   }
 }
