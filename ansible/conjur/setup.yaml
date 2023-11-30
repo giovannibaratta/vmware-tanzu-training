@@ -169,7 +169,6 @@
   - name: Load policy
     # Policies are safe to be re-applied
     ansible.builtin.shell: docker-compose exec conjur conjurctl policy load lab /policies/automation-policy.yml
-                           
     args:
       chdir: "{{ conjur_conf }}"
 
