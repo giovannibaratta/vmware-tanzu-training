@@ -19,5 +19,10 @@ terraform {
       source = "vancluever/acme"
       version = "2.18.0"
     }
+
+    avi = {
+      source = "vmware/avi"
+      version = "22.1.5"
+    }
   }
 }

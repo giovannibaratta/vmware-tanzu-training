@@ -12,3 +12,11 @@ provider "acme" {
 provider "desec" {
   api_token = var.desec_token
 }
+
+provider "avi" {
+  avi_username = var.avi.username
+  avi_tenant = var.avi.tenant
+  avi_password = local.avi.password
+  avi_controller = var.avi.controller
+  avi_version = var.avi.version
+}

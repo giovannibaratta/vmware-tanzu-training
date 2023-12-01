@@ -99,3 +99,25 @@ provider "registry.terraform.io/vancluever/acme" {
     "zh:cbdc3d1c0c569a2bb34d653102a44fbdac97da5af1cff21b6c974ee62300b625",
   ]
 }
+
+provider "registry.terraform.io/vmware/avi" {
+  version     = "22.1.5"
+  constraints = "22.1.5"
+  hashes = [
+    "h1:1ac+LA4pVB/MGUIBTg2N18vpvx7Q/jVbn30VjHrB4vw=",
+    "zh:1923318bcb5972394a498504a08ae3c8098263af89c93f2a3869214eebfdcbcd",
+    "zh:2f1eb066607572a94d42f8275b9aabc57befb5a8a77f886fb7995aa53da34d6f",
+    "zh:58b0718c43a86f026b1d5276ded8247b249d90bc8cfcf4059bc1b0fb6244008e",
+    "zh:65058be6ddc33d6412ee64fe78753701423d9a2b539b52760a8859c300e654f5",
+    "zh:67c2d7c26f8c679a4f4fdfa0a3ca5d8fefac72a6e95a39f7055c9c03434e594f",
+    "zh:84ef88af702671e2280366fd25ab1ae3de7056f32d2bdbf83feee970f378e857",
+    "zh:8eb1a06baf259932c2ea3bec29400a0c9f61ed2387e410b67c540ef105cf4515",
+    "zh:9cfd115c46a1a9d620a87ace1d6a652085181706793a0d43becc455793c11171",
+    "zh:a10fd9cf09ab9a87aaf204ddf77ad65637c3cdc2428b468d31fa8c584e916faa",
+    "zh:b7143f663fb49c19503b088ab42ae0b0de7c8500782969f3609ef3b7213f39f3",
+    "zh:bb2b5b0596925102d02a27d4be08c8f2dc8ac3c235432c188fa447a8a84bb00a",
+    "zh:c25405c03283271edf02bbc5efb86449212517ea96d2a0af36fd9a5c8f0693f8",
+    "zh:c87dec126d743c3082cab79ba162735f5fce524a9a2111393117d02f040b2718",
+    "zh:db8fa690259b09ad31dc8e87a265fd8b1c8d8a513b2ee8c136071c61c32737ca",
+  ]
+}

@@ -71,3 +71,26 @@ variable "desec_token" {
   type = string
   description = "Token used to generate DNS records and ACME challeneges in desec.io"
 }
+
+variable "avi" {
+  type = object({
+    username = string
+    tenant = string
+    controller = string
+    version = string
+    cloud_name = string
+  })
+}
+
+variable "avi_sensitive" {
+  sensitive = true
+  type = object({
+    password = string
+  })
+}
+
+variable "vault" {
+  type = object({
+    vip = string
+  })
+}

@@ -56,6 +56,16 @@ resource "desec_rrset" "vault" {
   ttl = 3600
 }
 
+resource "desec_rrset" "vault_vip" {
+  count = local.vault_instances
+
+  domain = "gkube.it"
+  subname = "vault"
+  type = "A"
+  records = [ var.vault.vip ]
+  ttl = 3600
+}
+
 # Generate certificates for vault instances
 
 resource "tls_private_key" "vault_private_key" {
@@ -72,6 +82,23 @@ resource "acme_certificate" "vault_certificates" {
 
   account_key_pem           = acme_registration.vault.account_key_pem
   common_name               = "vault-${count.index}.gkube.it"
+
+  recursive_nameservers = ["1.1.1.1:53"]
+  pre_check_delay = 30
+
+  dns_challenge {
+    provider = "desec"
+
+    config = {
+      DESEC_TOKEN = var.desec_token
+      DESEC_PROPAGATION_TIMEOUT=600
+    }
+  }
+}
+
+resource "acme_certificate" "vault_vip_certificate" {
+  account_key_pem           = acme_registration.vault.account_key_pem
+  common_name               = "vault.gkube.it"
 
   recursive_nameservers = ["1.1.1.1:53"]
   pre_check_delay = 30

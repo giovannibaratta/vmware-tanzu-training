@@ -29,3 +29,15 @@ haproxy_specs = {
 
   service_cidr = "172.16.100.0/24"
 }
+
+avi = {
+  controller = "172.17.0.30"
+  username = "admin"
+  version = "30.1.1"
+  tenant = "admin"
+  cloud_name = "vcenter-home-lab"
+}
+
+vault = {
+  vip = "172.16.200.2"
+}
