@@ -12,3 +12,10 @@ output "nodes" {
     }
   }
 }
+
+output "cluster" {
+  value = {
+    name = random_pet.cluster_name.id
+    api_fqdn = coalesce(var.register_dns ? "vault.${var.domain}" : null, var.vip, vsphere_virtual_machine.nodes[0].default_ip_address)
+  }
+}

@@ -28,3 +28,11 @@ resource "local_file" "vault_certificate_issuer" {
   content = sensitive(each.value)
   filename = "${path.module}/outputs/vault/${each.key}/issuer.pem"
 }
+
+resource "local_file" "vault_variables" {
+  content = templatefile("${path.module}/files/vault/vault_cluster_variables.tpl", {
+    cluster_name = module.vault_cluster.cluster.name
+    cluster_api_fqdn = module.vault_cluster.cluster.api_fqdn
+  })
+  filename = "${path.module}/outputs/vault/cluster.vars"
+}
