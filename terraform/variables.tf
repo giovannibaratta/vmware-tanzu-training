@@ -92,5 +92,10 @@ variable "avi_sensitive" {
 variable "vault" {
   type = object({
     vip = string
+    num_instances = number
   })
+}
+
+variable "domain" {
+  type = string
 }

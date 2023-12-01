@@ -24,5 +24,10 @@ terraform {
       source = "vmware/avi"
       version = "22.1.5"
     }
+
+    random = {
+      source = "hashicorp/random"
+      version = "3.5.1"
+    }
   }
 }

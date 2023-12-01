@@ -40,4 +40,7 @@ avi = {
 
 vault = {
   vip = "172.16.200.2"
+  num_instances = 3
 }
+
+domain = "gkube.it"
