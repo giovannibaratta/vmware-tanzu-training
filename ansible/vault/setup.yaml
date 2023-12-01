@@ -1,0 +1,123 @@
+- name: Install Vault
+  hosts: vault
+  become: true
+
+  vars:
+    ca: "{{ lookup('file', '../../terraform/outputs/vault-0/issuer.pem') }}"
+    node_cert: "{{ lookup('file', '../../terraform/outputs/vault-0/certificate.pem') }}"
+
+  tasks:
+    - name: Install gpg
+      ansible.builtin.apt:
+        name: gpg
+        state: present
+        update_cache: true
+
+    - name: Download gpg key
+      ansible.builtin.get_url:
+        url: https://apt.releases.hashicorp.com/gpg
+        dest: /tmp/vault-key-file
+
+    # https://www.reddit.com/r/ansible/comments/u2vy26/apt_key/
+    - name: De-Armor GPG key
+      shell:  cat /tmp/vault-key-file | gpg --yes --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      changed_when: false
+
+    - name: Add Vault repository
+      ansible.builtin.apt_repository: 
+        repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: true
+
+    - name: Install Vault
+      ansible.builtin.apt:
+        name: vault
+        state: present
+
+    # The vault user should be created during the installation of the package
+    - name: Check that vault user has been created
+      ansible.builtin.user:
+        name: vault
+
+    - name: Create directories
+      become: true
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0700'
+        owner: vault
+        group: vault
+      with_items:
+        - "/data"
+        - "/vault"
+        - "/vault/certs"
+
+    - name: Set permission for integrated storage
+      ansible.builtin.file:
+        path: /data
+        owner: vault
+        group: vault
+        mode: '0700'
+        recurse: yes
+        state: directory
+
+    - name: Assign permission to /vault/certs/
+      ansible.builtin.file:
+        path: /vault/certs/
+        state: directory
+        owner: vault
+        group: vault
+        mode: '0700'
+
+    - name: Copy private key
+      ansible.builtin.copy:
+        src: "../../terraform/outputs/vault-0/private-key.pem"
+        dest: "/vault/certs/vault-node-pk"
+        owner: vault
+        group: vault
+        mode: '0700'
+
+    - name: Copy certificate
+      ansible.builtin.template:
+        src: "templates/vault-node-fullchain.j2"
+        dest: "/vault/certs/vault-node-fullchain"
+        owner: vault
+        group: vault
+        mode: '0700'
+
+    - name: Retrieve hostname
+      shell: "hostname"
+      register: hostname_command
+
+    - name: Set fact
+      ansible.builtin.set_fact:
+        node_hostname: "{{ hostname_command.stdout }}.gkube.it"
+
+    - name: Copy configuration file
+      ansible.builtin.template:
+        src: "templates/vault.hcl.j2"
+        dest: "/etc/vault.d/vault.hcl"
+      notify:
+        - Restart Vault service
+
+    - name: Set Vault node id
+      ansible.builtin.lineinfile:
+        path: /etc/vault.d/vault.env
+        backup: yes
+        create: yes
+        line: "VAULT_RAFT_NODE_ID={{ ansible_hostname }}"
+
+    - name: Start Vault service, if not started
+      ansible.builtin.service:
+        name: vault
+        state: started
+        enabled: true
+      register: start_vault_service
+
+  handlers:
+  - name: Restart Vault service
+    when: not start_vault_service.changed
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: vault
+      state: restarted

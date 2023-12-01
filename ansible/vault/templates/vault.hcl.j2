@@ -1,0 +1,16 @@
+storage "raft" {
+  path = "/data"
+}
+
+ui = true
+
+api_addr = "https://{{ node_hostname }}"
+cluster_addr = "https://{{ node_hostname }}:8201"
+disable_mlock = true
+
+listener "tcp" {
+  address = "{{ node_hostname }}:8200"
+  cluster_address = "[::]:8201"
+  tls_cert_file = "/vault/certs/vault-node-fullchain"
+  tls_key_file  = "/vault/certs/vault-node-pk"
+}
