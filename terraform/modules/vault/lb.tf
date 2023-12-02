@@ -11,6 +11,7 @@ module "lb" {
     ssl = {
       private_key = acme_certificate.vip[0].private_key_pem
       certificate = acme_certificate.vip[0].certificate_pem
+      certificate_ca = acme_certificate.vip[0].issuer_pem
     }
   }
 

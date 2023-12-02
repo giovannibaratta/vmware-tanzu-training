@@ -11,6 +11,7 @@ variable "vip" {
     ssl = object({
       private_key = string
       certificate = string
+      certificate_ca = string
     })
   })
 }
