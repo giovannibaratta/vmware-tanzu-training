@@ -3,8 +3,26 @@
   become: true
 
   vars:
-    ca: "{{ lookup('file', '../../terraform/outputs/vault-0/issuer.pem') }}"
-    node_cert: "{{ lookup('file', '../../terraform/outputs/vault-0/certificate.pem') }}"
+    output_dir: "../../terraform/outputs/vault/"
+
+  vars_files:
+    - "../../terraform/outputs/vault/cluster.vars"
+
+  pre_tasks:
+    - name: Retrieve hostname
+      shell: "hostname -f"
+      register: hostname_command
+
+    - name: Set fact
+      ansible.builtin.set_fact:
+        node_hostname: "{{ hostname_command.stdout | split('.') | first }}"
+        node_fqdn: "{{ hostname_command.stdout }}"
+
+    - name: Set fact (SSL)
+      ansible.builtin.set_fact:
+        ca: "{{ lookup('file', output_dir + 'nodes/' + node_hostname + '/issuer.pem') }}"
+        node_cert: "{{ lookup('file', output_dir + 'nodes/' + node_hostname + '/cert.pem') }}"
+        node_private_key: "{{ lookup('file', output_dir + 'nodes/' + node_hostname + '/private-key.pem') }}"
 
   tasks:
     - name: Install gpg
@@ -71,7 +89,7 @@
 
     - name: Copy private key
       ansible.builtin.copy:
-        src: "../../terraform/outputs/vault-0/private-key.pem"
+        content: "{{ node_private_key }}"
         dest: "/vault/certs/vault-node-pk"
         owner: vault
         group: vault
@@ -85,14 +103,6 @@
         group: vault
         mode: '0700'
 
-    - name: Retrieve hostname
-      shell: "hostname"
-      register: hostname_command
-
-    - name: Set fact
-      ansible.builtin.set_fact:
-        node_hostname: "{{ hostname_command.stdout }}.gkube.it"
-
     - name: Copy configuration file
       ansible.builtin.template:
         src: "templates/vault.hcl.j2"
@@ -105,7 +115,7 @@
         path: /etc/vault.d/vault.env
         backup: yes
         create: yes
-        line: "VAULT_RAFT_NODE_ID={{ ansible_hostname }}"
+        line: "VAULT_RAFT_NODE_ID={{ node_hostname }}"
 
     - name: Start Vault service, if not started
       ansible.builtin.service:
