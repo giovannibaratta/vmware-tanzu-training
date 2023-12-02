@@ -12,21 +12,21 @@ resource "local_file" "vault_private_keys" {
   for_each = nonsensitive({ for node in module.vault_cluster.nodes: node.name => node.ssl.key if node.ssl != null})
 
   content = sensitive(each.value)
-  filename = "${path.module}/outputs/vault/${each.key}/private-key.pem"
+  filename = "${path.module}/outputs/vault/nodes/${each.key}/private-key.pem"
 }
 
 resource "local_file" "vault_certificate" {
   for_each = nonsensitive({ for node in module.vault_cluster.nodes: node.name => node.ssl.certificate if node.ssl != null})
 
   content = sensitive(each.value)
-  filename = "${path.module}/outputs/vault/${each.key}/cert.pem"
+  filename = "${path.module}/outputs/vault/nodes/${each.key}/cert.pem"
 }
 
 resource "local_file" "vault_certificate_issuer" {
   for_each = nonsensitive({ for node in module.vault_cluster.nodes: node.name => node.ssl.certificate_issuer if node.ssl != null})
 
   content = sensitive(each.value)
-  filename = "${path.module}/outputs/vault/${each.key}/issuer.pem"
+  filename = "${path.module}/outputs/vault/nodes/${each.key}/issuer.pem"
 }
 
 resource "local_file" "vault_variables" {
