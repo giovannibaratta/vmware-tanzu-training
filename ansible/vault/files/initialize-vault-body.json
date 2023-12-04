@@ -1,0 +1,10 @@
+{
+  "secret_shares": 0,
+  "secret_threshold": 0,
+  "stored_shares": 0,
+  "pgp_keys": null,
+  "recovery_shares": 5,
+  "recovery_threshold": 3,
+  "recovery_pgp_keys": null,
+  "root_token_pgp_key": ""
+}

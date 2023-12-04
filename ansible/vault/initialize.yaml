@@ -1,0 +1,50 @@
+- name: Initialize Vault
+  hosts: vault
+  become: true
+
+  tasks:
+    - name: Start Vault service
+      ansible.builtin.service:
+        name: vault
+        state: started
+
+    - name: Check initialization status
+      run_once: true
+      ansible.builtin.uri:
+        # We use the local address in case the DNS have not been registered for the hostname
+        url: https://127.0.0.1:8200/v1/sys/seal-status
+        # The certificate probably does not contain the server IP. We trust the local server in this case.
+        validate_certs: false
+        return_content: true
+      register: seal_status
+
+    - name: Set fact
+      ansible.builtin.set_fact:
+        is_initialized: "{{ seal_status.content | from_json | community.general.json_query('initialized' ) | bool }}"
+
+    - name: Initialize server
+      run_once: true
+      when: not is_initialized
+      ansible.builtin.uri:
+        # We use the local address in case the DNS have not been registered for the hostname
+        url: https://127.0.0.1:8200/v1/sys/init
+        method: PUT
+        body_format: json
+        src: "files/initialize-vault-body.json"
+        # The certificate probably does not contain the server IP. We trust the local server in this case.
+        validate_certs: false
+        return_content: true
+      register: initialization_output
+
+    - name: Wait 10 seconds to let Vault propagate the information
+      ansible.builtin.pause:
+        seconds: 10
+      when: initialization_output.changed
+
+    - name: Check if server is initialized and unsealed
+      ansible.builtin.uri:
+        # We use the local address in case the DNS have not been registered for the hostname
+        url: https://127.0.0.1:8200/v1/sys/seal-status
+        # The certificate probably does not contain the server IP. We trust the local server in this case.
+        validate_certs: false
+      failed_when: (not seal_status.content | from_json | community.general.json_query('initialized') | bool) or (seal_status.content | from_json | community.general.json_query('sealed') | bool)
