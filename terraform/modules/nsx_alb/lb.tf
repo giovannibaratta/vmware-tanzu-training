@@ -24,6 +24,7 @@ resource "avi_healthmonitor" "hm" {
   name          = "${var.service_name}-hm"
   type          = "HEALTH_MONITOR_HTTPS"
   failed_checks = 2
+
   https_monitor {
     http_request       = var.https_monitor_request
     http_response_code = ["HTTP_2XX"]

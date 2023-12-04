@@ -4,7 +4,7 @@ module "lb" {
 
   service_name = "vault"
   cloud_id = var.avi.cloud_id
-  https_monitor_request = "GET /v1/sys/health?standbyok=true&perfstandbyok=true"
+  https_monitor_request = "GET /v1/sys/health?standbyok=true&perfstandbyok=true HTTP/1.0"
 
   vip = {
     ip = var.vip
