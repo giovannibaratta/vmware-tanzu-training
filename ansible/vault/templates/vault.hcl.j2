@@ -19,3 +19,11 @@ listener "tcp" {
   tls_cert_file = "/vault/certs/vault-node-fullchain"
   tls_key_file  = "/vault/certs/vault-node-pk"
 }
+
+seal "azurekeyvault" {
+  tenant_id      = "{{ seal_azure_tenant_id }}"
+  client_id      = "{{ seal_azure_client_id }}"
+  client_secret  = "{{ seal_azure_client_secret }}"
+  vault_name     = "{{ seal_azure_vault }}"
+  key_name       = "{{ seal_azure_key }}"
+}
