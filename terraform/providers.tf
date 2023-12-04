@@ -14,9 +14,14 @@ provider "desec" {
 }
 
 provider "avi" {
-  avi_username = var.avi.username
-  avi_tenant = var.avi.tenant
-  avi_password = local.avi.password
+  avi_username   = var.avi.username
+  avi_tenant     = var.avi.tenant
+  avi_password   = local.avi.password
   avi_controller = var.avi.controller
-  avi_version = var.avi.version
+  avi_version    = var.avi.version
+}
+
+provider "azurerm" {
+  features {
+  }
 }

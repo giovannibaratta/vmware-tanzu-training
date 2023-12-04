@@ -29,5 +29,15 @@ terraform {
       source = "hashicorp/random"
       version = "3.5.1"
     }
+
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "3.83.0"
+    }
+
+    azuread = {
+      source = "hashicorp/azuread"
+      version = "2.46.0"
+    }
   }
 }
