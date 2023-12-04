@@ -1,0 +1,25 @@
+- name: Install Vault
+  hosts: vault
+  become: true
+
+  tasks:
+    - name: Stop Vault service
+      ansible.builtin.service:
+        name: vault
+        state: stopped
+        enabled: false
+
+    - name: Clean data directory
+      become: true
+      ansible.builtin.file:
+        path: "/data"
+        state: absent
+
+    - name: Recreate data directory
+      become: true
+      ansible.builtin.file:
+        path: "/data"
+        state: directory
+        mode: '0700'
+        owner: vault
+        group: vault
