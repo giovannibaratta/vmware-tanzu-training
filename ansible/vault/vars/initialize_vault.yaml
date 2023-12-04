@@ -1,0 +1,4 @@
+s3_endpoint_url: "https://minio.local.lan"
+s3_validate_certs: false
+s3_encrypt_objects: false
+s3_bucket_name: "vault"

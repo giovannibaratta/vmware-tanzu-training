@@ -1,9 +1,17 @@
 - name: Initialize Vault
   hosts: vault
-  become: true
+
+  vars:
+    skip_recovery_keys_upload: false
+    s3_validate_certs: true
+    s3_encrypt_objects: true
+
+  vars_files:
+    - "vars/initialize_vault.yaml"
 
   tasks:
     - name: Start Vault service
+      become: true
       ansible.builtin.service:
         name: vault
         state: started
@@ -36,10 +44,37 @@
         return_content: true
       register: initialization_output
 
+    - name: Upload recovery keys
+      when: initialization_output is not skipped and not skip_recovery_keys_upload
+      delegate_to: localhost
+      run_once: true
+      block:
+      - name: Create recovery keys file
+        ansible.builtin.copy:
+          content: "{{ initialization_output.content }}"
+          dest: "/tmp/vault_recovery_keys"
+
+      - name: Upload recovery keys
+        amazon.aws.s3_object:
+          bucket: "{{ s3_bucket_name }}"
+          object: "vault-recovery-keys-{{ ansible_date_time.iso8601_basic_short }}"
+          src: "/tmp/vault_recovery_keys"
+          mode: put
+          endpoint_url: "{{ s3_endpoint_url }}"
+          access_key: "{{ s3_access_key }}"
+          secret_key: "{{ s3_secret_key }}"
+          encrypt: "{{ s3_encrypt_objects }}"
+          validate_certs: "{{ s3_validate_certs }}"
+
+      - name: Remove recovery keys file
+        ansible.builtin.file:
+          state: absent
+          path: "/tmp/vault_recovery_keys"
+
     - name: Wait 10 seconds to let Vault propagate the information
       ansible.builtin.pause:
         seconds: 10
-      when: initialization_output.changed
+      when: initialization_output is not skipped
 
     - name: Check if server is initialized and unsealed
       ansible.builtin.uri:
@@ -47,4 +82,6 @@
         url: https://127.0.0.1:8200/v1/sys/seal-status
         # The certificate probably does not contain the server IP. We trust the local server in this case.
         validate_certs: false
+        return_content: true
+      register: seal_status
       failed_when: (not seal_status.content | from_json | community.general.json_query('initialized') | bool) or (seal_status.content | from_json | community.general.json_query('sealed') | bool)
