@@ -2,6 +2,7 @@
 - name: Prepare host
   hosts: keycloak
   become: true
+
   vars_files:
     - ./vars/conjur.yml
 
@@ -44,6 +45,9 @@
     keycloak_version: "22.0.5"
     keycloak_dir: "/opt/keycloak"
     keycloak_fqdn: "keycloak.local.lan"
+    artifacts_dir: "../../terraform/outputs/keycloak"
+    keycloak_tls_cert: "{{ lookup('ansible.builtin.file', artifacts_dir + '/tls/certificate.pem') }}"
+    keycloak_tls_ca_chain: "{{ lookup('ansible.builtin.file', artifacts_dir + '/tls/issuer.pem') }}"
 
   vars_files:
     - ./vars/conjur.yml
@@ -103,34 +107,23 @@
     notify:
       - Restart Keycloak service
 
-  - name: Check if keycloak cert is already present
-    stat:
-      path: "{{ keycloak_dir }}/tls/keycloak.pem"
-    register: keycloakcert_file_stats
+  - name: Copy TLS private key
+    ansible.builtin.copy:
+      src: "{{ artifacts_dir }}/tls/private-key.pem"
+      dest: "{{ keycloak_dir }}/tls/key.pem"
+      owner: keycloak
+      group: keycloak
+    notify:
+      - Restart Keycloak service
 
-  - name: Generate keycloak TLS conf
+  - name: Copy TLS certificate
     ansible.builtin.template:
-      src: "templates/keycloak-tls.conf.j2"
-      dest: "{{ keycloak_dir }}/tls/tls.conf"
+      src: "templates/keycloak-tls-fullchain.j2"
+      dest: "{{ keycloak_dir }}/tls/cert.pem"
       owner: keycloak
       group: keycloak
-
-  - name: Generate cert
-    when: not keycloakcert_file_stats.stat.exists
-    ansible.builtin.shell: openssl req -newkey rsa:2048 -days "365" -nodes -x509 -config "{{ keycloak_dir }}/tls/tls.conf" -extensions v3_ca -keyout "{{ keycloak_dir }}/tls/key.pem" -out "{{ keycloak_dir }}/tls/cert.pem"
-    args:
-      chdir: "{{ keycloak_dir }}/tls"
-      executable: /bin/bash
-
-  - name: Fix tls permissions
-    ansible.builtin.file:
-      path: "{{ item }}"
-      state: file
-      owner: keycloak
-      group: keycloak
-    with_items:
-      - "{{ keycloak_dir }}/tls/key.pem"
-      - "{{ keycloak_dir }}/tls/cert.pem"
+    notify:
+      - Restart Keycloak service
 
   - name: Start PostgreSQL service
     ansible.builtin.systemd:

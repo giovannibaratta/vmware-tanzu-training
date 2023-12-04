@@ -9,6 +9,15 @@ provider "acme" {
   server_url = "https://acme-v02.api.letsencrypt.org/directory"
 }
 
+resource "tls_private_key" "acme" {
+  algorithm = "RSA"
+}
+
+resource "acme_registration" "main" {
+  account_key_pem = tls_private_key.acme.private_key_pem
+  email_address   = "bargiovi@hotmail.it"
+}
+
 provider "desec" {
   api_token = var.desec_token
 }

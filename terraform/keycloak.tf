@@ -37,3 +37,28 @@ resource "vsphere_virtual_machine" "keycloak" {
     ignore_changes = [ept_rvi_mode, hv_mode]
   }
 }
+
+resource "acme_certificate" "keycloak" {
+  account_key_pem = acme_registration.main.account_key_pem
+  common_name     = "keycloak.${var.domain}"
+
+  recursive_nameservers = ["1.1.1.1:53"]
+  pre_check_delay       = 30
+
+  dns_challenge {
+    provider = "desec"
+
+    config = {
+      DESEC_TOKEN               = var.desec_token
+      DESEC_PROPAGATION_TIMEOUT = 600
+    }
+  }
+}
+
+resource "desec_rrset" "keycloak" {
+  domain  = var.domain
+  subname = "keycloak"
+  type    = "A"
+  records = [vsphere_virtual_machine.keycloak.default_ip_address]
+  ttl     = 3600
+}
