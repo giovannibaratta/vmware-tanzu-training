@@ -33,6 +33,11 @@ resource "local_file" "vault_variables" {
   content = templatefile("${path.module}/files/vault/vault_cluster_variables.tpl", {
     cluster_name = module.vault_cluster.cluster.name
     cluster_api_fqdn = module.vault_cluster.cluster.api_fqdn
+    seal_azure_tenant_id = data.azurerm_client_config.current.tenant_id
+    seal_azure_client_id = azuread_application_registration.vault.client_id
+    seal_azure_client_secret = azuread_application_password.vault.value
+    seal_azure_vault = azurerm_key_vault.vault.name
+    seal_azure_key = azurerm_key_vault_key.vault_seal.name
   })
   filename = "${path.module}/outputs/vault/cluster.vars"
 }
