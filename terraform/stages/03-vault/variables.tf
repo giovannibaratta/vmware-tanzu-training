@@ -7,7 +7,16 @@ variable "token" {
   sensitive = true
 }
 
+variable "enable_oidc_auth" {
+  default = false
+  type = bool
+  description = "Configure OIDC authentication in Vault."
+}
+
 variable "oidc_config" {
+  default = null
+  nullable = true
+
   type = object({
     client_id = string
     discovery_url = string
@@ -19,6 +28,9 @@ variable "oidc_config" {
 
 variable "oidc_config_sensitive" {
   sensitive = true
+  default = null
+  nullable = true
+
   type = object({
     client_secret = string
   })
