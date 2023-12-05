@@ -4,11 +4,12 @@ This README assume that a debian VM has been provisioned with Terraform using th
 
 1. Run ansible to install Vault
 
-    ```sh
-    ansible-playbook setup.yaml -i ../../terraform/outputs/ansible_inventory --u debian
-    ```
+   ```sh
+   ansible-playbook setup.yaml -i ../../terraform/unstaged/outputs/ansible_inventory --u debian
+   ```
+
 1. Customize the variables `vars/initialize_vault.yaml` if needed
 1. Initialize Vault cluster
-    ```sh
-    ansible-playbook initialize.yaml -i ../../terraform/outputs/ansible_inventory --u debian --extra-vars "@secrets.yaml"
-    ```
+   ```sh
+   ansible-playbook initialize.yaml -i ../../terraform/unstaged/outputs/ansible_inventory --u debian --extra-vars "@secrets.yaml"
+   ```

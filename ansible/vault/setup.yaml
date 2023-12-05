@@ -3,10 +3,10 @@
   become: true
 
   vars:
-    output_dir: "../../terraform/outputs/vault/"
+    output_dir: "../../terraform/unstaged/outputs/vault/"
 
   vars_files:
-    - "../../terraform/outputs/vault/cluster.vars"
+    - "../../terraform/unstaged/outputs/vault/cluster.vars"
 
   pre_tasks:
     - name: Retrieve hostname

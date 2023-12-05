@@ -45,7 +45,7 @@
     keycloak_version: "22.0.5"
     keycloak_dir: "/opt/keycloak"
     keycloak_fqdn: "keycloak.gkube.it"
-    artifacts_dir: "../../terraform/outputs/keycloak"
+    artifacts_dir: "../../terraform/unstaged/outputs/keycloak"
     keycloak_tls_cert: "{{ lookup('ansible.builtin.file', artifacts_dir + '/tls/certificate.pem') }}"
     keycloak_tls_ca_chain: "{{ lookup('ansible.builtin.file', artifacts_dir + '/tls/issuer.pem') }}"
 

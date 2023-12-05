@@ -8,18 +8,19 @@ This README assume that a debian VM has been provisioned with Terraform using th
 
 1. Run ansible to install Keycloak
 
-    ```sh
-    ansible-playbook setup.yaml -i ../../terraform/outputs/ansible_inventory --u debian
-    ```
+   ```sh
+   ansible-playbook setup.yaml -i ../../terraform/unstaged/outputs/ansible_inventory --u debian
+   ```
 
 1. Verify that Keycloak portal is up and running (connect to `https://<VM_IP>`).
 
 1. Set the variables in the playbook `configure.yaml`
 
 1. Run ansible to configure Keycloak realm
-    ```sh
-    ansible-playbook configure.yaml -i ../../terraform/outputs/ansible_inventory --u debian
-    ```
+
+   ```sh
+   ansible-playbook configure.yaml -i ../../terraform/unstaged/outputs/ansible_inventory --u debian
+   ```
 
 1. The client secret of the newly created user can be retrieved from UI
 
@@ -31,6 +32,7 @@ A Keycloak group contains users and can contain multiple roles.
 A role is just a name that represent a capability.
 
 To expose the roles of the user in the token we have to:
+
 1. create an additional scope
 1. Assign the built-in mapper groups that will add the roles of the user to the property groups in the token (the property name can be changed)
 1. We assign the scope to the OIDC client.
