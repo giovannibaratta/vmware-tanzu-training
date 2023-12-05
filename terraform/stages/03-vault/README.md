@@ -7,4 +7,24 @@ This directory contains the Terraform code to configure a Vault cluster.
 ## Prerequisites
 
 * A Vault cluster
-* A root token to authenticate to the cluster
+* A valid token to authenticate to the cluster
+
+## Usage
+
+1. Replace the value in [terraform.tfvars](./terraform.tfvars)
+1. Create (or replace the value in) [terraform-secrets.tfvars]
+1. Configure the Terraform backend
+1. `terraform init/plan/apply -var-file=terraform.tfvars -var-file=terraform-secrets.tfvars`
+
+<!-- BEGIN_TF_DOCS -->
+<!-- This section will be overridden by terraform-docs. Do not change it.-->
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_token"></a> [token](#input\_token) | Vault token | `string` | n/a | yes |
+| <a name="input_vault_address"></a> [vault\_address](#input\_vault\_address) | Vault server address | `string` | n/a | yes |
+| <a name="input_enable_oidc_auth"></a> [enable\_oidc\_auth](#input\_enable\_oidc\_auth) | Configure OIDC authentication in Vault. | `bool` | `false` | no |
+| <a name="input_oidc_config"></a> [oidc\_config](#input\_oidc\_config) | Parameters to configure OIDC auth. Required if enable\_oidc\_auth is true | <pre>object({<br>    client_id = string<br>    discovery_url = string<br>    user_claim = string<br>    groups_claim = string<br>    scopes = set(string)<br>  })</pre> | `null` | no |
+| <a name="input_oidc_config_sensitive"></a> [oidc\_config\_sensitive](#input\_oidc\_config\_sensitive) | Parameters to configure OIDC auth. Required if enable\_oidc\_auth is true | <pre>object({<br>    client_secret = string<br>  })</pre> | `null` | no |
+<!-- END_TF_DOCS -->
