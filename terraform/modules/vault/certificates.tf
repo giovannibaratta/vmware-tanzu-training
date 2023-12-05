@@ -33,6 +33,8 @@ resource "acme_certificate" "vip" {
   account_key_pem = acme_registration.vault[0].account_key_pem
   common_name     = "vault.${var.domain}"
 
+  preferred_chain = "ISRG Root X1"
+
   recursive_nameservers = ["1.1.1.1:53"]
   pre_check_delay       = 30
 
