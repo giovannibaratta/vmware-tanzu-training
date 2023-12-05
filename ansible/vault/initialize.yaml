@@ -15,6 +15,7 @@
       ansible.builtin.service:
         name: vault
         state: started
+        enabled: true
 
     - name: Check initialization status
       run_once: true
