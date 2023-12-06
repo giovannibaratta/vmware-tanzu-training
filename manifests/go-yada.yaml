@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: legacy-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-yada
+spec:
+  selector:
+    matchLabels:
+      app: go-yada
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        # This role must be defined in Vault
+        vault.hashicorp.com/role: 'legacy-app'
+        # Secrets that must be mounted inside the containers
+        vault.hashicorp.com/agent-inject-secret-super-secret: 'main/data/super-secret'
+        vault.hashicorp.com/agent-inject-secret-another-secret: 'main/data/this-is-mine'
+        vault.hashicorp.com/agent-run-as-user: '2000'
+        vault.hashicorp.com/agent-run-as-group: '2000'
+      labels:
+        app: go-yada
+    spec:
+      serviceAccount: legacy-app
+      containers:
+      - name: go-yada
+        image: giovannibaratta/go-yada
+
+        env:
+          # The app list the files container in this directory
+          - name: DIR_TO_MONITOR
+            value: /vault/secrets
+
+        ports:
+        - containerPort: 8080
+
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-yada
+spec:
+  selector:
+    app: go-yada
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 8080
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: psp:vmware-system-restricted:go-yada
+  namespace: go-yada
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  # ClusterRole created during the deployment
+  name: psp:vmware-system-restricted
+subjects:
+- kind: ServiceAccount
+  name: legacy-app
+  namespace: go-yada
+---
+# This ClusterRoleBinding is necessary to let Vault use the requestor token to verify its validity
+# querying the Kubernetes API Server
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-client-auth-delegator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: legacy-app
+  namespace: go-yada
