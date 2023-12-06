@@ -1,0 +1,29 @@
+global:
+  # Disable all components and enable them selectively
+  enabled: false
+  namespace: "vault"
+  tlsDisable: false
+  externalVaultAddr: "https://vault.gkube.it"
+
+  psp:
+    enable: false
+
+injector:
+  enabled: true
+  replicas: 1
+
+  # Configures the port the injector should listen on
+  port: 8080
+
+  # If multiple replicas are specified, by default a leader will be determined
+  # so that only one injector attempts to create TLS certificates.
+  leaderElector:
+    enabled: true
+
+  # Mount Path of the Vault Kubernetes Auth Method.
+  authPath: "auth/kubernetes"
+
+  webhook:
+    namespaceSelector:
+      matchLabels:
+        vault-injector: enabled
