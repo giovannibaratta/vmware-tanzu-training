@@ -24,7 +24,9 @@ This directory contains the Terraform code to configure a Vault cluster.
 |------|-------------|------|---------|:--------:|
 | <a name="input_token"></a> [token](#input\_token) | Vault token | `string` | n/a | yes |
 | <a name="input_vault_address"></a> [vault\_address](#input\_vault\_address) | Vault server address | `string` | n/a | yes |
+| <a name="input_enable_kubernetes_auth"></a> [enable\_kubernetes\_auth](#input\_enable\_kubernetes\_auth) | Configure Kubernetes authentication in Vault. | `bool` | `false` | no |
 | <a name="input_enable_oidc_auth"></a> [enable\_oidc\_auth](#input\_enable\_oidc\_auth) | Configure OIDC authentication in Vault. | `bool` | `false` | no |
-| <a name="input_oidc_config"></a> [oidc\_config](#input\_oidc\_config) | Parameters to configure OIDC auth. Required if enable\_oidc\_auth is true | <pre>object({<br>    client_id = string<br>    discovery_url = string<br>    user_claim = string<br>    groups_claim = string<br>    scopes = set(string)<br>  })</pre> | `null` | no |
+| <a name="input_kubernetes_auth_config"></a> [kubernetes\_auth\_config](#input\_kubernetes\_auth\_config) | Must be set if enable\_kubernetes\_auth is true. Host is the Kubernetes server that will validate the JWT token received by the Agent injector. | <pre>object({<br>    host = string<br>    ca = string<br>  })</pre> | `null` | no |
+| <a name="input_oidc_config"></a> [oidc\_config](#input\_oidc\_config) | Parameters to configure OIDC auth. Required if enable\_oidc\_auth is true | <pre>object({<br>    client_id     = string<br>    discovery_url = string<br>    user_claim    = string<br>    groups_claim  = string<br>    scopes        = set(string)<br>  })</pre> | `null` | no |
 | <a name="input_oidc_config_sensitive"></a> [oidc\_config\_sensitive](#input\_oidc\_config\_sensitive) | Parameters to configure OIDC auth. Required if enable\_oidc\_auth is true | <pre>object({<br>    client_secret = string<br>  })</pre> | `null` | no |
 <!-- END_TF_DOCS -->

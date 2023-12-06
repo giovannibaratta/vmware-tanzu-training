@@ -27,3 +27,23 @@ module "oidc-auth" {
 
   depends_on = [ terraform_data.oidc_variable_cross_check ]
 }
+
+module "kubernetes-auth" {
+  count = var.enable_kubernetes_auth ? 1 : 0
+
+  source = "../../modules/vault-kubernetes"
+
+  kubernetes_config = {
+    host = var.kubernetes_auth_config.host
+    ca = var.kubernetes_auth_config.ca
+  }
+
+  roles = {
+    "legacy-app" = {
+      name = "legacy-app"
+      service_account_names = ["legacy-app"]
+      namespaces = ["go-yada"]
+      policies_to_attach = [vault_policy.kv_ro.name]
+    }
+  }
+}
