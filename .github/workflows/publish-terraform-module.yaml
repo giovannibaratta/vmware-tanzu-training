@@ -1,0 +1,68 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "terraform/modules/*/version"
+
+concurrency:
+  group: "publish_tf_modules"
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  identify_changed_tf_modules:
+    runs-on: ubuntu-latest
+    outputs:
+      update_modules: ${{ steps.update_modules.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed_files
+        uses: tj-actions/changed-files@v40
+        with:
+          files: "terraform/modules/*/version"
+
+      - name: Prepare tags for Terraform modules
+        id: update_modules
+        run: |
+          update_modules=""
+
+          for file_path in ${{ steps.changed_files.outputs.all_changed_files }}; do
+            # file is something like terraform/modules/vault-oidc/version
+            module_name=$(cut -d'/' -f3 <<< "${file_path}")
+            module_version=$(cat "${file_path}" | head -n 1)
+            update_modules="${update_modules},${module_name}-v${module_version}"
+          done
+
+          if [[ "${update_modules}" != "" ]]; then
+            # Remove leading , from string and replace all , to build a json array
+            update_modules_without_leading_char=$(echo "${update_modules}" | cut -c2- | sed 's/,/\",\"/g')
+            # add leading [" and "] to the end to have a proper json array and set the output value
+            echo "::set-output name=tags::[\"${update_modules_without_leading_char}\"]"
+          else
+            echo "::set-output name=tags::"
+          fi
+
+  create_tags:
+    runs-on: ubuntu-latest
+    needs: [identify_changed_tf_modules]
+    strategy:
+      max-parallel: 1
+      matrix:
+        tag: ${{ fromJson(needs.identify_changed_tf_modules.outputs.update_modules) }}
+
+    steps:
+      - name: Create tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ matrix.tag }}',
+              sha: context.sha
+            })
