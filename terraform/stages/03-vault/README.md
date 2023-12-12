@@ -2,18 +2,20 @@
 
 This directory contains the Terraform code to configure a Vault cluster.
 
-> No data should be created using this code because all the information will also be stored in the Terraform state file.
+> No data (e.g. secrets), except for the one that are strictly required, should be created using this code because all the information will also be stored in the Terraform state file.
 
 ## Prerequisites
 
 * A Vault cluster
 * A valid token to authenticate to the cluster
+* (optional) a OIDC provider if the relative auth backend must be enabled
+* (optional) a Kubernetes cluster if the relative auth backend must be enabled
 
 ## Usage
 
 1. Replace the value in [terraform.tfvars](./terraform.tfvars)
 1. Create (or replace the value in) [terraform-secrets.tfvars]
-1. Configure the Terraform backend
+1. (optional) Configure the Terraform backend
 1. `terraform init/plan/apply -var-file=terraform.tfvars -var-file=terraform-secrets.tfvars`
 
 <!-- BEGIN_TF_DOCS -->

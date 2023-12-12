@@ -1,3 +1,9 @@
+# vault-oidc
+
+The module is responsible for configuring an auth method of type [OIDC](https://developer.hashicorp.com/vault/docs/auth/jwt#jwt-authentication).
+
+A default role is created as part of the setup, the role will be used for users who don't specify a specific role during the login.
+
 <!-- BEGIN_TF_DOCS -->
 <!-- This section will be overridden by terraform-docs. Do not change it.-->
 ## Inputs
