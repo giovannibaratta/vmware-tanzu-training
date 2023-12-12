@@ -55,10 +55,10 @@ function generate_merged_tree_output() {
       tree_output_suffix=" # ${tree_output_suffix}"
     fi
 
-    merged_output="${merged_output}\n${line}${tree_output_suffix}";
+    merged_output="${merged_output}${line}${tree_output_suffix}\n";
   done <<< "${raw_tree}"
 
-  echo -e "\`\`\`sh\n${merged_output}\n\`\`\`"
+  echo -e "\`\`\`sh\n${merged_output}\`\`\`"
 }
 
 function main() {
@@ -81,7 +81,7 @@ function main() {
   # This is necessary otherwise the sed command will complain.
   merged_tree_escaped="${merged_tree//$'\n'/\\\\\\\\n}"
   # Inject the merged tree into the escaped original file
-  output_content_escaped=$(sed -r "s/(<!-- BEGIN_FOLDER_STRUCTURE -->).+(<!-- END_FOLDER_STRUCTURE -->)/\1${merged_tree_escaped}\n\2/" <<< "${input_file_escaped}")
+  output_content_escaped=$(sed -r "s/(<!-- BEGIN_FOLDER_STRUCTURE -->).+(<!-- END_FOLDER_STRUCTURE -->)/\1\n${merged_tree_escaped}\n\2/" <<< "${input_file_escaped}")
   # Unescpace all the \\n
   output_content_unescaped="${output_content_escaped//\\n/\n}"
   # Do not use format string, let printf parse the escape chars contained in the variable.

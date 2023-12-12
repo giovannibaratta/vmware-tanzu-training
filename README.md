@@ -5,8 +5,8 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 
 ## Folder structure
 
-<!-- BEGIN_FOLDER_STRUCTURE -->```sh
-
+<!-- BEGIN_FOLDER_STRUCTURE -->
+```sh
 .
 ├── ansible # Contains Ansible playbooks to setup and configure applications
 ├── apps # Contains example applications
