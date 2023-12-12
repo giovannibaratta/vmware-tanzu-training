@@ -10,6 +10,7 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 .
 ├── ansible # Contains Ansible playbooks to setup and configure applications
 ├── apps # Contains example applications
+├── docs
 ├── falco # Contains manifests to deploy Falco in Kubernetes
 ├── home-lab # Ignore this folder
 ├── jenkins # Contains the instructions and manifests to deploy Jenkins in Kubernetes
