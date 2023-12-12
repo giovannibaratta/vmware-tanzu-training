@@ -17,7 +17,6 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 ├── manifests # Contains various manifests to install applications in Kubernetes
 ├── packer # Contains Packer code to deploy a debian golden image
 ├── scripts # Contains various scripts
-├── terraform # Contains Terraform code to deploy various components in vSphere, Vault and Kuber...
-└── velero # Contains instructions to install Velero
+└── terraform # Contains Terraform code to deploy various components in vSphere, Vault and Kuber...
 ```
 <!-- END_FOLDER_STRUCTURE -->
