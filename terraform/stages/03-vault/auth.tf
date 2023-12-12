@@ -12,7 +12,7 @@ resource "terraform_data" "oidc_variable_cross_check" {
 module "oidc-auth" {
   count = var.enable_oidc_auth ? 1 : 0
 
-  source = "../../modules/vault-oidc"
+  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/vault-oidc?ref=vault-oidc-v0.0.1&depth=1"
 
   oidc_config = merge(var.oidc_config, {
     redirect_uri = "${var.vault_address}/ui/vault/auth/oidc/oidc/callback"
@@ -31,7 +31,7 @@ module "oidc-auth" {
 module "kubernetes-auth" {
   count = var.enable_kubernetes_auth ? 1 : 0
 
-  source = "../../modules/vault-kubernetes"
+  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/vault-kubernetes?ref=vault-kubernetes-v0.0.1&depth=1"
 
   kubernetes_config = {
     host = var.kubernetes_auth_config.host
