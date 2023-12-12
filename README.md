@@ -18,7 +18,6 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 ├── packer # Contains Packer code to deploy a debian golden image
 ├── scripts # Contains various scripts
 ├── terraform # Contains Terraform code to deploy various components in vSphere, Vault and Kuber...
-├── tmc-self-managed # Ignore this folder
 └── velero # Contains instructions to install Velero
 ```
 <!-- END_FOLDER_STRUCTURE -->
