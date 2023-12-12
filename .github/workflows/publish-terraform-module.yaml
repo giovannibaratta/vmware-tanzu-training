@@ -1,3 +1,5 @@
+name: Release Terraform modules
+
 on:
   push:
     branches:
