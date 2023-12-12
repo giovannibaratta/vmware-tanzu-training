@@ -6,7 +6,7 @@ global:
   externalVaultAddr: "https://vault.gkube.it"
 
   psp:
-    enable: false
+    enable: true
 
 injector:
   enabled: true
