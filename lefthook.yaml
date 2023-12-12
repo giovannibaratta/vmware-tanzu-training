@@ -1,0 +1,8 @@
+assert_lefthook_installed: true
+min_version: 1.5.5
+
+pre-push:
+  parallel: true
+  scripts:
+    "validate-root-readme.sh":
+      runner: bash
