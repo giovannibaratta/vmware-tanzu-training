@@ -88,7 +88,7 @@ function hydrates(){
 }
 
 err() {
-  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
+  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] $*" >&2
 }
 
 SCRIPT_DIR=$(echo "$0" | rev | cut -d'/' -f2- | rev)
