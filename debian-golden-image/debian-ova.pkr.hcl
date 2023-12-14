@@ -66,8 +66,7 @@ build {
       insecure   = true
       username   = "${var.vcenter_user}"
       password   = "${var.vcenter_password}"
-      datacenter = "dc01"
-      folder     = "/templates/os/distro"
+      datacenter = "${var.datacenter}"
     }
   }
 }

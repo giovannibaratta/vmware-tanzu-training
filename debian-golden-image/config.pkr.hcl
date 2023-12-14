@@ -1,7 +1,7 @@
 packer {
   required_plugins {
     vsphere = {
-      version = "1.2.1"
+      version = "1.2.3"
       source  = "github.com/hashicorp/vsphere"
     }
 

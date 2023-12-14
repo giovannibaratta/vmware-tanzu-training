@@ -12,6 +12,10 @@ variable "vcenter_password" {
   sensitive = true
 }
 
+variable "datacenter" {
+  type = string
+}
+
 variable "cluster" {
   type = string
 }
