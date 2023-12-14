@@ -10,12 +10,12 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 .
 ├── ansible # Contains Ansible playbooks to setup and configure applications
 ├── apps # Contains example applications
+├── debian-golden-image # Contains Packer code to deploy a debian golden image
 ├── docs
 ├── falco # Contains manifests to deploy Falco in Kubernetes
 ├── home-lab # Ignore this folder
 ├── jenkins # Contains the instructions and manifests to deploy Jenkins in Kubernetes
 ├── manifests # Contains various manifests to install applications in Kubernetes
-├── packer # Contains Packer code to deploy a debian golden image
 ├── scripts # Contains various scripts
 └── terraform # Contains Terraform code to deploy various components in vSphere, Vault and Kuber...
 ```

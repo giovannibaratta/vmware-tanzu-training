@@ -2,7 +2,7 @@
 
 This folder contains the resources to build a golden image (empty for now) on vSphere using Packer.
 
-At the moment the OVF can not be customized due to some limitations of the provider.
+At the moment, the generated OVF can not be customized during deployments due to some limitations of the provider.
 
 ## How to build
 
