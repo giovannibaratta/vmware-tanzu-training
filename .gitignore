@@ -1,1 +1,4 @@
 *-default-values.yaml
+**/.terraform
+**/terraform-secrets.tfvars
+**/backend-local.tf
