@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The script read a yaml file and configure the vSphere namespaces accordigly to the content
 # of the file. The script DOES not delete existing namespaces if they are not defined

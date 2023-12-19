@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The script generate a tree structure of the directories in the current directory and enhance the
 # output using the content stored in the files .description in the respective folders.

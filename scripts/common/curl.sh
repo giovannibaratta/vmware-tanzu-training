@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #######################################
 # Generate a curl configuration file that can be referenced using the flag --config.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # This script can be used to copy the stub file containing harbor secrets to the current directory
 # and to produce the a merge file of the harbor config file and the file containing the secrets.
