@@ -3,35 +3,13 @@
   hosts: keycloak
   become: true
 
-  vars_files:
-    - ./vars/conjur.yml
-
   pre_tasks:
-
-    - name: Check if /etc/conjur.identity already exists
-      stat:
-        path: /etc/conjur.identity
-      register: identity_file
-
-    - name: Validate HFTOKEN
-      fail:
-        msg: 'variable HFTOKEN is not defined. It is required to register the host'
-      when:
-        - lookup('env', 'HFTOKEN') == ""
-        - not identity_file.stat.exists
-
-  roles:
-    - role: cyberark.conjur.conjur_host_identity
-      conjur_host_factory_token: "{{ lookup('env', 'HFTOKEN') }}"
-      conjur_host_name: "{{ inventory_hostname }}"
-
-  post_tasks:
     - name: Install dependencies
       ansible.builtin.apt:
         update_cache: yes
         pkg:
-        - "openjdk-17-jdk=17.0.8+7-1~deb12u1"
-        - "postgresql=15+248"
+        - "openjdk-17-jdk"
+        - "postgresql-15"
 
     - name: Add the Keycloak user
       ansible.builtin.user:
@@ -43,22 +21,20 @@
 
   vars:
     keycloak_version: "22.0.5"
+    # Root directory used for Keycloak installation
     keycloak_dir: "/opt/keycloak"
-    keycloak_fqdn: "keycloak.gkube.it"
-    artifacts_dir: "../../terraform/unstaged/outputs/keycloak"
-    keycloak_tls_cert: "{{ lookup('ansible.builtin.file', artifacts_dir + '/tls/certificate.pem') }}"
-    keycloak_tls_ca_chain: "{{ lookup('ansible.builtin.file', artifacts_dir + '/tls/issuer.pem') }}"
 
   vars_files:
-    - ./vars/conjur.yml
+    - "./vars/installation.yaml"
 
   pre_tasks:
-  - name: Set facts
-    ansible.builtin.set_fact:
-      # These variables are stored in the Conjur server. To be able to retrieve the variables, the Ansible host identity must be configured.
-      # See README for more details.
-      keycloak_db_password: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/keycloak/db_pass', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
-      keycloak_admin_password: "{{ lookup('cyberark.conjur.conjur_variable', 'automation/keycloak/admin_pass', config_file='../conjur.conf', identity_file='../conjur.identity') }}"
+    - name: Retrieve hostname
+      shell: "hostname -f"
+      register: hostname_command
+
+    - name: Set fact
+      ansible.builtin.set_fact:
+        keycloak_fqdn: "{{ hostname_command.stdout }}"
 
   tasks:
   - name: Install Keycloak
@@ -109,7 +85,7 @@
 
   - name: Copy TLS private key
     ansible.builtin.copy:
-      src: "{{ artifacts_dir }}/tls/private-key.pem"
+      content: "{{ keycloak_tls_private_key }}"
       dest: "{{ keycloak_dir }}/tls/key.pem"
       owner: keycloak
       group: keycloak

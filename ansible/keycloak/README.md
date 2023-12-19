@@ -1,15 +1,22 @@
 # Keycloak
 
-This README assume that a debian VM has been provisioned with Terraform using the code in this repository. If this is not the case, adjust the parameters of the following command as needed.
+## Prerequisites
+* Ansible inventory with a group named "keycloak" is defined
+* TLS certificate and private key for Keycloak.
 
-1. Setup Ansible identity. See parent [README](../README.md#ansible-identity) for more details.
+## Install Keycloak
 
-1. If if is the first time that you run the playbook, the host will be registered to Conjur. To perform this operation a token is required. The token must be set as an environment variable (HFTOKEN), to generate the token see [here](../README.md#integrate-ansible-with-conjur).
+1. Define a variable file with the following variables:
+   * artifacts_dir (directory containing `tls/certificate`, `tls/issuer.pem`, `tls/private-key.pem`)
+   * keycloak_db_password
+   * keycloak_admin_password
 
 1. Run ansible to install Keycloak
-
    ```sh
-   ansible-playbook setup.yaml -i ../../terraform/unstaged/outputs/ansible_inventory --u debian
+   ansible-playbook setup.yaml \
+      -i ../../terraform/outputs/01-tkgm-vsphere-nsx/ansible_inventory \
+      --u debian \
+      --extra-vars "@inputs/h2o-2-21094/installation.yaml"
    ```
 
 1. Verify that Keycloak portal is up and running (connect to `https://<VM_IP>`).
