@@ -1,0 +1,59 @@
+# This scanner template can be used with workloads that don't need image scan. The scan will be
+# performed anyway but the result will not be considered. In order to trigger this policy
+# the workload must set the parameter scanning_image_policy to an empty value.
+
+# N.B. It must be used in conjunction with noop-scan-policy
+
+apiVersion: carto.run/v1alpha1
+kind: ClusterImageTemplate
+metadata:
+  name: skippable-image-scanner-template
+spec:
+  healthRule:
+    multiMatch:
+      healthy:
+        matchConditions:
+        - status: "True"
+          type: Succeeded
+      unhealthy:
+        matchConditions:
+        - status: "False"
+          type: PolicySucceeded
+        - status: Unknown
+          type: PolicySucceeded
+        - status: "False"
+          type: Succeeded
+  imagePath: .status.compliantArtifact.registry.image
+  lifecycle: mutable
+  ytt: |
+    #@ load("@ytt:data", "data")
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.workload.metadata, "labels"):
+    #@     exclusions = ["kapp.k14s.io/app", "kapp.k14s.io/association"]
+    #@     for k,v in dict(data.values.workload.metadata.labels).items():
+    #@       if k not in exclusions:
+    #@         labels[k] = v
+    #@       end
+    #@     end
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    ---
+    apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
+    kind: ImageScan
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "image-scan" })
+    spec:
+      registry:
+        image: #@ data.values.image
+      scanTemplate: #@ data.values.params.scanning_image_template
+      #@ if len(data.values.params.scanning_image_policy) > 0:
+      scanPolicy: #@ data.values.params.scanning_image_policy
+      #@ else:
+      scanPolicy: "noop-scan-policy"
+      #@ end

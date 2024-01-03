@@ -1,0 +1,25 @@
+# Example policy that will consider all the vulnerabilities found by the image scanner as secure.
+# It can be used as a workaround for workloads to "bypass" the test scanning step.
+
+# N.B. It must be used in conjunction with skippable-image-scanner-template.yaml
+
+apiVersion: v1
+items:
+- apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
+  kind: ScanPolicy
+  metadata:
+    labels:
+      app.kubernetes.io/part-of: enable-in-gui
+    name: noop-scan-policy
+    namespace: dev-ns1
+  spec:
+    # The rego file below produce an empty deny array for every input
+    # of the image scanner. The msg must be set to be a valid rego file.
+    regoFile: |
+      package main
+
+      deny[msg] {
+        false
+        msg="I should never reach this line"
+      }
+kind: List
