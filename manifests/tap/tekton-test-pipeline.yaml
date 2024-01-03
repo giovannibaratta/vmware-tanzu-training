@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: developer-defined-tekton-pipeline
+  labels:
+    apps.tanzu.vmware.com/pipeline: test
+spec:
+  # The values of these params will be provided by TAP
+  params:
+    - name: source-url
+    - name: source-revision
+  tasks:
+    - name : test
+      params:
+        - name: source-url
+          value: $(params.source-url)
+        - name: source-revision
+          value: $(params.source-revision)
+      taskSpec:
+        stepTemplate:
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: "RuntimeDefault"
+            runAsNonRoot: true
+        steps:
+          - name: test
+            image: harbor.h2o-2-21094.h2o.vmware.com/library/ubuntu:22.04
+            # The content of the script should be replaced
+            # with some meaningful tests
+            script: |-
+              ls
