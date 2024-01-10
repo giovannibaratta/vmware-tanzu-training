@@ -20,3 +20,17 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 └── terraform # Contains Terraform code to deploy various components in vSphere, Vault and Kuber...
 ```
 <!-- END_FOLDER_STRUCTURE -->
+
+## Encrypted configuration files
+
+Configuration files that contain also sensitive data (e.g. token, password, ...) have been encrypted using sops (https://github.com/getsops/sops). In order to decrypt the file you need the private key used for the encryption or you need to provide new values for those secrets (based on your environment). If you want to update and commit the sensitive values you have to decrypt and crypt again the file. These type of files can be recognized because the have the extension .sops and have additional metadata inside the file.
+
+Encrypt the file
+```sh
+sops --encrypt --in-place --mac-only-encrypted --encrypted-regex '^(<regexToMatchProperties>)$' <file-path>
+```
+
+Decrypt the file
+```
+sops --decrypt --in-place --encrypted-regex '^(<regexToMatchProperties>)$' <file-path>
+```
