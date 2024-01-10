@@ -17,7 +17,7 @@
         repo: "{{ item }}"
         filename: debian
       with_items:
-      - "deb http://deb.debian.org/debian bookworm main"
+      - "deb http://deb.debian.org/debian bookworm main non-free-firmware"
       - "deb-src http://deb.debian.org/debian bookworm main"
 
     - name: Apt update & upgrade
