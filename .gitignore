@@ -1,4 +1,10 @@
+# Manifests
 *-default-values.yaml
+
+# Terraform
 **/.terraform
 **/terraform-secrets.tfvars
 **/backend-local.tf
+
+# Misx
+.DS_Store
