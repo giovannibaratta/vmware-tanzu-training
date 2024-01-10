@@ -1,0 +1,29 @@
+---
+- name: Prepare host
+  hosts: bootstrap
+  become: true
+
+  vars:
+    docker_edition: 'ce'
+    docker_install_compose: true
+    docker_users:
+    - debian
+
+  pre_tasks:
+    - name: Update cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+  roles:
+    - geerlingguy.docker
+
+  post_tasks:
+    - name: Copy kubectl CLI
+      ansible.builtin.copy:
+        src: "files/kubectl-cli"
+        dest: "/usr/bin/kubectl"
+
+    - name: Copy Tanzu CLI
+      ansible.builtin.copy:
+        src: "files/tanzu-cli"
+        dest: "/usr/bin/tanzu"
