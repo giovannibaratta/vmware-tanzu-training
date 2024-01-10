@@ -15,3 +15,7 @@ variable "vsphere_password" {
 variable "outputs_dir" {
   type = string
 }
+
+variable "domain" {
+  type = string
+}
