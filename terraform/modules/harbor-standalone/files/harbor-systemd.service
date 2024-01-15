@@ -1,0 +1,18 @@
+# Source https://github.com/goharbor/harbor/blob/04a140332ef92e12531fc0b5b839d3222036b8b0/tools/systemd/harbor.service
+
+[Unit]
+Description=Harbor Cloud Native Registry
+Documentation=https://goharbor.io
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=5
+ExecStart=docker compose -f /harbor/docker-compose.yml up
+ExecStop=docker compose -f /harbor/docker-compose.yml down -v
+ExecStopPost=docker compose -f /harbor/docker-compose.yml rm -f
+
+[Install]
+WantedBy=multi-user.target

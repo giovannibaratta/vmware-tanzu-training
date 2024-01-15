@@ -1,0 +1,61 @@
+# Configuration file of Harbor
+
+hostname: ${fqdn}
+
+http:
+  # If https enabled, this port will redirect to https port
+  port: 80
+
+https:
+  port: 443
+  # The cert and the key must be available in the data_volume configured in
+  # this configuration file
+  certificate: /data/cert/${fqdn}.pem
+  private_key: /data/cert/${fqdn}.key
+
+internal_tls:
+  enabled: false
+  dir: /data/cert
+
+harbor_admin_password: ${admin_password}
+
+database:
+  # The password for the root user of Harbor DB.
+  password: ${db_root_password}
+  max_idle_conns: 400
+  max_open_conns: 400
+  conn_max_lifetime: 0 # Do not close connections
+  conn_max_idle_time: 600
+
+data_volume: /data
+
+trivy:
+  ignore_unfixed: false
+  skip_update: false
+  offline_scan: false
+  security_check: vuln
+  insecure: false
+
+jobservice:
+  max_job_workers: 10
+  job_loggers:
+    - STD_OUTPUT
+    - FILE
+  logger_sweeper_duration: 1 #days
+
+
+notification:
+  webhook_job_max_retry: 3
+  webhook_job_http_client_timeout: 3 #seconds
+
+log:
+  level: info
+  local:
+    rotate_count: 50
+    location: /var/log/harbor
+
+cache:
+  enabled: false
+
+#This attribute is for migrator to detect the version of the .cfg file, DO NOT MODIFY!
+_version: 2.10.0
