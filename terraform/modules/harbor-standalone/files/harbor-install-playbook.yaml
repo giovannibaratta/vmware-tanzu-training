@@ -23,16 +23,33 @@
       mode: '0700'
 
   # Create self-signed CA
+  # https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html#set-up-the-ca
   - name: Create CA private key
     community.crypto.openssl_privatekey:
       path: /harbor/tls/ca.key
 
-  - name: Create CA certificate
+  - name: Create certificate signing request for CA certificate
+    community.crypto.openssl_csr_pipe:
+      privatekey_path: /harbor/tls/ca.key
+      common_name: Harbor CA
+      use_common_name_for_san: false
+      basic_constraints:
+        - 'CA:TRUE'
+      basic_constraints_critical: true
+      key_usage:
+        - keyCertSign
+      key_usage_critical: true
+    register: ca_csr
+
+  - name: Create self-signed CA certificate from CSR
     community.crypto.x509_certificate:
       path: /harbor/tls/ca.pem
+      csr_content: "{{ ca_csr.csr }}"
       privatekey_path: /harbor/tls/ca.key
       provider: selfsigned
 
+
+  # Create Harbor certificate
   - name: Create Harbor private key
     community.crypto.openssl_privatekey:
       path: /harbor/tls/harbor.key
