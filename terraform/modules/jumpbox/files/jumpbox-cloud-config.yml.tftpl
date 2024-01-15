@@ -1,0 +1,54 @@
+#cloud-config
+
+fqdn: ${fqdn}
+
+ssh_pwauth: false
+
+chpasswd:
+  # Passwords don't need to be reset on next login
+  expire: false
+
+users:
+  - name: root
+    lock_passwd: false
+    plain_text_passwd: ${password}
+  - name: ubuntu
+    ssh_authorized_keys:
+     - ${authorized_key}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo,docker
+    lock_passwd: true
+    shell: /bin/bash
+  - name: ansible
+    gecos: Ansible User
+    shell: /bin/bash
+    groups: sudo
+    lock_passwd: true
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+package_update: true
+package_upgrade: true
+packages:
+  - python3-pip # Required to install Ansible
+
+write_files:
+  - path: /ansible/setup-playbook.yaml
+    owner: root:root
+    permissions: '0644'
+    encoding: base64
+    content: ${setup_playbook}
+
+ansible:
+  install_method: pip
+  package_name: ansible
+  run_user: ansible
+  galaxy:
+    actions:
+      - ["ansible-galaxy", "role", "install", "geerlingguy.docker"]
+
+  setup_controller:
+    run_ansible:
+      - playbook_dir: /ansible
+        playbook_name: setup-playbook.yaml
+        timeout: 120
+        forks: 1
