@@ -1,5 +1,6 @@
-output "harbor" {
+output "ips" {
   value = {
-    ip = module.harbor.harbor_instance_ip
+    habror = module.harbor.harbor_instance_ip
+    jumpbox = module.jumpbox.jumpbox_instance_ip
   }
 }
