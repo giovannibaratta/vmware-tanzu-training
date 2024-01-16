@@ -1,0 +1,85 @@
+#cloud-config
+
+fqdn: ${fqdn}
+
+ssh_pwauth: false
+
+chpasswd:
+  # Passwords don't need to be reset on next login
+  expire: false
+
+users:
+  - name: root
+    lock_passwd: false
+    plain_text_passwd: ${root_password}
+  - name: ubuntu
+    ssh_authorized_keys:
+     - ${authorized_key}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo,docker
+    lock_passwd: true
+    shell: /bin/bash
+  # Create the user only if the user provided the Ansible playbook
+%{ if setup_playbook != null ~}
+  - name: ansible
+    gecos: Ansible User
+    shell: /bin/bash
+    groups: sudo
+    lock_passwd: true
+    sudo: ALL=(ALL) NOPASSWD:ALL
+%{ endif ~}
+
+package_update: true
+package_upgrade: true
+
+# Install the package only if the user provide an Ansible playbook
+%{ if setup_playbook != null ~}
+packages:
+  - python3-pip # Required to install Ansible
+%{ endif ~}
+
+%{ if setup_playbook != null || length(write_files) > 0 ~}
+write_files:
+%{ if setup_playbook != null ~}
+  # Load the user-provided playbook
+  - path: /ansible/setup-playbook.yaml
+    owner: root:root
+    permissions: '0644'
+    encoding: base64
+    content: ${setup_playbook}
+  # Loop over the user provided files
+%{ endif ~}
+%{ for path, content in write_files ~}
+  - path: ${path}
+    owner: root:root
+    permissions: '0644'
+    encoding: base64
+    content: ${content}
+%{ endfor ~}
+%{ endif ~}
+
+
+# Run ansible only if the user provided a playbook
+%{ if setup_playbook != null ~}
+ansible:
+  install_method: pip
+  package_name: ansible
+  run_user: ansible
+%{ if length(galaxy_actions) > 0 ~}
+  galaxy:
+    actions:
+    # galaxy_actions is an array of array of string
+%{ for action in galaxy_actions ~}
+    -
+%{ for elem in action ~}
+      - ${elem}
+%{ endfor ~}
+%{ endfor ~}
+%{ endif ~}
+  setup_controller:
+    run_ansible:
+      - playbook_dir: /ansible
+        playbook_name: setup-playbook.yaml
+        timeout: 600
+        forks: 1
+%{ endif ~}
