@@ -1,0 +1,17 @@
+# Source https://github.com/keycloak/keycloak/issues/10357
+
+[Unit]
+Description=Keycloak Application Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=keycloak
+Group=keycloak
+RemainAfterExit=yes
+LimitNOFILE=102642
+ExecStart={{ keycloak_dir }}/bin/kc.sh start
+EnvironmentFile={{keycloak_dir}}/environment
+
+[Install]
+WantedBy=multi-user.target
