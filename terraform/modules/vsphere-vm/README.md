@@ -2,6 +2,8 @@
 
 The module deploys a VM in a vSphere environment. The virtual machine can be customized using a mixing of cloud-init configurations and Ansible playbooks.
 
+The module has been tested with Ubuntu 22.04.
+
 <!-- BEGIN_TF_DOCS -->
 <!-- This section will be overridden by terraform-docs. Do not change it.-->
 ## Inputs

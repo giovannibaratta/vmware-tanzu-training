@@ -36,6 +36,8 @@ package_upgrade: true
 %{ if setup_playbook != null ~}
 packages:
   - python3-pip # Required to install Ansible
+  - acl # Required by Ansible to impersonate unprivileged users
+  - python3-psycopg2 # Required by community.postgresql modules
 %{ endif ~}
 
 %{ if setup_playbook != null || length(write_files) > 0 ~}
