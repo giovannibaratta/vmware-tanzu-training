@@ -1,6 +1,8 @@
 #cloud-config
 
+hostname: ${hostname}
 fqdn: ${fqdn}
+prefer_fqdn_over_hostname: true
 
 ssh_pwauth: false
 

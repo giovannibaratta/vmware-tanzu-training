@@ -6,12 +6,15 @@ resource "random_password" "vm_root_user" {
 }
 
 locals {
+  hostname = split(".", var.fqdn)[0]
+
   # Fallback to a random generated password if the user didn't provide one
   root_password = coalesce(var.root_password, random_password.vm_root_user.result)
 
   # User data rendered using the Terraform provider produce an invalid configuration
   # See https://github.com/hashicorp/terraform-provider-cloudinit/issues/165
   default_user_data = templatefile("${path.module}/files/default-cloud-config.yml.tftpl", {
+    hostname: local.hostname
     fqdn : var.fqdn
     root_password : local.root_password
     authorized_key : var.vm_authorized_key
