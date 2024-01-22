@@ -1,0 +1,5 @@
+#@ load("@ytt:overlay", "overlay")
+
+# Remove self-signed CA certificate request
+#@overlay/match by=lambda indexOrKey, left, right: left["metadata"]["name"].startswith("prometheus-ca"), expects=1
+#@overlay/remove

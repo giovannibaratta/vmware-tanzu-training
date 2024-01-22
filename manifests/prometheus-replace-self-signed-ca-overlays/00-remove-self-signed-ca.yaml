@@ -1,0 +1,5 @@
+#@ load("@ytt:overlay", "overlay")
+
+# Remove the self-signed issuer
+#@overlay/match by=overlay.subset({"kind": "Issuer"}), expects="1+"
+#@overlay/remove
