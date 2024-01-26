@@ -1,0 +1,14 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  routes:
+    - services:
+        - name: gitlab-webservice-default
+          port: 8181
+  virtualhost:
+    fqdn: gitlab.h2o-2-21094.h2o.vmware.com
+    tls:
+      secretName: gitlab-wildcard-tls

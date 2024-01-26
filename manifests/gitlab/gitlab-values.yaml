@@ -1,0 +1,21 @@
+global:
+  edition: ce
+  hosts:
+    domain: gitlab.h2o-2-21094.h2o.vmware.com
+  ingress:
+    configureCertmanager: false
+
+nginx-ingress:
+  enabled: false
+
+certmanager-issuer:
+  email: "giovanni.baratta@broadcom.com"
+
+certmanager:
+  install: false
+
+prometheus:
+  install: false
+
+gitlab-runner:
+  install: false
