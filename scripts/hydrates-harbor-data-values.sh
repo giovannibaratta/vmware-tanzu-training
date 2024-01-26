@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This script can be used to copy the stub file containing harbor secrets to the current directory
-# and to produce the a merge file of the harbor config file and the file containing the secrets.
+# and to produce a merged file of the harbor config file and the file containing the secrets.
 # The script also add the files containing the secrets to .gitignore.
 #
 # Usage: ./script gen-template|hydrates
@@ -50,7 +50,7 @@ function gen_template(){
 
     echo "Template file copied to ${dst_file_path}"
 
-    if ! grep -E "^$SECRETS_FILE_NAME" ".gitignore" > /dev/null; then
+    if ! grep -E "^$SECRETS_FILE_NAME" ".gitignore" > /dev/null 2>&1; then
         echo -e "\n${SECRETS_FILE_NAME}" >> ".gitignore"
         echo "Added ${SECRETS_FILE_NAME} to .gitignore"
     fi
@@ -77,7 +77,7 @@ function hydrates(){
         exit 1
     fi
 
-    if ! grep -E "^$HYDRATED_FILE_NAME" ".gitignore" > /dev/null; then
+    if ! grep -E "^$HYDRATED_FILE_NAME" ".gitignore" > /dev/null 2>&1; then
         echo -e "\n${HYDRATED_FILE_NAME}" >> ".gitignore"
         echo "Added ${HYDRATED_FILE_NAME} to .gitignore"
     fi
