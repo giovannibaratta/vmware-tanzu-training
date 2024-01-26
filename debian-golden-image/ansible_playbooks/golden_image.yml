@@ -29,7 +29,7 @@
       ansible.builtin.apt:
         pkg:
         - "vim"
-        - "python3-psycopg2" # # Required by community.postgresql modules
+        - "python3-psycopg2" # Required by community.postgresql modules
         - "acl" # Required by Ansible to impersonate unprivileged users
         - "sudo"
 
