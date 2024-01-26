@@ -1,0 +1,14 @@
+ingress:
+  enabled: true
+  virtual_host_fqdn: "prometheus.h2o-2-22330.h2o.vmware.com"
+  prometheus_prefix: "/"
+  alertmanager_prefix: "/alertmanager/"
+  prometheusServicePort: 80
+  alertmanagerServicePort: 80
+
+prometheus:
+  pvc:
+    storageClassName: vc01cl01-t0compute
+alertmanager:
+  pvc:
+    storageClassName: vc01cl01-t0compute

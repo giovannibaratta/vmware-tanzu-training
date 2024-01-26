@@ -9,7 +9,7 @@ contour:
  logLevel: info
 envoy:
  service:
-   type: LoadBalancer # Required NSX ALB
+   type: LoadBalancer # Require NSX ALB
    externalTrafficPolicy: Cluster
    disableWait: false
  hostPorts:
