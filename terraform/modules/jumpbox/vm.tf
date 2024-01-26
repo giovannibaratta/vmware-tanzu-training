@@ -23,7 +23,7 @@ locals {
 }
 
 resource "vsphere_virtual_machine" "jumpbox" {
-  name = "jumpbox"
+  name             = "jumpbox"
   resource_pool_id = var.vsphere.resource_pool_id
   datastore_id     = var.vsphere.datastore_id
 
@@ -56,8 +56,13 @@ resource "vsphere_virtual_machine" "jumpbox" {
 
   vapp {
     properties = {
-      "user-data" = base64encode(local.jumpbox_user_data)
+      "user-data"   = base64encode(local.jumpbox_user_data)
       "public-keys" = var.vm_authorized_key
     }
+  }
+
+  # Perma diff
+  lifecycle {
+    ignore_changes = [ept_rvi_mode, hv_mode, clone]
   }
 }
