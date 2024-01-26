@@ -1,0 +1,15 @@
+ceip_policy_disclosed: true
+profile: buildservice
+
+buildservice:
+  kp_default_repository: 'harbor.h2o-2-22330.h2o.vmware.com/tbs/tbs'
+  kp_default_repository_secret:
+    name: kp-default-repository
+    namespace: tap-install
+
+  # If set to true, buildpacks will not be installed
+  exclude_dependencies: false
+
+  ca_cert_data: |-
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----
