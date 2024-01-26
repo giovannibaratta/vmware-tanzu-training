@@ -1,0 +1,15 @@
+---
+namespace: tap-install
+targetImagePullSecret: registries-credentials
+snyk:
+  tokenSecret:
+    name: snyk-token-secret
+metadataStore:
+  #! The url where the Store deployment is accesible.
+  #! Default value is: "https://metadata-store-app.metadata-store.svc.cluster.local:8443"
+  url: "https://metadata-store-app.metadata-store.svc.cluster.local:8443"
+  caSecret:
+    #! The name of the secret that contains the ca.crt to connect to the Store Deployment.
+    #! Default value is: "app-tls-cert"
+    name: "app-tls-cert"
+    importFromNamespace: "" #! since both Snyk and Grype both enable store, one must leave importFromNamespace blank

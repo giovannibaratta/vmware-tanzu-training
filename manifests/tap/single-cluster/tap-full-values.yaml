@@ -1,0 +1,147 @@
+profile: full
+
+shared:
+  ingress_domain: "app.h2o-2-21094.h2o.vmware.com"
+
+  image_registry:
+    project_path: "harbor.h2o-2-21094.h2o.vmware.com/tap/"
+    secret:
+      name: "harbor-credentials"
+      namespace: "tap-install"
+
+  kubernetes_version: "1.26.5"
+
+  # List all the certificate that must be trusted by TAP components. Otherwise you can specify
+  # the certificates individually in each components.
+  ca_cert_data: |-
+      -----BEGIN CERTIFICATE-----
+      -----END CERTIFICATE-----
+
+ceip_policy_disclosed: true
+
+supply_chain: testing_scanning
+
+ootb_supply_chain_testing_scanning:
+  scanning:
+    image:
+      template: snyk-private-image-scan-template
+      policy: snyk-scan-policy
+    source:
+      template: blob-source-scan-template
+      policy: scan-policy
+
+contour:
+  envoy:
+    service:
+      type: LoadBalancer
+
+buildservice:
+  kp_default_repository: "harbor.h2o-2-21094.h2o.vmware.com/tap/build-service"
+  kp_default_repository_secret:
+    name: "registry-credentials"
+    namespace: "tap-install"
+
+tap_gui:
+  metadataStoreAutoconfiguration: true # Creates a service account, the Kubernetes control plane token and the requisite app_config block to enable communications between Tanzu Developer Portal and SCST - Store.
+
+  tls:
+   namespace: tap-gui
+   secretName: tap-gui-cert-custom
+
+  app_config:
+
+    integrations:
+      github:
+        - host: github.com
+          token:
+
+    backend:
+      database:
+        client: pg
+        connection:
+          host: 192.168.70.104
+          port: 5432
+          user: tap-gui
+          password:
+          database: tap
+    auth:
+      environment: prod
+      session:
+        secret: custom session secret
+      providers:
+        oidc:
+          prod:
+            metadataUrl: https://keycloak.h2o-2-21094.h2o.vmware.com/realms/tap/.well-known/openid-configuration
+            clientId: tap-oidc
+            clientSecret:
+            prompt: auto
+            scope: 'openid profile email groups'
+        gitlab:
+          prod:
+            clientId:
+            clientSecret:
+            audience: "https://gitlab.h2o-2-21094.h2o.vmware.com"
+            callbackUrl: "https://tap-gui.app.h2o-2-21094.h2o.vmware.com/api/auth/gitlab/handler/frame"
+
+    catalog:
+      locations:
+        - type: url
+          target: https://github.com/giovannibaratta/tap-developer-portal/blob/main/catalog-info.yaml
+
+metadata_store:
+  ns_for_export_app_cert: "*" # Verify this namespace is available within your cluster before initiating the Tanzu Application Platform installation.
+  app_service_type: ClusterIP # Defaults to LoadBalancer. If shared.ingress_domain is set earlier, this must be set to ClusterIP.
+  # Use external DB
+  deploy_internal_db: "false"
+  db_host: 192.168.70.106
+  db_name: metadata-store
+  db_user: tap-metadata-store
+  db_password:
+  db_sslmode: "verify-ca"
+  auto_correct_db_indexes: true # Need superuser permissions to add the extension to the DB
+  db_ca_certificate: |-
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----
+
+policy:
+  tuf_enabled: false # By default, TUF initialization and keyless verification are deactivated.
+
+namespace_provisioner:
+  controller: true
+  default_parameters:
+    limits:
+      default:
+        cpu: 4
+        memory: 4Gi
+      defaultRequest:
+        cpu: 100m
+        memory: 250Mi
+
+  additional_sources:
+  - git:
+      ref: origin/main
+      subPath: ns-provisioner-samples/testing-scanning-supplychain-multiple-scanners
+      url: https://github.com/vmware-tanzu/application-accelerator-samples.git
+  import_data_values_secrets:
+  - name: scanner-auth
+    namespace: tap-install
+    create_export: true
+
+# Enables developer to use LiveUpdate without the need to access the repository directly.
+local_source_proxy:
+  repository: "harbor.h2o-2-21094.h2o.vmware.com/local-proxy"
+
+  push_secret:
+   name: lsp-push-credentials
+   namespace: tap-install
+   create_export: true
+
+  pull_secret:
+   name: lsp-pull-credentials
+   namespace: tap-install
+   create_export: true
+
+api_portal:
+  apiPortalServer:
+    sourceUrls:  https://test-app.dev-ns1.app.h2o-2-21094.h2o.vmware.com/api
+    trustInsecureSourceUrls: true
