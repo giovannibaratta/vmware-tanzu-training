@@ -38,12 +38,12 @@ locals {
     authorized_key : var.vm_authorized_key
     harbor_install_playbook : base64encode(local.harbor_playbook)
     harbor_conf : base64encode(local.harbor_conf)
-    harbor_service: base64encode(file("${path.module}/files/harbor-systemd.service"))
+    harbor_service : base64encode(file("${path.module}/files/harbor-systemd.service"))
   })
 }
 
 resource "vsphere_virtual_machine" "harbor" {
-  name = "harbor"
+  name             = "harbor"
   resource_pool_id = var.vsphere.resource_pool_id
   datastore_id     = var.vsphere.datastore_id
 
@@ -76,8 +76,13 @@ resource "vsphere_virtual_machine" "harbor" {
 
   vapp {
     properties = {
-      "user-data" = base64encode(local.harbor_user_data)
+      "user-data"   = base64encode(local.harbor_user_data)
       "public-keys" = var.vm_authorized_key
     }
+  }
+
+  # Perma diff
+  lifecycle {
+    ignore_changes = [ept_rvi_mode, hv_mode, clone]
   }
 }
