@@ -4,6 +4,10 @@ If you are deploying an Harbor registry for the first time, you might need to up
 
 ## FAQ
 
-**<i> How to let the kapp-controller trust a self-signed certificate of the Harbor registry ?**
+**<i> How to let the kapp-controller trust a self-signed certificate of the Harbor registry ?</i>**
 
 The certificate can be injected using a secret or a config map, see [here](https://carvel.dev/kapp-controller/docs/latest/controller-config/) for more details .
+
+**<i> The pods are failing because the secrets containing TLS certificate can not be found</i>**
+
+Verify if the `certificaterequests` CRD have been created in the namespace used to install TMC. Verify that the issuer specified in the values file is of type ClusterIssuer.
