@@ -1,0 +1,28 @@
+apiVersion: run.tanzu.vmware.com/v1alpha3
+kind: TanzuKubernetesCluster
+metadata:
+  name: corp
+  namespace: dev
+spec:
+  topology:
+    controlPlane:
+      replicas: 1
+      vmClass: best-effort-large
+      storageClass: vc01cl01-t0compute
+      tkr:
+        reference:
+          name: v1.26.5---vmware.2-fips.1-tkg.1
+      nodeDrainTimeout: 10m
+    nodePools:
+      - name: node-pool-default
+        replicas: 3
+        vmClass: best-effort-large
+        storageClass: vc01cl01-t0compute
+        tkr:
+          reference:
+            name: v1.26.5---vmware.2-fips.1-tkg.1
+        nodeDrainTimeout: 5m
+  settings:
+    network:
+      cni:
+        name: antrea
