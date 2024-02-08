@@ -17,8 +17,9 @@ spec:
   commonName: Self Signed CA
   secretName: self-signed-root-ca-tls
   privateKey:
-    algorithm: ECDSA
-    size: 256
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
   issuerRef:
     name: ca-bootstrapper
     kind: ClusterIssuer
