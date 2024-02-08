@@ -4,7 +4,11 @@
 # Terraform
 **/.terraform
 **/terraform-secrets.tfvars
-**/backend-local.tf
+**/backend-*.tf
+**/backends
 
 # Misx
 .DS_Store
+
+# Temporary directories
+*-tmp/
