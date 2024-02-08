@@ -1,3 +1,5 @@
+# This manifest can be used instead of the ingress object create by the Helm chart. Only the webservice
+# is exposed.
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:

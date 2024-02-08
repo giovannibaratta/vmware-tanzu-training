@@ -1,9 +1,38 @@
 global:
   edition: ce
   hosts:
-    domain: gitlab.h2o-2-21094.h2o.vmware.com
+    domain: gitlab.h2o-2-22574.h2o.vmware.com
   ingress:
+    # Assume that a default Ingress class exists. If there is no default ingress class, annotate it
+    # with ingressclass.kubernetes.io/is-default-class before deploying the release or specify the 
+    # class name in the attribute below.
+    class: none
     configureCertmanager: false
+    annotations:
+      # In order to use an external issuer, we have to specify the TLS secret name used in the ingress
+      # otherwise they will be the same causing an issue with cert-manager.
+      cert-manager.io/issuer: gitlab-issuer
+
+gitlab:
+  webservice:
+    ingress:
+      tls:
+        secretName: webservice-tls
+
+  kas:
+    ingress:
+      tls:
+        secretName: kas-tls
+
+registry:
+  ingress:
+    tls:
+      secretName: registry-tls
+
+minio:
+  ingress:
+    tls:
+      secretName: minio-tls
 
 nginx-ingress:
   enabled: false

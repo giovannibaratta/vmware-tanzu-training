@@ -1,0 +1,34 @@
+# Deploy a Self signed CA. The first issuer is used to generate the certificate
+# and private key of the CA, the second issuer is the proper CA.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: gitlab-ca-bootstrapper
+  namespace: gitlab
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: self-signed-ca-cert
+  namespace: gitlab
+spec:
+  isCA: true
+  commonName: GitLab Self Signed CA
+  secretName: self-signed-root-ca-tls
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  issuerRef:
+    name: gitlab-ca-bootstrapper
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: gitlab-issuer
+  namespace: gitlab
+spec:
+  ca:
+    secretName: self-signed-root-ca-tls
