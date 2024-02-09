@@ -115,3 +115,22 @@ The certificate can be injected using a secret or a config map, see [here](https
 **<i> The pods are failing because the secrets containing TLS certificate can not be found</i>**
 
 Verify if the `certificaterequests` CRD have been created in the namespace used to install TMC. Verify that the issuer specified in the values file is of type ClusterIssuer.
+
+**<i> Internal error while logging in </i>**
+
+Check the landing service logs, if the error is due an invalid securecookie, the pod must be restarted.
+  ```bash
+  kubectl logs landing-service-server-5d4459bb5c-fgdlk  --since=1m -f | jq
+  ...
+  securecookie: the value is not valid
+  ...
+  ```
+
+**<i> Internal error (FailedPrecondition) while create a cluster </i>**
+
+```bash
+API Error: Failed to create cluster: rpc error: code = FailedPrecondition desc = management cluster or intent agent is not healthy:failed to create the cluster (failed precondition)
+```
+
+1. Connect to the supervisor nodes via ssh
+1. Restart the intent-agent pods
