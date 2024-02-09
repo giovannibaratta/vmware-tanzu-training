@@ -9,6 +9,7 @@
 
 # Misx
 .DS_Store
+.vscode
 
 # Temporary directories
 *-tmp/
