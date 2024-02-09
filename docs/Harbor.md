@@ -6,7 +6,7 @@ Habor Docs page: https://goharbor.io/docs/2.7.0/
 
 [Tanzu Harbor package docs](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/2.2/using-tkg/workload-packages-harbor.html)
 
-The procedure below contains the steps to install Harbor using the Tanzu with a certificate emitted by cert-manager.
+The procedure below contains the steps to install Harbor using the Tanzu with a certificate emitted by cert-manager. If the TLS section is not configure, the package generates a self-signed CA that is used to generate the certificates.
 
 1. Verify that yq is installed and version is 4.5 or later
    ```bash
