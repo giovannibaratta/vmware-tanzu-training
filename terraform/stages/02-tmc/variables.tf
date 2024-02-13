@@ -19,3 +19,17 @@ variable "clusters_additional_trusted_cas" {
   description = "Additional CA in PEM encoding. The CAs can be concatenated"
   nullable = true
 }
+
+variable "git_repo_credentials" {
+  type = object({
+    username = string
+    password = string
+  })
+
+  sensitive = true
+}
+
+variable "git_repo_url" {
+  type = string
+  description = "The URL should not include https and there shouldn't be any trailing /"
+}
