@@ -13,3 +13,9 @@ variable "supervisor_context_name" {
   description = "Name of the supervisor context in .kube/config"
   type = string
 }
+
+variable "clusters_additional_trusted_cas" {
+  type = string
+  description = "Additional CA in PEM encoding. The CAs can be concatenated"
+  nullable = true
+}
