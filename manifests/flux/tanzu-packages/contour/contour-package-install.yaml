@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    packaging.carvel.dev/package: contour-tkg-system
+    tkg.tanzu.vmware.com/tanzu-package: contour-tkg-system
+  name: contour-tkg-system-sa
+  namespace: tkg-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    packaging.carvel.dev/package: contour-tkg-system
+    tkg.tanzu.vmware.com/tanzu-package: contour-tkg-system
+  name: contour-tkg-system-cluster-role
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    packaging.carvel.dev/package: contour-tkg-system
+    tkg.tanzu.vmware.com/tanzu-package: contour-tkg-system
+  name: contour-tkg-system-cluster-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: contour-tkg-system-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: contour-tkg-system-sa
+  namespace: tkg-system
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  annotations:
+    packaging.carvel.dev/package-ClusterRole: contour-tkg-system-cluster-role
+    packaging.carvel.dev/package-ClusterRoleBinding: contour-tkg-system-cluster-rolebinding
+    packaging.carvel.dev/package-Secret: contour-tkg-system-values
+    packaging.carvel.dev/package-ServiceAccount: contour-tkg-system-sa
+    tkg.tanzu.vmware.com/tanzu-package-ClusterRole: contour-tkg-system-cluster-role
+    tkg.tanzu.vmware.com/tanzu-package-ClusterRoleBinding: contour-tkg-system-cluster-rolebinding
+    tkg.tanzu.vmware.com/tanzu-package-Secret: contour-tkg-system-values
+    tkg.tanzu.vmware.com/tanzu-package-ServiceAccount: contour-tkg-system-sa
+  name: contour
+  namespace: tkg-system
+spec:
+  packageRef:
+    refName: contour.tanzu.vmware.com
+    versionSelection:
+      constraints: 1.23.5+vmware.1-tkg.1
+      prereleases: {}
+  serviceAccountName: contour-tkg-system-sa
+  values:
+  - secretRef:
+      name: contour-tkg-system-values

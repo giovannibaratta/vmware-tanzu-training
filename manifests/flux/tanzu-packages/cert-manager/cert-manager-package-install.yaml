@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    packaging.carvel.dev/package: cert-manager-tkg-system
+    tkg.tanzu.vmware.com/tanzu-package: cert-manager-tkg-system
+  name: cert-manager-tkg-system-sa
+  namespace: tkg-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    packaging.carvel.dev/package: cert-manager-tkg-system
+    tkg.tanzu.vmware.com/tanzu-package: cert-manager-tkg-system
+  name: cert-manager-tkg-system-cluster-role
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    packaging.carvel.dev/package: cert-manager-tkg-system
+    tkg.tanzu.vmware.com/tanzu-package: cert-manager-tkg-system
+  name: cert-manager-tkg-system-cluster-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cert-manager-tkg-system-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: cert-manager-tkg-system-sa
+  namespace: tkg-system
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  annotations:
+    packaging.carvel.dev/package-ClusterRole: cert-manager-tkg-system-cluster-role
+    packaging.carvel.dev/package-ClusterRoleBinding: cert-manager-tkg-system-cluster-rolebinding
+    packaging.carvel.dev/package-ServiceAccount: cert-manager-tkg-system-sa
+    tkg.tanzu.vmware.com/tanzu-package-ClusterRole: cert-manager-tkg-system-cluster-role
+    tkg.tanzu.vmware.com/tanzu-package-ClusterRoleBinding: cert-manager-tkg-system-cluster-rolebinding
+    tkg.tanzu.vmware.com/tanzu-package-ServiceAccount: cert-manager-tkg-system-sa
+  name: cert-manager
+  namespace: tkg-system
+spec:
+  packageRef:
+    refName: cert-manager.tanzu.vmware.com
+    versionSelection:
+      constraints: 1.10.2+vmware.1-tkg.1
+      prereleases: {}
+  serviceAccountName: cert-manager-tkg-system-sa
