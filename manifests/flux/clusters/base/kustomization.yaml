@@ -7,4 +7,5 @@ commonLabels:
   managed-by: kustomize
 
 resources:
+- namespace.yaml
 - deployment.yaml
