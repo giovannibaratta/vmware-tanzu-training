@@ -20,8 +20,13 @@ resource "tanzu-mission-control_package_repository" "tanzu_standard" {
   depends_on = [tanzu-mission-control_tanzu_kubernetes_cluster.external]
 }
 
+locals {
+  git_requires_credentials = var.git_repo_credentials != null
+}
+
 resource "tanzu-mission-control_repository_credential" "gitops" {
-  name = "gitops-repo-credentials"
+  count = local.git_requires_credentials ? 1 : 0
+  name  = "gitops-repo-credentials"
 
   scope {
     cluster_group {
@@ -31,9 +36,23 @@ resource "tanzu-mission-control_repository_credential" "gitops" {
 
   spec {
     data {
-      username_password {
-        username = var.git_repo_credentials.username
-        password = var.git_repo_credentials.password
+
+      dynamic "username_password" {
+        for_each = var.git_repo_credentials.type == "user_pass" ? [var.git_repo_credentials.user_pass] : []
+
+        content {
+          username = username_password.value.username
+          password = username_password.value.password
+        }
+      }
+
+      dynamic "ssh_key" {
+        for_each = var.git_repo_credentials.type == "ssh" ? [var.git_repo_credentials.ssh] : []
+
+        content {
+          identity    = ssh_key.value.identity
+          known_hosts = ssh_key.value.known_hosts
+        }
       }
     }
   }
@@ -52,8 +71,8 @@ resource "tanzu-mission-control_git_repository" "gitops" {
   }
 
   spec {
-    url                = "https://${var.git_repo_url}/poc/flux"
-    secret_ref         = tanzu-mission-control_repository_credential.gitops.name
+    url                = var.git_repo_url
+    secret_ref         = local.git_requires_credentials ? tanzu-mission-control_repository_credential.gitops[0].name : null
     interval           = "60s"
     git_implementation = "GO_GIT"
     ref {
@@ -78,7 +97,7 @@ resource "tanzu-mission-control_kustomization" "package_installation" {
 
   spec {
     # Path in the Git repository. The folder must contain a kustomization.yaml file
-    path     = "tanzu-packages"
+    path     = var.gitops_repo_root_folder
     prune    = true
     interval = "60s"
 
