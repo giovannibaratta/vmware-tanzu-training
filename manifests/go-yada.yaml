@@ -32,7 +32,8 @@ spec:
         image: giovannibaratta/go-yada
 
         env:
-          # The app list the files container in this directory
+          # Directory that must be monitored by the application. Secrets to be displayed
+          # must be put in this directory
           - name: DIR_TO_MONITOR
             value: /vault/secrets
 
