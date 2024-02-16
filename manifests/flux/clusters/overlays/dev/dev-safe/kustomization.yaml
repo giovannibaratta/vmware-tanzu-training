@@ -1,0 +1,7 @@
+namePrefix: safe-
+
+commonLabels:
+  type: safe
+
+resources:
+  - ../

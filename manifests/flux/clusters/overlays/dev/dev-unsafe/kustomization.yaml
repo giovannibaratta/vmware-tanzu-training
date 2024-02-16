@@ -1,0 +1,7 @@
+namePrefix: unsafe-
+
+commonLabels:
+  type: unsafe
+
+resources:
+  - ../
