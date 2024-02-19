@@ -11,3 +11,17 @@ resources:
 - deployment.yaml
 - tanzu-packages/cert-manager.yaml
 - tanzu-packages/contour.yaml
+
+# Adjust the dependencies to include the name with the namePrefix
+replacements:
+- source:
+    group: kustomize.toolkit.fluxcd.io/v1beta2
+    kind: Kustomization
+    name: tanzu-packages-cert-manager
+    fieldPath: metadata.name
+  targets:
+  - select:
+      group: kustomize.toolkit.fluxcd.io/v1beta2
+      kind: Kustomization
+      name: tanzu-packages-contour
+    fieldPath: spec.dependsOn.0.name
