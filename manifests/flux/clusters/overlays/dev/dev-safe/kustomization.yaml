@@ -1,14 +1,11 @@
 namePrefix: dev-safe-
 
-commonLabels:
-  env: dev
-  type: safe
 
 resources:
-  - ../../../base
+- ../../../base
 
 components:
-  - ../shared
+- ../shared
 
-patchesStrategicMerge:
-  - app1-replicas.yaml
+patches:
+- path: app1-replicas.yaml
