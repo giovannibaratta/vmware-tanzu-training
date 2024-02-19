@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: the-container
-        image: monopole/hello:1
+        image: harbor-repo.vmware.com/dockerhub-proxy-cache/monopole/hello:1
         command: ["/hello",
                   "--port=8080",
                   "--enableRiskyFeature=$(ENABLE_RISKY)"]
