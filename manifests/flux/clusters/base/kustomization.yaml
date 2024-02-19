@@ -9,3 +9,5 @@ commonLabels:
 resources:
 - namespace.yaml
 - deployment.yaml
+- tanzu-packages/cert-manager.yaml
+- tanzu-packages/contour.yaml

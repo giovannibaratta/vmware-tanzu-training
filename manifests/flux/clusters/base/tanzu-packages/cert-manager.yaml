@@ -10,5 +10,5 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: gitops
+    name: cluster-setup-repo
     namespace: tanzu-continuousdelivery-resources
