@@ -8,6 +8,8 @@ spec:
   interval: 1m0s
   path: manifests/flux/clusters/base/tanzu-packages/contour/
   prune: true
+  dependsOn:
+    - name: tanzu-packages-cert-manager
   sourceRef:
     kind: GitRepository
     name: cluster-setup-repo
