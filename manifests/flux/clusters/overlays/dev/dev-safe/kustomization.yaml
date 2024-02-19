@@ -9,3 +9,6 @@ resources:
 
 components:
   - ../shared
+
+patchesStrategicMerge:
+  - app1-replicas.yaml

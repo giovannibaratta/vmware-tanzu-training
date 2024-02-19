@@ -1,5 +1,11 @@
+# This file contains a list of shared resources that must be applied to all the clusters
+# that are part of the "dev" group. All the overlays should reference this file.
+
+# components:
+#  - <path to the folder containing this file>
+
 apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 
-commonLabels:
-  common: dev-common
+patchesStrategicMerge:
+  - app1-replicas.yaml
