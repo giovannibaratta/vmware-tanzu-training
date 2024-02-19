@@ -1,11 +1,8 @@
-namePrefix: dev-safe-
-
-
 resources:
-- ../../../base
+  - ../../../base
 
 components:
-- ../shared
+  - ../shared
 
 patches:
-- path: app1-replicas.yaml
+  - path: app1-replicas.yaml
