@@ -8,7 +8,7 @@ This is an example on how to structure folders for using Flux in Tanzu Mission C
 
 Flux defined a CRD named Kustomization. Do not get confused with the resource Kustomization defined by Kustomize. They are two different resources and can be used together. The resources can be identified by the api group defined in the manifest.
 
-## Folder structure
+## Folder structure
 
 ```bash
 ├── apps
@@ -34,7 +34,7 @@ All the configurations that must be applied to all clusters (e.g. Tanzu packages
 
 The `apps` folder contains the definitions of applications (it can also be a reference to an external resource) that must be deployed in the clusters. Again, these resources must be explicitly referenced by the overlay or one of the components.
 
-## Resources
+## Resources
 
 The deployment of resources can be handled in at least 3 different ways:
 * monorepo: include the Kubernetes manifests in the repo and reference them in `kustomization.yaml`
@@ -47,7 +47,7 @@ The deployment of resources can be handled in at least 3 different ways:
 |Flux Kustomization|It can be used to decouple the repository used for managing the cluster from the repositories containing the manifests of specific resources (e.g. apps)</br>The reconciliation state of each component can be inspected with `kubectl`|Write patches is difficult because Kustomize patches will not work as it is. The patch must be included in the Kustomization, hence if the Flux Kustomization is the base layer a Kustomization `kustomize.config.k8s.io` patch that include a Kustomization `kustomize.toolkit.fluxcd.io` path must be written (nested patches)|
 |Helm release|It can be used to decouple the repository used for managing the cluster from the repositories containing the manifests of specific resources (e.g. apps)</br>The reconciliation state of each component can be inspected with `kubectl`|If the Helm chart is well written, it can be easily patched using the values property of the CRD.|
 
-## Limitations
+## Limitations
 
 * `namePrefix` does not work very well with Kustomization (`kustomize.toolkit.fluxcd.io`) `dependsOn` attribute. Since the name of the resource will be prefixed, during the reconciliation the cluster is not able to find the dependency.
 
