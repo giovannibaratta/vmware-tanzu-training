@@ -1,0 +1,10 @@
+commonLabels:
+  env: external
+  site: b
+
+resources:
+  # Reference to the base Kustomization layer
+  - ../../../base
+
+components:
+  - ../shared

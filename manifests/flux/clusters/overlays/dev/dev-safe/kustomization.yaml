@@ -1,8 +1,0 @@
-resources:
-  - ../../../base
-components:
-  - ../shared
-patches:
-  - path: patches/plain-manifests-app.yaml
-  - path: patches/helm-based-app.yaml
-  - path: patches/monorepo-manifests-app.yaml

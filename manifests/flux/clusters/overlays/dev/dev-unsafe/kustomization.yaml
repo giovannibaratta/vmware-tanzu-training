@@ -1,9 +1,0 @@
-commonLabels:
-  env: dev
-  type: unsafe
-
-resources:
-  - ../../../base
-
-components:
-  - ../shared
