@@ -34,3 +34,5 @@ Decrypt the file
 ```
 sops --decrypt --in-place --encrypted-regex '^(<regexToMatchProperties>)$' <file-path>
 ```
+
+> The regex used to encrypt a file can be found inside the encrypted file
