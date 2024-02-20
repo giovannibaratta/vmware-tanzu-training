@@ -9,6 +9,7 @@ kind: Component
 
 resources:
   - ../../../../apps/plain-manifests
+  - ../../../../apps/helm-based
 
 patches:
   - path: patches/plain-manifests-app.yaml
