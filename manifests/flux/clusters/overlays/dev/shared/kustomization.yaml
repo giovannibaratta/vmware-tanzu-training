@@ -8,6 +8,6 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 
 resources:
-  - ../../../../apps/plain-manifests/plain-manifests-app.yaml
+  - ../../../../apps/plain-manifests
 # patches:
 # - path: app1-replicas.yaml
