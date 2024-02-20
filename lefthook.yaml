@@ -6,3 +6,35 @@ pre-push:
   scripts:
     "validate-root-readme.sh":
       runner: bash
+
+pre-commit:
+  parallel: true
+  commands:
+    check-broken-link:
+      glob: "*.md"
+      run: |
+        command=""
+
+        if which docker 2>&1 > /dev/null; then
+          echo "Docker found"
+          command="docker"
+        fi
+
+        if [[ "$command" == "" ]] && which podman 2>&1 > /dev/null; then
+          echo "Podman found"
+          command="podman"
+        fi
+
+        if  [[ "$command" == "" ]]; then
+          echo "No container runtime found"
+          exit 1
+        fi
+
+        files_to_scan=()
+
+        # Prefix files name with the basedir mounted in the container
+        for FILE in {all_files}; do
+          files_to_scan+=( "/files/${FILE}" )
+        done
+
+        "$command" run -v ${PWD}:/files:ro --rm -i ghcr.io/tcort/markdown-link-check:stable -c /files/.markdown-link-checker-config.json -q "${files_to_scan[@]}"
