@@ -10,6 +10,7 @@ kind: Component
 resources:
   - ../../../../apps/plain-manifests
   - ../../../../apps/helm-based
+  - ../../../../apps/monorepo-manifests
 
 patches:
   - path: patches/plain-manifests-app.yaml
