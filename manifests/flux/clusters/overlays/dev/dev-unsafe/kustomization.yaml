@@ -1,5 +1,3 @@
-namePrefix: dev-unsafe-
-
 commonLabels:
   env: dev
   type: unsafe
@@ -7,5 +5,5 @@ commonLabels:
 resources:
   - ../../../base
 
-# components:
-#   - ../shared
+components:
+  - ../shared
