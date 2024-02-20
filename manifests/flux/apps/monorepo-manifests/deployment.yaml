@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: the-deployment
+  namespace: monorepo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: hello
+  template:
+    metadata:
+      labels:
+        deployment: hello
+    spec:
+      containers:
+      - name: the-container
+        image: harbor-repo.vmware.com/dockerhub-proxy-cache/monopole/hello:2
+        command: ["/hello",
+                  "--port=8080",
+                  "--enableRiskyFeature=false"]
+        ports:
+        - containerPort: 8080

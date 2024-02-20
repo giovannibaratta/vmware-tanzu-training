@@ -2,18 +2,18 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: tanzu-packages-contour
+  name: external-plain-manifests-app
   namespace: tanzu-continuousdelivery-resources
 spec:
   interval: 1m0s
-  path: manifests/flux/tanzu-packages/contour/
+  path: manifests/flux-apps/plain-manifests/
   prune: true
   sourceRef:
     kind: GitRepository
-    name: gitops
+    name: cluster-setup-repo
     namespace: tanzu-continuousdelivery-resources
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: contour
-      namespace: tanzu-system-ingress
+      name: the-deployment
+      namespace: the-deployment

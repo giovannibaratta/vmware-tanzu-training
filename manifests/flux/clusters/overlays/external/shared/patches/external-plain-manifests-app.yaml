@@ -1,0 +1,23 @@
+# Since the deployment is defined in another repo we can not directly patch the resource because
+# Kustomize will not find it. Therefore we have to patch the Flux Kustomization to include a patch
+# for the managed resource
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: external-plain-manifests-app
+  namespace: tanzu-continuousdelivery-resources
+spec:
+  patches:
+    - patch: |-
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: the-deployment
+          namespace: the-deployment
+
+        spec:
+          replicas: 2
+      target:
+        kind: Deployment
+        name: the-deployment
+        namespace: the-deployment

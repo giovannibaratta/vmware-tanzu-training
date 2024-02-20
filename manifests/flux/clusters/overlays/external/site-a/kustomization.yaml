@@ -1,0 +1,12 @@
+resources:
+  # Reference to the base Kustomization layer
+  - ../../../base
+
+components:
+  - ../shared
+
+# Cluster specific patches that overwrite shared patches
+patches:
+  - path: patches/external-plain-manifests-app.yaml
+  - path: patches/helm-based-app.yaml
+  - path: patches/monorepo-manifests-app.yaml
