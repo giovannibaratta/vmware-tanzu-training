@@ -7,5 +7,5 @@ commonLabels:
 resources:
   - ../../../base
 
-components:
-  - ../shared
+# components:
+#   - ../shared

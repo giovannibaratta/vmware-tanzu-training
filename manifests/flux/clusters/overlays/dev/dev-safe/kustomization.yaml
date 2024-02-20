@@ -1,8 +1,7 @@
 resources:
   - ../../../base
+# components:
+#   - ../shared
 
-components:
-  - ../shared
-
-patches:
-  - path: app1-replicas.yaml
+# patches:
+#   - path: app1-replicas.yaml
