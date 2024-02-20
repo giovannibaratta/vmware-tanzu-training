@@ -38,5 +38,5 @@ kustomize build <path-to-folder-containing-kustomization.yaml>
 Generate diff with online configuration
 ```bash
 export KUBECTL_EXTERNAL_DIFF="colordiff -N -u"
-kustomize build <path-to-folder-containing-kustomization.yaml> | kubectl diff -f -
+kubectl diff --prune -k clusters/overlays/dev/dev-safe
 ```
