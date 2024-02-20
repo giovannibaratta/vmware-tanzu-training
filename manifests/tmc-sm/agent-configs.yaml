@@ -1,0 +1,61 @@
+apiVersion: "installers.tmc.cloud.vmware.com/v1alpha1"
+kind: "AgentConfig"
+metadata:
+  name: "tmc-agent-config"
+  # The namespace in the supervisor cluster in which the TMC agent will be installed.
+  # This is not an arbitrary namespace, it is already defined in the supervisor
+  namespace: svc-tmc-c8
+spec:
+  allowedHostNames:
+    # hostname associated to the TMC installation to which the supervisor must be registered
+    - "tmc.h2o-2-22574.h2o.vmware.com"
+  # List of CAs to be trusted by the TMC agents
+  caCerts: |-
+    -----BEGIN CERTIFICATE-----
+    MIIE+DCCAuCgAwIBAgIUP5uxxtfd4ztjSEuoXpkZrooVLyUwDQYJKoZIhvcNAQEL
+    BQAwFDESMBAGA1UEAwwJSGFyYm9yIENBMB4XDTI0MDEyNzIxMTc0NloXDTM0MDEy
+    NDIxMTc0NlowFDESMBAGA1UEAwwJSGFyYm9yIENBMIICIjANBgkqhkiG9w0BAQEF
+    AAOCAg8AMIICCgKCAgEAsObt98p1tFD9IZPuLhtGIZ2cxCYy0gyYpVxL4sUh/oA5
+    UfAIBbO8EQH/OfSTBhRh/noqyVICMrxnO2nJpKm0twW+AM4h0++VCaTuoOIki8Zm
+    jAN+RjU+MJbiOB5CWvR4bOXnFNPTdjEJr47fvvzbKMmuc+VuXPcPvVQmaqSeQdP1
+    MvO1XtPZ7/f5wID/RmB6Woi2yuPHbalrRJDB28e551fm1nScg1+Y3L01mtTJ6ovU
+    kwnIIcPnVFWk4cpISXkV+ijZt8cHbDipeIPO8CDy1kYm8CdimTJs6KVvGF7PqRYC
+    r+PBNvtG5Dbxmm6MRKV1+GimAgyKnnu1pOspmom6rgpmjLiW4Xl3QtCyoHRuKPgJ
+    eRWkndj4Z9F1K/Srt1k9atllPz+y0pNzuR+HQnCSXI+MA7WkK1B/7z0uzfQiNHrl
+    CR8OtmiamIEms9Ls4U782fRIZxsxB1jUxJ77MgILpICEB8YIYwDTlZMsGkXC0BSH
+    /QyjNS4skQoFjeXDppuFjBS4WBgFUywPmaU2qLetUGswh0yxLjDcteBNQi90OTnK
+    C8Mqht1r6fyEs8mB1d3r3PMzdF3gO706mRu8HKbYJrJNyjNRO45+tA6wBrZuziUj
+    lCmXQNMIUMPpIJDsgw8kaG9IgN2owvy3trW67tLozF/t+vk+Oh0EghuD4DUN3psC
+    AwEAAaNCMEAwDgYDVR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0O
+    BBYEFN8XjHoNlAeBPzG0oBTSWXgjQQ23MA0GCSqGSIb3DQEBCwUAA4ICAQBdjFzk
+    BTaOpsqHNhy/u1QlTmvFp9dcspTzeEXEO6xJozfF6cFoQpJ7eNd89XDi+uZENbcw
+    075HzZMf7QrjtDxxy1MPulWargpb03PZIwd96ArDtY0riGay4NTs/ZrS4vQjA4iy
+    me8G7ZIQPvXeFeQ4DOzJotCP5ql+GqGv3HBMCfGZQXuY76pV6Jg9XhBghFCf5IJz
+    Rc5bYC1X/phI3h++9iN990aB6m+w3Pt5tiZbfvYqSz8iqR4xOJ39PrVrz3/tpcVD
+    uhNVYGE3EMEuyXr5DfyynpoRSJ1xUHl2L/k20fzI5vzuc5RcapPkMg6i3gVwG9LB
+    13sv71PwprGoYZ/uySuQtJT5kkVeV5SiMGnw7XzkuGu2MUVdrnzLiHQMHqzGa/OI
+    MGoVm2G7kYSbHbN62V68pEFp/TlH6GfY9uRWBl5xH9nBdmIED7Cv5yBXpEgNS5kQ
+    FTOZRysWUwfmec8nFKn31RG7hjMYQZAioSYzOkan+3g8k5XAQOwDP5UZqJNwMccC
+    ai52ssUCLGHIRpB5+aPFATBLSFLkkTRYdUV4Sjd/JWtl1PchNljI9Fa9epMfK1GT
+    Jz8ucmaQivlpkWP2bF/ey37wUBQJTCRGVPr5t16eZaJxGFh3rPSic4nFvdoJ0hEI
+    fYNluKHpW0r7Gp1kYKm1oWYaqiqWSMJb4NiT7Q==
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIC/jCCAeagAwIBAgIQW9TCa1Oin/XSYueSioTinDANBgkqhkiG9w0BAQsFADAZ
+    MRcwFQYDVQQDEw5TZWxmIFNpZ25lZCBDQTAeFw0yNDAyMDcwOTE1MDJaFw0yNDA1
+    MDcwOTE1MDJaMBkxFzAVBgNVBAMTDlNlbGYgU2lnbmVkIENBMIIBIjANBgkqhkiG
+    9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxo1mNBcVN/x1Utahm7vdcecT6rv9E4mgFzrX
+    fXn9f3dkBRx1sxVo85cL/r2ESTFFQtaJqIfudJJ8OQv/MKdwxg1yS4skjxqo4iP5
+    wxuBtwPT4IESvsgn5VZ0nBYYYmemg2qMXMshWuO/Vz1kUvi+iTywXAHzDqM6X6RQ
+    yszUAMUnrnf6nsZPFOJG2B76+81f0wTFXS6I2+BggyuZLdnSFlbWlSXhsjHPCSe6
+    NZ+VRHf8fV+PRbkB4DMF2Mq55F2GkSWu+j2JC41ic4Ba3tkStyEp9AGr8H37H3zO
+    sY+eAXwZTn3wInuWYaER9uRBdzTybNuEMPMOgebiPdmeQAYcvQIDAQABo0IwQDAO
+    BgNVHQ8BAf8EBAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUOZqI3I6e
+    II2KDWK8QVN08cvZQpswDQYJKoZIhvcNAQELBQADggEBACSzfi34PVfwLtw7i8uo
+    IDRxlBLwDqwHckpdU5pEaQzOlw3R/OUWU1Mb8aCwSfaTColDdIogaheqVqb4DBPk
+    bgPAD1+F/o2F7a35h8dD30dh7q+CZl2NCzL9QTbYtnvat9QfKrsSwhi3PWNrNS0A
+    qOEkbnaTxoF0Uo/3Gc+WqL8Ig9fkokO+M4y0dZlJDgQC9urMfH3fjoHwb2xDq/B6
+    BJZ7BRUvBLkKSRrzQaA4lHuP7BVOTeQFQIzv5zF4S7mji/cme6jA7rhWdy69+lcT
+    gjqVVCeY5WdMWYG6btWKn1foYRR8ZsCUAMzMy+cQkvyXNjICqhAK/dLTq7e4ntFJ
+    Kfg=
+    -----END CERTIFICATE-----

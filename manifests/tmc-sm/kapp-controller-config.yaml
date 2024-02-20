@@ -1,0 +1,42 @@
+# This file must be applied in the same in which the Kapp controller is running. The file is used
+# to configure the Kapp controller, see https://carvel.dev/kapp-controller/docs/v0.50.x/controller-config/
+# for more details.
+apiVersion: v1
+kind: Secret
+metadata:
+  # Name must be `kapp-controller-config` for kapp controller to pick it up
+  name: kapp-controller-config
+  # Namespace must match the namespace kapp-controller is deployed to
+  namespace: tkg-system
+stringData:
+  # A chain of CAs that the kapp-controller should trust
+  caCerts: |
+    -----BEGIN CERTIFICATE-----
+    MIIE+DCCAuCgAwIBAgIUP5uxxtfd4ztjSEuoXpkZrooVLyUwDQYJKoZIhvcNAQEL
+    BQAwFDESMBAGA1UEAwwJSGFyYm9yIENBMB4XDTI0MDEyNzIxMTc0NloXDTM0MDEy
+    NDIxMTc0NlowFDESMBAGA1UEAwwJSGFyYm9yIENBMIICIjANBgkqhkiG9w0BAQEF
+    AAOCAg8AMIICCgKCAgEAsObt98p1tFD9IZPuLhtGIZ2cxCYy0gyYpVxL4sUh/oA5
+    UfAIBbO8EQH/OfSTBhRh/noqyVICMrxnO2nJpKm0twW+AM4h0++VCaTuoOIki8Zm
+    jAN+RjU+MJbiOB5CWvR4bOXnFNPTdjEJr47fvvzbKMmuc+VuXPcPvVQmaqSeQdP1
+    MvO1XtPZ7/f5wID/RmB6Woi2yuPHbalrRJDB28e551fm1nScg1+Y3L01mtTJ6ovU
+    kwnIIcPnVFWk4cpISXkV+ijZt8cHbDipeIPO8CDy1kYm8CdimTJs6KVvGF7PqRYC
+    r+PBNvtG5Dbxmm6MRKV1+GimAgyKnnu1pOspmom6rgpmjLiW4Xl3QtCyoHRuKPgJ
+    eRWkndj4Z9F1K/Srt1k9atllPz+y0pNzuR+HQnCSXI+MA7WkK1B/7z0uzfQiNHrl
+    CR8OtmiamIEms9Ls4U782fRIZxsxB1jUxJ77MgILpICEB8YIYwDTlZMsGkXC0BSH
+    /QyjNS4skQoFjeXDppuFjBS4WBgFUywPmaU2qLetUGswh0yxLjDcteBNQi90OTnK
+    C8Mqht1r6fyEs8mB1d3r3PMzdF3gO706mRu8HKbYJrJNyjNRO45+tA6wBrZuziUj
+    lCmXQNMIUMPpIJDsgw8kaG9IgN2owvy3trW67tLozF/t+vk+Oh0EghuD4DUN3psC
+    AwEAAaNCMEAwDgYDVR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0O
+    BBYEFN8XjHoNlAeBPzG0oBTSWXgjQQ23MA0GCSqGSIb3DQEBCwUAA4ICAQBdjFzk
+    BTaOpsqHNhy/u1QlTmvFp9dcspTzeEXEO6xJozfF6cFoQpJ7eNd89XDi+uZENbcw
+    075HzZMf7QrjtDxxy1MPulWargpb03PZIwd96ArDtY0riGay4NTs/ZrS4vQjA4iy
+    me8G7ZIQPvXeFeQ4DOzJotCP5ql+GqGv3HBMCfGZQXuY76pV6Jg9XhBghFCf5IJz
+    Rc5bYC1X/phI3h++9iN990aB6m+w3Pt5tiZbfvYqSz8iqR4xOJ39PrVrz3/tpcVD
+    uhNVYGE3EMEuyXr5DfyynpoRSJ1xUHl2L/k20fzI5vzuc5RcapPkMg6i3gVwG9LB
+    13sv71PwprGoYZ/uySuQtJT5kkVeV5SiMGnw7XzkuGu2MUVdrnzLiHQMHqzGa/OI
+    MGoVm2G7kYSbHbN62V68pEFp/TlH6GfY9uRWBl5xH9nBdmIED7Cv5yBXpEgNS5kQ
+    FTOZRysWUwfmec8nFKn31RG7hjMYQZAioSYzOkan+3g8k5XAQOwDP5UZqJNwMccC
+    ai52ssUCLGHIRpB5+aPFATBLSFLkkTRYdUV4Sjd/JWtl1PchNljI9Fa9epMfK1GT
+    Jz8ucmaQivlpkWP2bF/ey37wUBQJTCRGVPr5t16eZaJxGFh3rPSic4nFvdoJ0hEI
+    fYNluKHpW0r7Gp1kYKm1oWYaqiqWSMJb4NiT7Q==
+    -----END CERTIFICATE-----

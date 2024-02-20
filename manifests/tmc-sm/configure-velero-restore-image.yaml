@@ -1,0 +1,27 @@
+# Configure Velero to use the image specified in the image block during the restore procedure.
+# The config map should be applied only in the cluster where the restore will take place.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fs-restore-action-config
+  namespace: velero
+  labels:
+    # Do not touch the these labels because they are used by Velero to correctly identify
+    # the config map
+    velero.io/plugin-config: ""
+    velero.io/pod-volume-restore: RestoreItemAction
+data:
+  # Replace the hostname with your private registry
+  image: harbor.h2o-2-22574.h2o.vmware.com/library/velero/velero-restore-helper:v1.11.1
+  secCtxRunAsUser: "1001"
+  secCtxRunAsGroup: "999"
+  secCtxAllowPrivilegeEscalation: "false"
+  secCtx: |
+      capabilities:
+        drop:
+        - ALL
+        add: []
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsUser: 1001
+      runAsGroup: 999
