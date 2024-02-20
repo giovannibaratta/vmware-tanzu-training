@@ -23,7 +23,7 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 
 ## Encrypted configuration files
 
-Configuration files that contain also sensitive data (e.g. token, password, ...) have been encrypted using sops (https://github.com/getsops/sops). In order to decrypt the file you need the private key used for the encryption or you need to provide new values for those secrets (based on your environment). If you want to update and commit the sensitive values you have to decrypt and crypt again the file. These type of files can be recognized by the string `.sops` included in the filename and they have additional metadata inside the file.
+Configuration files that contain also sensitive data (e.g. token, password, ...) have been encrypted using [sops](https://github.com/getsops/sops). In order to decrypt the file you need the private key used for the encryption or you need to provide new values for those secrets (based on your environment). If you want to update and commit the sensitive values you have to decrypt and crypt again the file. These type of files can be recognized by the string `.sops` included in the filename and they have additional metadata inside the file.
 
 Encrypt the file
 ```sh
