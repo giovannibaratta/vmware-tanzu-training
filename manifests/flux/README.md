@@ -63,5 +63,5 @@ kustomize build <path-to-folder-containing-kustomization.yaml>
 
 ```bash
 export KUBECTL_EXTERNAL_DIFF="colordiff -N -u"
-kubectl diff --prune -k clusters/overlays/dev/dev-safe
+kubectl diff --prune -k <path-to-folder-containing-kustomization.yaml>
 ```
