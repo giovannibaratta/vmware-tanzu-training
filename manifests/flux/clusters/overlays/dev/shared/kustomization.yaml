@@ -14,3 +14,4 @@ resources:
 
 patches:
   - path: patches/plain-manifests-app.yaml
+  - path: patches/monorepo-manifests-app.yaml
