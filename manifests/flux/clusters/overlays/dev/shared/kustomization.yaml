@@ -9,5 +9,6 @@ kind: Component
 
 resources:
   - ../../../../apps/plain-manifests
-# patches:
-# - path: app1-replicas.yaml
+
+patches:
+  - path: patches/plain-manifests-app.yaml
