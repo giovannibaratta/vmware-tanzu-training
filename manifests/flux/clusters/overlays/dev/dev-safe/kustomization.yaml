@@ -2,6 +2,5 @@ resources:
   - ../../../base
 components:
   - ../shared
-
-# patches:
-#   - path: app1-replicas.yaml
+patches:
+  - path: patches/plain-manifests-app.yaml
