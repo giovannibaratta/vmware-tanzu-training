@@ -10,7 +10,7 @@
   1. Resource group for ALB, tkgm
 1. Configure a bootstrap machine
   1. (optional) Build a golden image using this [guide](../debian-golden-image/README.md).
-  1. Deploy a VMs an install the necessary packages using [this](../ansible/tkgm-bootstrap-machine) playbook.
+  1. Deploy a VMs an install the necessary packages using [this](../ansible/tkgm-bootstrap) playbook.
 
 1. Upload Kubernetes ova image and NSX Advance Load Balancer image to the content library
 1. Deploy NSX ALB
