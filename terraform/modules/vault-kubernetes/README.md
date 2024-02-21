@@ -16,6 +16,6 @@ The module creates a role foreach entry in the variable `roles`. The entry must 
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_kubernetes_config"></a> [kubernetes\_config](#input\_kubernetes\_config) | n/a | <pre>object({<br>    host = string<br>    ca = string<br>  })</pre> | n/a | yes |
-| <a name="input_roles"></a> [roles](#input\_roles) | n/a | <pre>map(object({<br>    name = string<br>    service_account_names = optional(set(string), ["*"])<br>    namespaces = set(string)<br>    policies_to_attach = optional(set(string), [])<br>  }))</pre> | `{}` | no |
+| kubernetes\_config | n/a | <pre>object({<br>    host = string<br>    ca = string<br>  })</pre> | n/a | yes |
+| roles | n/a | <pre>map(object({<br>    name = string<br>    service_account_names = optional(set(string), ["*"])<br>    namespaces = set(string)<br>    policies_to_attach = optional(set(string), [])<br>  }))</pre> | `{}` | no |
 <!-- END_TF_DOCS -->

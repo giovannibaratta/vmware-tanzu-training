@@ -13,6 +13,6 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_nsxt_config"></a> [nsxt\_config](#input\_nsxt\_config) | Information to connect to the NSX manager | <pre>object({<br>    host                 = string<br>    username             = string<br>    allow_unverified_ssl = bool<br>  })</pre> | n/a | yes |
-| <a name="input_nsxt_config_sensitive"></a> [nsxt\_config\_sensitive](#input\_nsxt\_config\_sensitive) | Information to connect to the NSX manager | <pre>object({<br>    password = string<br>  })</pre> | n/a | yes |
+| nsxt\_config | Information to connect to the NSX manager | <pre>object({<br>    host                 = string<br>    username             = string<br>    allow_unverified_ssl = bool<br>  })</pre> | n/a | yes |
+| nsxt\_config\_sensitive | Information to connect to the NSX manager | <pre>object({<br>    password = string<br>  })</pre> | n/a | yes |
 <!-- END_TF_DOCS -->

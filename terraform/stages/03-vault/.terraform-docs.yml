@@ -25,7 +25,7 @@ sort:
   by: required
 
 settings:
-  anchor: true
+  anchor: false
   color: true
   default: true
   description: false
