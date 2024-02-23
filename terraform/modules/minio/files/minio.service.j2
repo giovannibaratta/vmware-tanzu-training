@@ -1,0 +1,37 @@
+# Source https://raw.githubusercontent.com/minio/minio-service/master/linux-systemd/minio.service
+
+[Unit]
+Description=MinIO
+Documentation=https://docs.min.io
+Wants=network-online.target
+After=network-online.target
+AssertFileIsExecutable=/usr/local/bin/minio
+AssertFileNotEmpty={{ minio_conf_dir }}/environment
+
+[Service]
+Type=notify
+
+WorkingDirectory=/usr/local/
+
+User=minio
+Group=minio
+ProtectProc=invisible
+
+EnvironmentFile={{ minio_conf_dir }}/environment
+ExecStart=/usr/local/bin/minio server --address "0.0.0.0:443" "{{ minio_data_dir }}" --certs-dir "{{minio_certs_dir}}" --anonymous
+
+# Let systemd restart this service always
+Restart=always
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=1048576
+
+# Specifies the maximum number of threads this process can create
+TasksMax=infinity
+
+# Disable timeout logic and wait until process is stopped
+TimeoutStopSec=infinity
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target

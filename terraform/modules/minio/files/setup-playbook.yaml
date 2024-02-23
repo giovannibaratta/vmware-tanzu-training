@@ -1,0 +1,217 @@
+---
+- name: Prepare host
+  hosts: localhost
+  connection: local
+  become: true
+
+  tasks:
+    - name: Add the MinIO user
+      ansible.builtin.user:
+        name: minio
+
+- name: Install and configure MinIO
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    minio_root_dir: "/opt/minio"
+    minio_conf_dir: "{{ minio_root_dir }}/conf"
+    minio_certs_dir: "{{ minio_conf_dir }}/tls"
+    minio_data_dir: "{{ minio_root_dir }}/data"
+    minio_root_password: "${minio_root_password}"
+
+  pre_tasks:
+  - name: Retrieve hostname
+    shell: "hostname -f"
+    register: hostname_command
+
+  - name: Set facts
+    ansible.builtin.set_fact:
+      minio_fqdn: "{{ hostname_command.stdout }}"
+
+  tasks:
+  - name: Install MinIO
+    block:
+    - name: Download executable
+      ansible.builtin.get_url:
+        url: "https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2024-01-28T22-35-53Z"
+        dest: /usr/local/bin/minio
+        checksum: sha256:b0638a7f484c53c2d22777f9d8d777d600a321aaeff526bf42a8524c89bfec5e
+        mode: '0755'
+
+    - name: Create MinIO dirs
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: minio
+        group: minio
+      with_items:
+        - "{{ minio_root_dir }}"
+        - "{{ minio_conf_dir }}"
+        - "{{ minio_certs_dir }}"
+        - "{{ minio_data_dir }}"
+
+  - name: Create TLS folder
+    ansible.builtin.file:
+      path: "/ansible/tls/"
+      state: directory
+      mode: '0700'
+
+  # Create self-signed CA
+  # https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html#set-up-the-ca
+  - name: Create self-signed CA
+    block:
+    - name: Generate CA private key
+      community.crypto.openssl_privatekey:
+        path: /ansible/tls/ca.key
+
+    - name: Generate certificate signing request for CA certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: /ansible/tls/ca.key
+        common_name: MinIO CA
+        use_common_name_for_san: false
+        basic_constraints:
+          - 'CA:TRUE'
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+        key_usage_critical: true
+      register: ca_csr
+
+    - name: Generate self-signed CA certificate from CSR
+      community.crypto.x509_certificate:
+        path: /ansible/tls/ca.pem
+        csr_content: "{{ ca_csr.csr }}"
+        privatekey_path: /ansible/tls/ca.key
+        provider: selfsigned
+        return_content: true
+      register: minio_ca_cert_task
+
+  # Trust CA system wide
+  - name: Copy CA
+    ansible.builtin.copy:
+      src: "/ansible/tls/ca.pem"
+      dest: "/etc/ssl/certs/minio_ca.pem"
+      remote_src: true
+
+  - name: Create MinIO certificate
+    block:
+    - name: Generate MinIO private key
+      community.crypto.openssl_privatekey:
+        path: /ansible/tls/minio.key
+
+    # Generate CSR and sign it with the self-signed cA
+    - name: Generate MinIO certificate signing request (CSR)
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: /ansible/tls/minio.key
+        common_name: "{{ minio_fqdn }}"
+        subject_alt_name:
+          - "DNS:{{ minio_fqdn }}"
+          - "IP:{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+      register: minio_csr
+
+    - name: Generate MinIO certificate
+      community.crypto.x509_certificate:
+        path: /ansible/tls/minio.pem
+        csr_content: "{{ minio_csr.csr }}"
+        ownca_privatekey_path: /ansible/tls/ca.key
+        ownca_path: /ansible/tls/ca.pem
+        provider: ownca
+        return_content: true
+      register: minio_cert_task
+
+  - name: Copy TLS private key
+    ansible.builtin.copy:
+      src: "/ansible/tls/minio.key"
+      dest: "{{ minio_certs_dir }}/private.key"
+      remote_src: true
+      owner: minio
+      group: minio
+    notify:
+      - Restart MinIO service
+
+  - name: Copy TLS certificate
+    ansible.builtin.copy:
+      src: "/ansible/tls/minio.pem"
+      dest: "{{ minio_certs_dir }}/public.crt"
+      remote_src: true
+      owner: minio
+      group: minio
+    notify:
+      - Restart MinIO service
+
+  - name: Add capabilities to bind to 443
+    community.general.capabilities:
+      path: "/usr/local/bin/minio"
+      capability: cap_net_bind_service=+eip
+      state: present
+
+  # The file is referenced in the systemd unit service
+  - name: Generate environment file
+    ansible.builtin.template:
+      src: "templates/minio-environment.j2"
+      dest: "{{ minio_conf_dir }}/environment"
+    notify:
+      - Restart MinIO service
+
+  - name: Generate MinIO service
+    ansible.builtin.template:
+      src: "templates/minio.service.j2"
+      dest: "/etc/systemd/system/minio.service"
+    notify:
+      - Restart MinIO service
+
+  - name: Start MinIO service
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: minio
+      state: started
+      enabled: true
+    register: start_minio_service
+
+  handlers:
+  - name: Restart MinIO service
+    when: not start_minio_service.changed
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: minio
+      state: restarted
+
+- name: Install and configure MinIO client
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    minio_alias: "local"
+    minio_root_password: "${minio_root_password}"
+
+  pre_tasks:
+  - name: Retrieve hostname
+    shell: "hostname -f"
+    register: hostname_command
+
+  - name: Set facts
+    ansible.builtin.set_fact:
+      minio_root_password: ${minio_root_password}
+      minio_fqdn: "{{ hostname_command.stdout }}"
+
+  tasks:
+  - name: Download client executable
+    become: true
+    ansible.builtin.get_url:
+      url: "https://dl.min.io/client/mc/release/linux-amd64/archive/mc.RELEASE.2024-02-16T11-05-48Z"
+      dest: /usr/local/bin/mc
+      checksum: sha256:32e654f270446525d03482992b274290654283cfe573bbe1bf2687e3e0981400
+      mode: '0755'
+
+  - name: Add local server credentials
+    become: true
+    become_user: minio
+    ansible.builtin.shell: "mc config host add {{ minio_alias }} https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} root \"{{ minio_root_password }}\""
+
+  - name: Test connection
+    become: true
+    become_user: minio
+    ansible.builtin.shell: "mc admin info {{ minio_alias }}"
