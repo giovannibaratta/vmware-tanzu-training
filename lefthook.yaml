@@ -38,3 +38,28 @@ pre-commit:
         done
 
         "$command" run -v ${PWD}:/files:ro --rm -i ghcr.io/tcort/markdown-link-check:stable -c /files/.markdown-link-checker-config.json -q "${files_to_scan[@]}"
+
+    run-terraform-tests:
+      files: git --no-pager diff --name-only HEAD
+      glob: "terraform/modules/*/*"
+      run: |
+        modified_files=()
+
+        for FILE in {files}; do
+          modified_files+=( "$FILE" )
+        done
+
+        # Get unique modules that have been modified
+        IFS=$'\n' modules_to_test=$(sort <<< "${modified_files[*]}" | cut -d'/' -f1-3 | uniq)
+        unset IFS
+
+        # For each module, run the terraform command to run the tests
+        for module in $modules_to_test; do
+          echo "Testing $module"
+          terraform -chdir="$module" init -upgrade > /dev/null
+          if ! terraform -chdir="$module" test; then
+            echo "Tests failed"
+            exit 1
+          fi
+          echo ""
+        done
