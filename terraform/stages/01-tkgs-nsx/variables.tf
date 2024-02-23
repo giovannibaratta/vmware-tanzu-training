@@ -28,3 +28,9 @@ variable "domain" {
 variable "vm_authorized_key" {
   type = string
 }
+
+variable "sensitive_output_dir" {
+  type = string
+  default = null
+  nullable = true
+}
