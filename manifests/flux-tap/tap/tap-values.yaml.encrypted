@@ -66,6 +66,9 @@ shared:
     -----END CERTIFICATE-----
 ceip_policy_disclosed: true
 profile: full
+excluded_packages:
+ # Excluded due to a conflict when installing TAP using TMC + Flux
+ - fluxcd.source.controller.tanzu.vmware.com
 supply_chain: basic
 contour:
   envoy:
