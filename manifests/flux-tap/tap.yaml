@@ -10,7 +10,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: tap-repo
+    name: gitops-branch-tap-gitops-flux
     namespace: tanzu-continuousdelivery-resources
   decryption:
       provider: sops
