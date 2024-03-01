@@ -13,3 +13,5 @@ secretGenerator:
    namespace: tap-install
    files:
    - values.yaml=tap-values.yaml.encrypted
+   options:
+    disableNameSuffixHash: true
