@@ -5,4 +5,10 @@ metadata:
 
 resources:
   - namespace.yaml
+  - service-account.yaml
   - package-repository.yaml
+
+secretGenerator:
+ - name: tap-values
+   files:
+   - values.yaml=tap-values.yaml.encrypted
