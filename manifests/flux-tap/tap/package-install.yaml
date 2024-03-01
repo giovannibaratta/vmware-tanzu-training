@@ -1,18 +1,13 @@
 apiVersion: packaging.carvel.dev/v1alpha1
 kind: PackageInstall
 metadata:
-  # annotations:
-  #   packaging.carvel.dev/package-ClusterRole: tap-install-cluster-role
-  #   packaging.carvel.dev/package-ClusterRoleBinding: tap-install-cluster-rolebinding
-  #   packaging.carvel.dev/package-Secret: tap-values
-  #   packaging.carvel.dev/package-ServiceAccount: tap-install-sa
   name: tap
   namespace: tap-install
 spec:
   packageRef:
     refName: tap.tanzu.vmware.com
     versionSelection:
-      constraints: 1.7.4
+      constraints: 1.8.0
       prereleases: {}
   serviceAccountName: tap-install-sa
   values:

@@ -8,4 +8,4 @@ metadata:
 spec:
   fetch:
     imgpkgBundle:
-      image: harbor.h2o-2-22574.h2o.vmware.com/tap/tap-packages:1.7.4
+      image: harbor.h2o-2-22574.h2o.vmware.com/tap/tap-packages:1.8.0
