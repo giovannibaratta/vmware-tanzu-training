@@ -4,4 +4,5 @@ metadata:
   name: tap
 
 resources:
+  - namespace.yaml
   - package-repository.yaml
