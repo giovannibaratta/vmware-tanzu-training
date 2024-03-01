@@ -10,5 +10,6 @@ resources:
 
 secretGenerator:
  - name: tap-values
+   namespace: tap-install
    files:
    - values.yaml=tap-values.yaml.encrypted
