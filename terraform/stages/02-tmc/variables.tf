@@ -63,3 +63,13 @@ variable "gitops_repo_root_folder" {
   description = "path of folder containing the root kustomization.yaml"
   default     = ""
 }
+
+variable "age_secret_key" {
+  sensitive = true
+  type = string
+
+  validation {
+    condition = startswith(var.age_secret_key, "AGE-SECRET-KEY-")
+    error_message = "Key must start with AGE-SECRET-KEY-"
+  }
+}
