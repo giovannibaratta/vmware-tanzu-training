@@ -16,150 +16,167 @@
     harbor_hostname: "${harbor_fqdn}"
 
   tasks:
-  - name: Create TLS folder
-    ansible.builtin.file:
-      path: "/harbor/tls/"
-      state: directory
-      mode: '0700'
+    - name: Create TLS folder
+      ansible.builtin.file:
+        path: "/harbor/tls/"
+        state: directory
+        mode: "0700"
 
-  # Create self-signed CA
-  # https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html#set-up-the-ca
-  - name: Create CA private key
-    community.crypto.openssl_privatekey:
-      path: /harbor/tls/ca.key
+    # Create self-signed CA
+    # https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html#set-up-the-ca
+    - name: Create CA private key
+      community.crypto.openssl_privatekey:
+        path: /harbor/tls/ca.key
 
-  - name: Create certificate signing request for CA certificate
-    community.crypto.openssl_csr_pipe:
-      privatekey_path: /harbor/tls/ca.key
-      common_name: Harbor CA
-      use_common_name_for_san: false
-      basic_constraints:
-        - 'CA:TRUE'
-      basic_constraints_critical: true
-      key_usage:
-        - keyCertSign
-      key_usage_critical: true
-    register: ca_csr
+    - name: Create certificate signing request for CA certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: /harbor/tls/ca.key
+        common_name: Harbor CA
+        use_common_name_for_san: false
+        basic_constraints:
+          - "CA:TRUE"
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+        key_usage_critical: true
+      register: ca_csr
 
-  - name: Create self-signed CA certificate from CSR
-    community.crypto.x509_certificate:
-      path: /harbor/tls/ca.pem
-      csr_content: "{{ ca_csr.csr }}"
-      privatekey_path: /harbor/tls/ca.key
-      provider: selfsigned
+    - name: Create self-signed CA certificate from CSR
+      community.crypto.x509_certificate:
+        path: /harbor/tls/ca.pem
+        csr_content: "{{ ca_csr.csr }}"
+        privatekey_path: /harbor/tls/ca.key
+        provider: selfsigned
+        # It must be less than 825 days to work on newer MacOs versions
+        selfsigned_not_after: "+730d"
 
+    # Create Harbor certificate
+    - name: Create Harbor private key
+      community.crypto.openssl_privatekey:
+        path: /harbor/tls/harbor.key
 
-  # Create Harbor certificate
-  - name: Create Harbor private key
-    community.crypto.openssl_privatekey:
-      path: /harbor/tls/harbor.key
+    # Create CSR and sign it with the self-signed cA
+    - name: Create Harbor certificate signing request (CSR)
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: /harbor/tls/harbor.key
+        common_name: "{{ harbor_hostname }}"
+        subject_alt_name:
+          - "DNS:{{ harbor_hostname }}"
+      register: harbor_csr
 
-  # Create CSR and sign it with the self-signed cA
-  - name: Create Harbor certificate signing request (CSR)
-    community.crypto.openssl_csr_pipe:
-      privatekey_path: /harbor/tls/harbor.key
-      common_name: "{{ harbor_hostname }}"
-      subject_alt_name:
-        - "DNS:{{ harbor_hostname }}"
-    register: harbor_csr
+    - name: Create Harbor certificate
+      community.crypto.x509_certificate:
+        path: /harbor/tls/harbor.pem
+        csr_content: "{{ harbor_csr.csr }}"
+        ownca_privatekey_path: /harbor/tls/ca.key
+        ownca_path: /harbor/tls/ca.pem
+        # It must be less than 825 days to work on newer MacOs versions
+        ownca_not_after: "+365d"
+        provider: ownca
+      notify:
+        - Regenerate Harbor configs
+        - Restart Harbor service
 
-  - name: Create Harbor certificate
-    community.crypto.x509_certificate:
-      path: /harbor/tls/harbor.pem
-      csr_content: "{{ harbor_csr.csr }}"
-      ownca_privatekey_path: /harbor/tls/ca.key
-      ownca_path: /harbor/tls/ca.pem
-      provider: ownca
+    # Copy certificate and private key in the all the required folders
+    - name: Create Docker cert folder
+      ansible.builtin.file:
+        path: "/etc/docker/certs.d/{{ harbor_hostname }}/"
+        state: directory
+        mode: "0755"
 
-  # Copy certificate and private key in the all the required folders
-  - name: Create Docker cert folder
-    ansible.builtin.file:
-      path: "/etc/docker/certs.d/{{ harbor_hostname }}/"
-      state: directory
-      mode: '0755'
+    - name: Create /data folder
+      ansible.builtin.file:
+        path: "/data"
+        state: directory
+        mode: "0755"
 
-  - name: Create /data folder
-    ansible.builtin.file:
-      path: "/data"
-      state: directory
-      mode: '0755'
+    - name: Create /data/cert folder
+      ansible.builtin.file:
+        path: "/data/cert"
+        state: directory
+        mode: "0755"
 
-  - name: Create /data/cert folder
-    ansible.builtin.file:
-      path: "/data/cert"
-      state: directory
-      mode: '0755'
+    - name: Create /data/ca_download folder
+      ansible.builtin.file:
+        path: "/data/ca_download"
+        state: directory
+        mode: "0755"
 
-  - name: Create /data/ca_download folder
-    ansible.builtin.file:
-      path: "/data/ca_download"
-      state: directory
-      mode: '0755'
+    - name: Copy Harbor private key to Docker certs
+      ansible.builtin.copy:
+        src: /harbor/tls/harbor.key
+        dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname}}.key"
+        remote_src: yes
 
-  - name: Copy Harbor private key to Docker certs
-    ansible.builtin.copy:
-      src: /harbor/tls/harbor.key
-      dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname}}.key"
-      remote_src: yes
+    - name: Copy Harbor certificate to Docker certs
+      ansible.builtin.copy:
+        src: /harbor/tls/harbor.pem
+        dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname}}.pem"
+        remote_src: yes
 
-  - name: Copy Harbor certificate to Docker certs
-    ansible.builtin.copy:
-      src: /harbor/tls/harbor.pem
-      dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname}}.pem"
-      remote_src: yes
+    - name: Copy CA certificate
+      ansible.builtin.copy:
+        src: /harbor/tls/ca.pem
+        dest: "/etc/docker/certs.d/{{ harbor_hostname }}/ca.pem"
+        remote_src: yes
 
-  - name: Copy CA certificate
-    ansible.builtin.copy:
-      src: /harbor/tls/ca.pem
-      dest: "/etc/docker/certs.d/{{ harbor_hostname }}/ca.pem"
-      remote_src: yes
+    - name: Copy Harbor private key to data volume
+      ansible.builtin.copy:
+        src: /harbor/tls/harbor.key
+        dest: "/data/cert/{{ harbor_hostname}}.key"
+        remote_src: yes
 
-  - name: Copy Harbor private key to data volume
-    ansible.builtin.copy:
-      src: /harbor/tls/harbor.key
-      dest: "/data/cert/{{ harbor_hostname}}.key"
-      remote_src: yes
+    - name: Copy Harbor certificate to data volume
+      ansible.builtin.copy:
+        src: /harbor/tls/harbor.pem
+        dest: "/data/cert/{{ harbor_hostname}}.pem"
+        remote_src: yes
 
-  - name: Copy Harbor certificate to data volume
-    ansible.builtin.copy:
-      src: /harbor/tls/harbor.pem
-      dest: "/data/cert/{{ harbor_hostname}}.pem"
-      remote_src: yes
+    - name: Copy CA to data volume
+      ansible.builtin.copy:
+        src: /harbor/tls/ca.pem
+        dest: "/data/ca_download/ca.crt"
+        remote_src: yes
 
-  - name: Copy CA to data volume
-    ansible.builtin.copy:
-      src: /harbor/tls/ca.pem
-      dest: "/data/ca_download/ca.crt"
-      remote_src: yes
-
-  - name: Check if Harbor is already installed
-    ansible.builtin.shell:
-      cmd: docker compose ls | grep harbor
-    register: harbor_installed
-    ignore_errors: true
-
-  - name: Install Harbor
-    when: harbor_installed.rc == 1
-    block:
-    - name: Download install script
-      ansible.builtin.get_url:
-        url: "https://github.com/goharbor/harbor/releases/download/v2.10.0/harbor-offline-installer-v2.10.0.tgz"
-        dest: /tmp/harbor.tgz
-        checksum: md5:a63bba7a1d820dc27a5caaa4a9ff3721
-
-    - name: Extract archive
-      ansible.builtin.unarchive:
-        remote_src: true
-        src: /tmp/harbor.tgz
-        dest: /
-
-    - name: Install harbor
+    - name: Check if Harbor is already installed
       ansible.builtin.shell:
-        cmd: /harbor/install.sh --with-trivy
+        cmd: docker compose ls | grep harbor
+      register: harbor_installed
+      ignore_errors: true
 
-  # The service file is copied via cloud-init
-  - name: Start Harbor service
-    ansible.builtin.systemd:
-      name: harbor
-      state: started
-      enabled: true
+    - name: Install Harbor
+      when: harbor_installed.rc == 1
+      block:
+        - name: Download install script
+          ansible.builtin.get_url:
+            url: "https://github.com/goharbor/harbor/releases/download/v2.10.0/harbor-offline-installer-v2.10.0.tgz"
+            dest: /tmp/harbor.tgz
+            checksum: md5:a63bba7a1d820dc27a5caaa4a9ff3721
+
+        - name: Extract archive
+          ansible.builtin.unarchive:
+            remote_src: true
+            src: /tmp/harbor.tgz
+            dest: /
+
+        - name: Install harbor
+          ansible.builtin.shell:
+            cmd: /harbor/install.sh --with-trivy
+
+    # The service file is copied via cloud-init
+    - name: Start Harbor service
+      ansible.builtin.systemd:
+        name: harbor
+        state: started
+        enabled: true
+
+  handlers:
+    - name: Regenerate Harbor configs
+      ansible.builtin.shell:
+        cmd: /harbor/prepare
+
+    - name: Restart Harbor service
+      ansible.builtin.systemd:
+        daemon_reload: true
+        name: harbor
+        state: restarted
