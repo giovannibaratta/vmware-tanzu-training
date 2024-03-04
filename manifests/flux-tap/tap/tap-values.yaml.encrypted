@@ -1,0 +1,115 @@
+shared:
+  ingress_domain: tap.h2o-2-22574.h2o.vmware.com
+  image_registry:
+    project_path: harbor.h2o-2-22574.h2o.vmware.com/tap
+    username: admin
+    password: ENC[AES256_GCM,data:zBEJ1yTaTpm9mWH8bwxPnA==,iv:bdvXXh3kv5pZy7eHW6P1FdTOLIfilctVniojmMdlVEY=,tag:5RjiLtNuAHqS9OfenDzF0w==,type:str]
+  kubernetes_version: 1.26.5
+  ca_cert_data: |-
+    -----BEGIN CERTIFICATE-----
+    MIIE+DCCAuCgAwIBAgIUP5uxxtfd4ztjSEuoXpkZrooVLyUwDQYJKoZIhvcNAQEL
+    BQAwFDESMBAGA1UEAwwJSGFyYm9yIENBMB4XDTI0MDEyNzIxMTc0NloXDTM0MDEy
+    NDIxMTc0NlowFDESMBAGA1UEAwwJSGFyYm9yIENBMIICIjANBgkqhkiG9w0BAQEF
+    AAOCAg8AMIICCgKCAgEAsObt98p1tFD9IZPuLhtGIZ2cxCYy0gyYpVxL4sUh/oA5
+    UfAIBbO8EQH/OfSTBhRh/noqyVICMrxnO2nJpKm0twW+AM4h0++VCaTuoOIki8Zm
+    jAN+RjU+MJbiOB5CWvR4bOXnFNPTdjEJr47fvvzbKMmuc+VuXPcPvVQmaqSeQdP1
+    MvO1XtPZ7/f5wID/RmB6Woi2yuPHbalrRJDB28e551fm1nScg1+Y3L01mtTJ6ovU
+    kwnIIcPnVFWk4cpISXkV+ijZt8cHbDipeIPO8CDy1kYm8CdimTJs6KVvGF7PqRYC
+    r+PBNvtG5Dbxmm6MRKV1+GimAgyKnnu1pOspmom6rgpmjLiW4Xl3QtCyoHRuKPgJ
+    eRWkndj4Z9F1K/Srt1k9atllPz+y0pNzuR+HQnCSXI+MA7WkK1B/7z0uzfQiNHrl
+    CR8OtmiamIEms9Ls4U782fRIZxsxB1jUxJ77MgILpICEB8YIYwDTlZMsGkXC0BSH
+    /QyjNS4skQoFjeXDppuFjBS4WBgFUywPmaU2qLetUGswh0yxLjDcteBNQi90OTnK
+    C8Mqht1r6fyEs8mB1d3r3PMzdF3gO706mRu8HKbYJrJNyjNRO45+tA6wBrZuziUj
+    lCmXQNMIUMPpIJDsgw8kaG9IgN2owvy3trW67tLozF/t+vk+Oh0EghuD4DUN3psC
+    AwEAAaNCMEAwDgYDVR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0O
+    BBYEFN8XjHoNlAeBPzG0oBTSWXgjQQ23MA0GCSqGSIb3DQEBCwUAA4ICAQBdjFzk
+    BTaOpsqHNhy/u1QlTmvFp9dcspTzeEXEO6xJozfF6cFoQpJ7eNd89XDi+uZENbcw
+    075HzZMf7QrjtDxxy1MPulWargpb03PZIwd96ArDtY0riGay4NTs/ZrS4vQjA4iy
+    me8G7ZIQPvXeFeQ4DOzJotCP5ql+GqGv3HBMCfGZQXuY76pV6Jg9XhBghFCf5IJz
+    Rc5bYC1X/phI3h++9iN990aB6m+w3Pt5tiZbfvYqSz8iqR4xOJ39PrVrz3/tpcVD
+    uhNVYGE3EMEuyXr5DfyynpoRSJ1xUHl2L/k20fzI5vzuc5RcapPkMg6i3gVwG9LB
+    13sv71PwprGoYZ/uySuQtJT5kkVeV5SiMGnw7XzkuGu2MUVdrnzLiHQMHqzGa/OI
+    MGoVm2G7kYSbHbN62V68pEFp/TlH6GfY9uRWBl5xH9nBdmIED7Cv5yBXpEgNS5kQ
+    FTOZRysWUwfmec8nFKn31RG7hjMYQZAioSYzOkan+3g8k5XAQOwDP5UZqJNwMccC
+    ai52ssUCLGHIRpB5+aPFATBLSFLkkTRYdUV4Sjd/JWtl1PchNljI9Fa9epMfK1GT
+    Jz8ucmaQivlpkWP2bF/ey37wUBQJTCRGVPr5t16eZaJxGFh3rPSic4nFvdoJ0hEI
+    fYNluKHpW0r7Gp1kYKm1oWYaqiqWSMJb4NiT7Q==
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIE/DCCAuSgAwIBAgIUSNdXaY29N+6cuIykz5s1rKTxeCUwDQYJKoZIhvcNAQEL
+    BQAwFjEUMBIGA1UEAwwLS2V5Y2xvYWsgQ0EwHhcNMjQwMTI3MjExODI2WhcNMzQw
+    MTI0MjExODI2WjAWMRQwEgYDVQQDDAtLZXljbG9hayBDQTCCAiIwDQYJKoZIhvcN
+    AQEBBQADggIPADCCAgoCggIBALJk2BGkQjT+fYh6xwkoITP3VGSGDuJHZevS9h/a
+    O2hA2ubCRNpWDxNiJYCfyXxmPU1TN3HZzXm07og76VhxERlTkK16bljbLaAhz16B
+    tr0xsH2GOcfphBqI61+pJrDtibPl0rKERAa/0QvsqWWZGyqrFnJjrPTYSGZVSp59
+    xRkO+ibZgaJh/StjGIalmzCJIsMbC3TH7EsTJacDKk3OJalE1bV0bhbOZfHm6PFy
+    W3lFQPU2XCYVwBvL6TAGv6Coloi7KYdK+1utVjTAWIVBSsg/KmSItAhkDpbx2G6X
+    927TkwiyrBPFs1FZGGAH65kxWA7E/h9puvyu2Er53qgRYzVB0bsce9Div4dGT82g
+    XYgCsPQRO88Y+S1d656/y1oYWRCgOpjtiZRMFD7ts+URRO2v/IXMmxRpS1qjwfe9
+    35TmLw5clHO1sU4Bz4FIGGWjIR9xU2X/0x0pATSuSPSvcornEKBgkUJVFphTX2FF
+    XAyLpobkGfgr9WAdaDpjsYD6MAQEoePk/2iswBJRDyV+mP8e01WyUv3GFBzWSnc9
+    zWR/6G4IaXrOpm9A34nN+V+Mm7v9MJ6PzvX0QlcsiSyl9D/1nrdnxIR1F9BmyKPD
+    I5dIzdeJUAGoMpsxmX/JIqkQZvIxuGfxK9Ux/HnZgT75oQ/Gnwt6fHXerJRsrnWY
+    iYDZAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwICBDAPBgNVHRMBAf8EBTADAQH/MB0G
+    A1UdDgQWBBRHzHgyZjWAs1dpiuyJMzy7IHcOjDANBgkqhkiG9w0BAQsFAAOCAgEA
+    j3z2n2iR5ewqojHK4TXcTiJ/aNjrilVTDeOz95tvt7iWwOqRdf1wsHy9wj70uHwq
+    AHgrP3NUVa3TVAEEcOBcZJE49OIIuSxvwCcrOPS2NrSD9QUoasfI/wAG0OWobZir
+    gaqT3f+1euSipokL8iPzIv3xqMo9faytyLULQ/RHiXgQYsqZ7F0smqJZA/2n9BSN
+    QJgY33FH/inoNMDFLM4yJ3lIqYy5XD4wdGCpDdrxUh1NTIC4TlV2RX1Qw85YQ/bu
+    +Dsr2RD1rPTKDpMgTYSQhQJBdtBwIA7pSr2GACinPDJhNAuyeAo6tQx4x8awZm3e
+    3Dc/9Yy665Nq/0FjEBnEh9O5MpGQx1Z920eY0EymEIjr+M+KFY3zOvaosfT4sEIF
+    W91i3y9C8e3bJSPlyLy3NXh7dm2KjOAtw20OqFZh7Wy91lmtGysGt+aw/+TVVxc9
+    NnN1DZddvYkhD7IfJyjNr8HRL+j5wRp2Dp6MzVE00fKyhLUGwR0iMQR5Dtk+7gUP
+    hsjEwFkqZH64wUlL7RhJOxCL4RpRpJi/LfgjV5ODXGGR0/oWU9Dqf3o5LH9nkmox
+    qCNoOnVLVodolMtXjKhHl0EWRuO3hqKEyLyRQ+/1bdmnPOWFVXKHzr+qJIQQazVR
+    gZb5rpS2IJou1qbbEto4UQTz62HEnRFPljqnmIuqFh8=
+    -----END CERTIFICATE-----
+ceip_policy_disclosed: true
+profile: full
+excluded_packages:
+ # Excluded due to a conflict when installing TAP using TMC + Flux
+ - fluxcd.source.controller.tanzu.vmware.com
+supply_chain: basic
+contour:
+  envoy:
+    service:
+      type: LoadBalancer
+buildservice:
+  kp_default_repository: harbor.h2o-2-22574.h2o.vmware.com/build-service
+tap_gui:
+  # Creates a service account, the Kubernetes control plane token and the requisite app_config block to enable communications between Tanzu Developer Portal and SCST - Store.
+  metadataStoreAutoconfiguration: true
+  app_config:
+    auth:
+      # This allows unauthenticated users to log in to your portal. If you want to deactivate it, make sure you configure an alternative auth provider.
+      allowGuestAccess: true
+    catalog:
+      locations:
+        - type: url
+          target: https://github.com/giovannibaratta/tap-developer-portal/blob/main/catalog-info.yaml
+metadata_store:
+  ns_for_export_app_cert: '*'
+  app_service_type: ClusterIP
+policy:
+  tuf_enabled: false
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1kxepwud823s90xceck53vk0ddg2ca9qlfknz5nvckq6wmdzecvdqe8medm
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA3RHBIZnc3NW4rc3pVS29N
+        eVFJSDU0V2hRazlsandYY2VxNWY2V1ZpUG5vCkJHZklEYkR5eWdCTDNwSGFuSjR3
+        TmJFaU1XVUt2TjhhNGMxYjVOZFYyU1UKLS0tIENBTjMwYk11bkM3R25YS2VqSjFt
+        akhXZzV3cElweWZPdkxuZFIvVzJDOXcK0hvPztyYZdjT0V9DaZ3pAvovvBA8Lyf/
+        mETyiZWlYz8N/Wr90eqattrxp7tW/lNNYs1SEspvKN5mDrnCJudenA==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2024-03-01T13:26:16Z"
+  mac: ENC[AES256_GCM,data:kgL9rsxpV2pzidh1EN/CLXaPn7RGFzUUpiSaitO2UdWiiVnkaIhShyGo/ysHMFQFXB+ka1htCeFm+eW3hjcENDOFh2HwA3UurPVKwGxP9btzggIFhhWxBjXzgYCXQaexufWzbOpVFawTYYLXFfyCjt9kOqM0RFj6SuzArEOGvbk=,iv:Up3xeaA4DIX/qw0RaOdxYURMgmKbZwJvJou5IJ7aQfQ=,tag:7OteDDx3rFdREKkMudLBpA==,type:str]
+  pgp: []
+  encrypted_regex: ^.*([pP]assword|[sS]ecret).*$
+  mac_only_encrypted: true
+  version: 3.8.1
