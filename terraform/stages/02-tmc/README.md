@@ -16,6 +16,12 @@ The terraform code needs to create a secret in the supervisor cluster, hence we 
 <!-- BEGIN_TF_DOCS -->
 <!-- This section will be overridden by terraform-docs. Do not change it.-->
 
+## Troubleshooting
+
+**<i>During a plan/apply Terraform hangs while processing resources managed by a Kubernetes provider</i>**
+
+It is possible that the `tmc` CLI is not authenticated anymore. Try to login again to the TMC instance using the CLI.
+
 ## Inputs
 
 | Name                            | Description                                                            | Type                                                                                                                                                                                                                  | Default | Required |
