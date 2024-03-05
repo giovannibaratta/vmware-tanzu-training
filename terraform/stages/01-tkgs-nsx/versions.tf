@@ -1,4 +1,7 @@
 terraform {
+
+  required_version = ">= 1.7.4"
+
   required_providers {
     http = {
       source  = "hashicorp/http"
@@ -13,6 +16,11 @@ terraform {
     vsphere = {
       source  = "hashicorp/vsphere"
       version = "2.6.1"
+    }
+
+    harbor = {
+      source  = "goharbor/harbor"
+      version = "3.10.8"
     }
   }
 }
