@@ -15,6 +15,7 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 ├── falco # Contains manifests to deploy Falco in Kubernetes
 ├── home-lab # Ignore this folder
 ├── jenkins # Contains the instructions and manifests to deploy Jenkins in Kubernetes
+├── kubernetes # Contains source code and resource related to Kubernetes
 ├── manifests # Contains various manifests to install applications in Kubernetes
 ├── scripts # Contains various scripts
 └── terraform # Contains Terraform code to deploy various components in vSphere, Vault and Kuber...
