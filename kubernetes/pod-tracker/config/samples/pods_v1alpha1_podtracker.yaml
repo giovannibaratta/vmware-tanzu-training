@@ -1,0 +1,15 @@
+apiVersion: pods.giovannibaratta.local/v1alpha1
+kind: PodTracker
+metadata:
+  labels:
+    app.kubernetes.io/name: podtracker
+    app.kubernetes.io/instance: podtracker-sample
+    app.kubernetes.io/part-of: pod-tracker
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: pod-tracker
+  name: podtracker-sample
+  namespace: default
+spec:
+  podToTrack:
+    name: pod-to-track
+    namespace: target-namespace
