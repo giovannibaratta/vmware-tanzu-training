@@ -53,6 +53,10 @@ const (
 
 // PodTracker is the Schema for the podtrackers API
 // +kubebuilder:subresource:status
+// Customize output printed by Kubectl CLI
+// +kubebuilder:printcolumn:name="Tracked Namespace",type="string",JSONPath=`.spec.podToTrack.namespace`
+// +kubebuilder:printcolumn:name="Tracked Pod",type="string",JSONPath=`.spec.podToTrack.name`
+// +kubebuilder:printcolumn:name="State",type="string",JSONPath=`.status.podStatus`
 type PodTracker struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

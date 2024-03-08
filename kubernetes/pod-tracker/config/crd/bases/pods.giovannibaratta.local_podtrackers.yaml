@@ -14,7 +14,17 @@ spec:
     singular: podtracker
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.podToTrack.namespace
+      name: Tracked Namespace
+      type: string
+    - jsonPath: .spec.podToTrack.name
+      name: Tracked Pod
+      type: string
+    - jsonPath: .status.podStatus
+      name: State
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: PodTracker is the Schema for the podtrackers API

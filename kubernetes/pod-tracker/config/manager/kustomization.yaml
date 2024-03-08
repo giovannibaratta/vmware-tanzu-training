@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: giovannibaratta/podtracker-operator
-  newTag: v1709829077-arm
+  newTag: v1709900846-arm
