@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+      "files": ["*.md"],
+      "excludeFiles": ["README.md"],
+      "options": {
+        "parser": "slidev",
+        "plugins": ["prettier-plugin-slidev"]
+      }
+    }
+  ]
+}

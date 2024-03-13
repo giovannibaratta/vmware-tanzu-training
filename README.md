@@ -18,6 +18,7 @@ The chance that what you find here will work "as it is" is zero, nevertheless it
 ├── kubernetes # Contains source code and resource related to Kubernetes
 ├── manifests # Contains various manifests to install applications in Kubernetes
 ├── scripts # Contains various scripts
+├── slides
 └── terraform # Contains Terraform code to deploy various components in vSphere, Vault and Kuber...
 ```
 <!-- END_FOLDER_STRUCTURE -->
