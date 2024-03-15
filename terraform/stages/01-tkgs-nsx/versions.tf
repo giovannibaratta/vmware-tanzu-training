@@ -17,10 +17,5 @@ terraform {
       source  = "hashicorp/vsphere"
       version = "2.7.0"
     }
-
-    harbor = {
-      source  = "goharbor/harbor"
-      version = "3.10.8"
-    }
   }
 }

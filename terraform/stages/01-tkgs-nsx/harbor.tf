@@ -11,20 +11,3 @@ module "harbor" {
     template_id      = vsphere_content_library_item.ubuntu2204.id
   }
 }
-
-resource "harbor_project" "projects" {
-  for_each = var.registry_projects
-
-  name                   = each.value
-  public                 = true
-  vulnerability_scanning = false
-
-  lifecycle {
-    precondition {
-      condition     = local.deploy_harbor
-      error_message = "Harbor service must be enabled to enable the projects"
-    }
-  }
-
-  depends_on = [module.harbor]
-}
