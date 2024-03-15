@@ -17,11 +17,11 @@ internal_tls:
   enabled: false
   dir: /data/cert
 
-harbor_admin_password: ${admin_password}
+harbor_admin_password: "${admin_password}"
 
 database:
   # The password for the root user of Harbor DB.
-  password: ${db_root_password}
+  password: "${db_root_password}"
   max_idle_conns: 400
   max_open_conns: 400
   conn_max_lifetime: 0 # Do not close connections
