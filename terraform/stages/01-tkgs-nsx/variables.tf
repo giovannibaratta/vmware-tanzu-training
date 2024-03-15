@@ -47,3 +47,10 @@ variable "services" {
 
   default = {}
 }
+
+variable "registry_projects" {
+  description = "List of projects that must be created in the registry"
+
+  type    = set(string)
+  default = []
+}
