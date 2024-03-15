@@ -7,7 +7,7 @@ output "ips" {
 }
 
 
-resource "local_sensitive_file" "ansible_inventory" {
+resource "local_sensitive_file" "sensitive_output" {
   count = var.sensitive_output_dir != null ? 1 : 0
 
   content = templatefile("${path.module}/files/sensitive.output.tpl", {
