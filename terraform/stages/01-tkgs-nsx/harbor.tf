@@ -1,4 +1,5 @@
 module "harbor" {
+  count  = local.deploy_harbor ? 1 : 0
   source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/harbor-standalone?ref=harbor-standalone-v0.0.4&depth=1"
 
   vm_authorized_key = var.vm_authorized_key

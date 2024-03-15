@@ -1,4 +1,5 @@
 module "minio" {
+  count  = local.deploy_minio ? 1 : 0
   source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/minio?ref=minio-v0.0.1&depth=1"
 
   fqdn = "minio.${var.domain}"

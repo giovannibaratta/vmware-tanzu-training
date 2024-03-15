@@ -1,4 +1,5 @@
 module "jumpbox" {
+  count = local.deploy_jumpbox ? 1 : 0
   source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/jumpbox?ref=jumpbox-v0.0.3&depth=1"
 
   vm_authorized_key = var.vm_authorized_key

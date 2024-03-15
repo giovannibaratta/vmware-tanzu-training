@@ -1,4 +1,5 @@
 module "keycloak" {
+  count  = local.depoy_keylock ? 1 : 0
   source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/keycloak?ref=keycloak-v0.0.1&depth=1"
 
   fqdn = "keycloak.${var.domain}"

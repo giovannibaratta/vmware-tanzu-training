@@ -6,8 +6,8 @@ provider "vsphere" {
 }
 
 provider "harbor" {
-  url      = "https://${module.harbor.harbor_instance_ip}"
+  url      = "https://${try(module.harbor[0].harbor_instance_ip, "")}"
   username = "admin"
-  password = module.harbor.harbor_admin_passowrd
+  password = try(module.harbor[0].harbor_admin_passowrd, "")
   insecure = true
 }

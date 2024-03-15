@@ -34,3 +34,16 @@ variable "sensitive_output_dir" {
   default = null
   nullable = true
 }
+
+variable "services" {
+  description = "Select the services that must be deployed"
+
+  type = object({
+    bastion  = optional(bool, true)
+    registry = optional(bool, false)
+    s3       = optional(bool, false)
+    idp      = optional(bool, false)
+  })
+
+  default = {}
+}
