@@ -10,16 +10,13 @@ output "ips" {
 }
 
 locals {
-  stage_output = {
-    "registry_provider" = try({
-      url = "https://${module.harbor[0].harbor_instance_ip}"
-      username = "admin"
-    }, null)
-  }
+  stage_output = {}
 
   stage_sensitive_output = {
     "minio_root_password" = try(module.minio[0].minio_root_password, null),
     "registry_provider" = try({
+      url = "https://${module.harbor[0].harbor_instance_ip}"
+      username = "admin"
       password = module.harbor[0].harbor_admin_passowrd
     }, null)
   }
