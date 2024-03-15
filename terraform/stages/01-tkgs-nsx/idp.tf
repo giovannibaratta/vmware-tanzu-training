@@ -7,7 +7,7 @@ module "keycloak" {
 
   vsphere = {
     datastore_id     = data.vsphere_datastore.datastore.id
-    resource_pool_id = vsphere_resource_pool.harbor.id
+    resource_pool_id = vsphere_resource_pool.services.id
     network_id       = data.vsphere_network.mgmt_segment.id
     template_id      = vsphere_content_library_item.ubuntu2204.id
   }

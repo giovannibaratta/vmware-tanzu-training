@@ -22,8 +22,8 @@ data "vsphere_network" "mgmt_segment" {
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
-resource "vsphere_resource_pool" "harbor" {
-  name                    = "harbor"
+resource "vsphere_resource_pool" "services" {
+  name                    = "services"
   parent_resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
 }
 
