@@ -14,9 +14,9 @@ variable "vsphere_password" {
 
 variable "vcenter_data" {
   type = object({
-    datacenter_name = string
-    cluster_name = string
-    datastore_name = string
+    datacenter_name   = string
+    cluster_name      = string
+    datastore_name    = string
     mgmt_segment_name = string
   })
 }
@@ -30,8 +30,8 @@ variable "vm_authorized_key" {
 }
 
 variable "sensitive_output_dir" {
-  type = string
-  default = null
+  type     = string
+  default  = null
   nullable = true
 }
 
