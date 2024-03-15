@@ -38,12 +38,14 @@ resource "vsphere_content_library_item" "ubuntu2204" {
   file_url    = "https://cloud-images.ubuntu.com/releases/jammy/release/ubuntu-22.04-server-cloudimg-amd64.ova"
   library_id  = vsphere_content_library.templates.id
 
-  lifecycle {
-    ignore_changes = [ 
-      # Ignore the properties becasue if the file has been uploaded manually and then imported
-      # into terraform it will force a replacement
-      file_url,
-      description
-     ]
-  }
+  # If you want to manually upload the image from the UI, import the terraform resource and
+  # uncomment the following lines
+  # lifecycle {
+  #   ignore_changes = [ 
+  #     # Ignore the properties becasue if the file has been uploaded manually and then imported
+  #     # into terraform it will force a replacement
+  #     file_url,
+  #     description
+  #    ]
+  # }
 }
