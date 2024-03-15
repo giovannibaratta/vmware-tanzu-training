@@ -1,1 +1,0 @@
-minio_root_password: ${minio_root_password}
