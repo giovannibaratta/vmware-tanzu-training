@@ -1,11 +1,13 @@
 output "ips" {
   value = {
-    habror = try(module.harbor[0].harbor_instance_ip, null)
-    jumpbox = try(module.jumpbox[0].jumpbox_instance_ip, null)
-    minio = try(module.minio[0].instance_ip, null)
+    for name, ip in {
+      "registry" : try(module.harbor[0].harbor_instance_ip, null),
+      "bastion" : try(module.jumpbox[0].jumpbox_instance_ip, null),
+      "s3" : try(module.minio[0].instance_ip, null),
+      "idp": try(module.keycloak[0].instance_ip, null),
+    } : name => ip if ip != null
   }
 }
-
 
 resource "local_sensitive_file" "sensitive_output" {
   count = var.sensitive_output_dir != null ? 1 : 0
