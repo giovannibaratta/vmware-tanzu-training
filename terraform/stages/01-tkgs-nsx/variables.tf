@@ -63,3 +63,8 @@ variable "services" {
 
   default = {}
 }
+
+variable "supervisor_context_name" {
+  description = "Name of the supervisor context in .kube/config"
+  type        = string
+}
