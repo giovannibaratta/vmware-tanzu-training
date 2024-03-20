@@ -17,7 +17,7 @@ locals {
     "registry_provider" = try({
       url      = "https://${module.harbor[0].harbor_instance_ip}"
       username = "admin"
-      password = module.harbor[0].harbor_admin_passowrd
+      password = module.harbor[0].harbor_admin_password
     }, null),
     "idp_provider" = try({
       url      = "https://idp.${var.domain}"
