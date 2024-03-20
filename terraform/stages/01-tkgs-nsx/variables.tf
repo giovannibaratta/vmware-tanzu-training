@@ -86,3 +86,14 @@ variable "tkgs_clusters" {
     error_message = "Duplicated namespace/name pair found in the list"
   }
 }
+
+variable "ca_private_key" {
+  description = "Private key in PEM format used to generate certificates"
+  type = string
+  sensitive = true
+}
+
+variable "ca_certificate" {
+  description = "Certificate in PEM format of the CA"
+  type = string
+}
