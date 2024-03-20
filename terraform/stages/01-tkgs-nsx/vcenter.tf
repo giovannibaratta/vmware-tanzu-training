@@ -1,3 +1,4 @@
+# Import existing vSphere references
 data "vsphere_datacenter" "datacenter" {
   name = var.vcenter_data.datacenter_name
 }
