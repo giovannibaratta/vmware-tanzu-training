@@ -18,3 +18,15 @@ variable "vsphere" {
     template_id = string
   })
 }
+
+variable "tls" {
+  type = object({
+    private_key = string
+    certificate = string
+    ca_chain = optional(string, null)
+  })
+
+  nullable = true
+  default = null
+  description = "TLS configuration to use. Private key and certificate must be base64 encoded"
+}
