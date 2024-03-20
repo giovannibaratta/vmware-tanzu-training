@@ -18,6 +18,11 @@ locals {
       url      = "https://${module.harbor[0].harbor_instance_ip}"
       username = "admin"
       password = module.harbor[0].harbor_admin_passowrd
+    }, null),
+    "idp_provider" = try({
+      url      = "https://idp.${var.domain}"
+      username = "admin"
+      password = module.keycloak[0].keycloak_admin_password
     }, null)
   }
 }
