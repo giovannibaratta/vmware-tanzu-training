@@ -1,0 +1,24 @@
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  annotations:
+    packaging.carvel.dev/package-ClusterRole: tanzu-mission-control-tkg-system-cluster-role
+    packaging.carvel.dev/package-ClusterRoleBinding: tanzu-mission-control-tkg-system-cluster-rolebinding
+    packaging.carvel.dev/package-Secret: tanzu-mission-control-tkg-system-values
+    packaging.carvel.dev/package-ServiceAccount: tanzu-mission-control-tkg-system-sa
+    tkg.tanzu.vmware.com/tanzu-package-ClusterRole: tanzu-mission-control-tkg-system-cluster-role
+    tkg.tanzu.vmware.com/tanzu-package-ClusterRoleBinding: tanzu-mission-control-tkg-system-cluster-rolebinding
+    tkg.tanzu.vmware.com/tanzu-package-Secret: tanzu-mission-control-tkg-system-values
+    tkg.tanzu.vmware.com/tanzu-package-ServiceAccount: tanzu-mission-control-tkg-system-sa
+  name: tanzu-mission-control
+  namespace: tkg-system
+spec:
+  packageRef:
+    refName: tmc.tanzu.vmware.com
+    versionSelection:
+      constraints: 1.1.0
+      prereleases: {}
+  serviceAccountName: tanzu-mission-control-tkg-system-sa
+  values:
+  - secretRef:
+      name: tanzu-mission-control-tkg-system-values
