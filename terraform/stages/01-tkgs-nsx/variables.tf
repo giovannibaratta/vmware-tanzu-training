@@ -67,4 +67,22 @@ variable "services" {
 variable "supervisor_context_name" {
   description = "Name of the supervisor context in .kube/config"
   type        = string
+  nullable = true
+  default = null
+}
+
+variable "tkgs_clusters" {
+  type = list(object({
+    control_plane_replicas = optional(number, 1)
+    worker_node_replicas = optional(number, 3)
+    namespace = string
+    name = string
+  }))
+
+  default = []
+
+  validation {
+    condition = length(toset([ for v in var.tkgs_clusters: "${v.namespace}/${v.name}" ])) == length(var.tkgs_clusters)
+    error_message = "Duplicated namespace/name pair found in the list"
+  }
 }

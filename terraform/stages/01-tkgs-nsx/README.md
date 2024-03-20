@@ -1,5 +1,20 @@
+# 01-tkgs-nsx
+
+The stage deploys external resources that can be used to provide additional services on top of TKGs. The stage assumes that TKGs and NSX are already installed.
+
+The available services are:
+* Harbor
+* MinIO
+* Keycloak
+* empty TKGs clusters
+
+## Prerequisites
+
+* kubectl CLI
+
 <!-- BEGIN_TF_DOCS -->
 <!-- This section will be overridden by terraform-docs. Do not change it.-->
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |

@@ -1,51 +1,18 @@
-# The Kubernetes provider provide a resource kubernetes_manifest to manage CRD but during the plan
-# and the apply it needs to list the CRDs and this operation can not be performed in a supervisor
-# cluster unless you manually create the necessary role bindings (this means that you have to connect
-# with the Kubernetes credentials available in the supervisor nodes).
-# This is a workaround to deploy TKC cluster until a proper Terraform provider is implemeted
+module "tkgs_clusters" {
+  for_each = local.tkgs_clusters
 
-resource "terraform_data" "tmc_cluster" {
+  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/tkgs-cluster?ref=tkgs-cluster-v0.0.1&depth=1"
 
-  input = {
-    manifest = "${path.module}/files/tmc-cluster.yaml"
-    context  = var.supervisor_context_name
-  }
+  cluster_name            = each.value.name
+  cluster_namespace       = each.value.namespace
+  control_plane_replicas  = each.value.control_plane_replicas
+  worker_node_replicas    = each.value.worker_node_replicas
+  supervisor_context_name = var.supervisor_context_name
+  desired_state           = "PRESENT"
 
-  provisioner "local-exec" {
-    command    = "kubectl apply -f ${self.input.manifest} --context ${self.input.context}"
-    on_failure = fail
-  }
+  tkr           = "v1.26.5---vmware.2-fips.1-tkg.1"
+  storage_class = "vc01cl01-t0compute"
+  vm_class      = "best-effort-large"
 
-  provisioner "local-exec" {
-    command    = "kubectl wait -f ${self.input.manifest} --for=condition=Ready --timeout=20m --context ${self.input.context}"
-    on_failure = fail
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "kubectl delete -f ${self.input.manifest} --context ${self.input.context}"
-  }
+  additional_ca = base64decode("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUUrRENDQXVDZ0F3SUJBZ0lVYWN4M2F0dTZXaDBCaDFOK0xjbjFWUmZ6dFBFd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0ZERVNNQkFHQTFVRUF3d0pTR0Z5WW05eUlFTkJNQjRYRFRJME1ETXhOVEUwTkRnME9Gb1hEVE0wTURNeApNekUwTkRnME9Gb3dGREVTTUJBR0ExVUVBd3dKU0dGeVltOXlJRU5CTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGCkFBT0NBZzhBTUlJQ0NnS0NBZ0VBcW1TWWdwQktQL1hWV1V6L2pheHhiZE9iMEtxVStwQXVWdWtZQ0xBci9WSDIKbnJrZkJxblF0bjU0SlJINzloVUtmaEtQaXF0dHBaakJqVFhtN28yMHppRm4rR3dDK1ZtTVRNbWxYR1RUaGhnYwoxams0WGsvY2JHV3hCcFQ1L0RzZ2g3ckg3NlMwREN6TjNsWCtsY3NKL01yWkVNU3VaRTgvZ1ZhcHRSZEJwRDZ2CkxMbG9COWQ4aUtYVXpIL3B5bHE2bnZueEQ3cXpYWjlZWld1Z2VPdU5NbzRJOERDMGtQVGdKK2l2SFpPMzQxa1cKSjJXYllDZFkwVWpGSVVLek4rRURBQmc2QUt5dnJ4SkRhRzU5SGNZanpMWGl2K2QvdkVQYWJBa01vdWlMaWxNbgpIdTZwU3FYWklxdVQ1cG1PWXFaYUhkYmRQTmVlRlljMTlwV3lxS3JMYnltYnBidDRvQWVadTNnTDUrZnlKZXdGCmtvRjA2VXdCbTdmTWV4L053VWMrbHB4NEFOWnVZUmFWMVp0WDkzMTY4Ym5ZcVMvenBxRzR6cWc5UUhhcGNXb24KZ280WTV6SEJWMUNDejZKUmxXWURvaUpDUzVCZFlicS82TmFhWFdNdnNKaE15R1Urc2RjQzMreW92WEx1bkxjYQphbHoramtKK3lNLzRmZ0poa1BFQjlBQi9Bd2IwaWpkOWkzdEVVUW1TR1dRaDVPWU05NHpENXVHV3JXRU4zVmwzCkRtbXIweEw3QWFNRk1ZYTNwZWVtVm9Rcm5PSHd1KzBHYW1WMHRwZDhndGptc1BrNmxSQVBoNFI5bE5MeUd0VlYKaEZwOTRhanhKclR6d3hGSVlvdTY0eDdWYnY1eXptK3JWdjNMNlVWMHF4R2pza00yeXY5Q2hYU1BjMU4vMkg4QwpBd0VBQWFOQ01FQXdEZ1lEVlIwUEFRSC9CQVFEQWdJRU1BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0hRWURWUjBPCkJCWUVGTEh3ZHh1YTUrNVgvd296TXc1Z1dCOWk5S1BpTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElDQVFCNG1MSjYKbjlkYVh2dW9xcFJhdzIyMUFGSnBEaURmU0pVb1g4MlBtZXU3VWZ5cG8yUVVJSzExY0NjMHFHK0J3TjlQK0RuRQowdDg5L3lrWXhwTlRaWGZOa0RTWk51RkNjT0pLQkoyLzB5SjNaYmdyYjFxZHZBZnZ5b21GV3FUK3hyRzlZZkxjClRlaHFvMHdyUGVGZGVzTXRQWEkzYTloM2wzemppaU8yUXlmSjZBa0xsUEVTaTBQdk1TVXpZSDVGWXV5cGREblUKWHBZTlRiK2oxdUxiZUdDcTJvWWhuclowV0lJZTRMTE0wMUJKYXg4dFF3emREVEFVZXgweWZRRjYzUVFldWluNQpHeG1qQ055aEVreXlRTmtQclJRZlhxVndiOFNHdklmQy9XWVJocmlRM2x2TGsrUEc2YW5aNWhDR25PN0pzVSs0CklFbENQbHZLU3FBNDdjUDNoNE91NWhmSERyRmF2K1B5TkZmbEVWYkx2MmZYSDR1QlZLUkFPZFhCOCtNMkQ0MEgKUW9wMHhidm0yT0JNRTVlbitkRWlBUkJJcUF3SVYvSE9wL2pFK254WjI1SUp4eVhlYUlsdXF3UGVTZktLWkdMQwowd3FoNzZOYnd0a09yV3MxdjZHN0tqekZZNTRvem5hd2xRNXo1Qkw3QVdudFI2bnlBVXBseC9ZWFNiKytibVV4CisrYThCL1ExYlljaWY5MGxaU0pLNGthM295ek9WQThBREdob09kbHgvMjRZS0VoeXVKU3V1M0ZRY0s4MkMwZDQKT2FubEw4UXZpekV0VkJZWEkvS0hKcWVFb1c2SjR0OGdUN2tDeC9KVUdpNDhQWHhNQmRHOGduVVQrbHJIb1VQVQorcTMrbkdhdklXckFTRE5lQjk3QnptaS9mOVVrVTR6MnRCamgrUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K")
 }
-
-locals {
-  tmc_cluster_manifest = yamldecode(file("${path.module}/files/tmc-cluster.yaml"))
-}
-
-data "kubernetes_secret_v1" "tmc_cluster_admin_kubeconfig" {
-  metadata {
-    name      = "${local.tmc_cluster_manifest.metadata.name}-kubeconfig"
-    namespace = local.tmc_cluster_manifest.metadata.namespace
-  }
-
-  depends_on = [terraform_data.tmc_cluster]
-}
-
-locals {
-  tmc_cluster_admin_kubeconfig = yamldecode(data.kubernetes_secret_v1.tmc_cluster_admin_kubeconfig.data.value)
-}
-
-resource "local_sensitive_file" "tmc_kubeconfig" {
-  content  = data.kubernetes_secret_v1.tmc_cluster_admin_kubeconfig.data.value
-  filename = "${var.sensitive_output_dir}/kubeconfigs/tmc-admin-kubeconfig"
-}
-
