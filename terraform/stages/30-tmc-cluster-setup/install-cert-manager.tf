@@ -69,19 +69,40 @@ resource "kubernetes_manifest" "cert_manager_package_install" {
   ]
 }
 
-resource "terraform_data" "cluster_issuer" {
-
-  input = {
-    kubeconfig_file = var.tmc_kubeconfig
-  }
-
+resource "terraform_data" "wait_for_cert_manager" {
   # Wait for CRDs availability
   provisioner "local-exec" {
     command    = "kubectl wait -f ${path.module}/files/package-install-cert-manager.yaml --for=condition=ReconcileSucceeded --timeout=10m"
     on_failure = fail
     environment = {
-      "KUBECONFIG" = self.input.kubeconfig_file
+      "KUBECONFIG" = var.tmc_kubeconfig
     }
+  }
+
+  depends_on = [ kubernetes_manifest.cert_manager_package_install ]
+}
+
+resource "kubernetes_secret_v1" "ca_tls" {
+  metadata {
+    name      = "self-signed-root-ca-tls"
+    namespace = "cert-manager"
+  }
+
+  data = {
+    "tls.crt" = var.ca_certificate
+    "tls.key" = var.ca_private_key
+  }
+
+  type = "kubernetes.io/tls"
+
+  # We need to wait for the namespace to be available
+  depends_on = [terraform_data.wait_for_cert_manager]
+}
+
+resource "terraform_data" "cluster_issuer" {
+
+  input = {
+    kubeconfig_file = var.tmc_kubeconfig
   }
 
   # Apply the manifest
@@ -102,5 +123,5 @@ resource "terraform_data" "cluster_issuer" {
     }
   }
 
-  depends_on = [kubernetes_manifest.cert_manager_package_install]
+  depends_on = [kubernetes_secret_v1.ca_tls]
 }

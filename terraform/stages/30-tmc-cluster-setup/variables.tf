@@ -24,3 +24,14 @@ variable "tmc_values" {
   description = "TMC values"
   sensitive = true
 }
+
+variable "ca_certificate" {
+  type = string
+  description = "Certificate used to configure the cluster issuer"
+}
+
+variable "ca_private_key" {
+  type = string
+  sensitive = true
+  description = "Private key used to configure the cluster issuer"
+}

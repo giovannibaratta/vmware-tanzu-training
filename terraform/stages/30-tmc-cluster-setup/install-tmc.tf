@@ -124,10 +124,36 @@ resource "kubernetes_namespace_v1" "tmc_local" {
   }
 }
 
-resource "kubernetes_manifest" "tmc_package_install" {
-  manifest = yamldecode(file("${path.module}/files/package-install-tmc-sm.yaml"))
+locals {
+  manifest = file("${path.module}/files/package-install-tmc-sm.yaml")
+}
+
+resource "terraform_data" "tmc_package_install" {
+
+  input = {
+    kubeconfig_file = var.tmc_kubeconfig
+  }
+
+  # Apply the manifest
+  provisioner "local-exec" {
+    command    = "kubectl apply -f - <<< \"${local.manifest}\""
+    on_failure = fail
+    environment = {
+      "KUBECONFIG" = self.input.kubeconfig_file
+    }
+  }
+
+  provisioner "local-exec" {
+    when       = destroy
+    command    = "kubectl delete packageinstall -n tkg-system tanzu-mission-control"
+    on_failure = continue
+    environment = {
+      "KUBECONFIG" = self.input.kubeconfig_file
+    }
+  }
 
   depends_on = [
+    terraform_data.cluster_issuer,
     kubernetes_manifest.tmc_repository,
     kubernetes_secret_v1.tmc_values,
     kubernetes_cluster_role_binding_v1.tmc_install,
