@@ -250,6 +250,7 @@ The procedure highlighted below differs from the procedure documented in the lin
        ```
 
 1.  Configure backup schedule
+
     1. Create a backup
        ```bash
        velero create backup tmc-cluster \
@@ -257,7 +258,8 @@ The procedure highlighted below differs from the procedure documented in the lin
          --include-cluster-resources
        ```
 
-      > `kube-system` must not be excluded from the backup
+    > `kube-system` must not be excluded from the backup
+
     1. Verify backup
        ```bash
        velero backup describe tmc-cluster
@@ -295,6 +297,7 @@ The procedure highlighted below differs from the procedure documented in the lin
 1. Configure Velero to use image hosted in private registry for item restore
 
    1. Prepare the manifest
+
       ```bash
       TARGET_REGISTRY="harbor.h2o-2-22574.h2o.vmware.com"
 
@@ -335,6 +338,7 @@ The procedure highlighted below differs from the procedure documented in the lin
       ```
 
 1. Restore the backup
+
    ```bash
    velero restore create --from-backup tmc-cluster
    ```
@@ -374,3 +378,19 @@ API Error: Failed to create cluster: rpc error: code = FailedPrecondition desc =
 
 1. Connect to the supervisor nodes via ssh
 1. Restart the intent-agent pods
+
+**<i> tmc-bootstrapper-\* can not be deployed due to certificate signed by unknown authority</i>**
+
+- Check that the agentconfig has been created with the necessary CAs to trust.
+
+  ```sh
+  kubectl describe agentconfigs.installers.tmc.cloud.vmware.com -n svc-tmc-c8
+  ```
+
+- Check that the daemon-set is running.
+
+  ```sh
+  kubectl get daemonsets.apps -n svc-tmc-c8
+  ```
+
+- If it is not running, describe one of the pod. If they are failing due to `exec: "nsenter": executable file not found in $PATH: unknown`, you have to update the supervisor control plane
