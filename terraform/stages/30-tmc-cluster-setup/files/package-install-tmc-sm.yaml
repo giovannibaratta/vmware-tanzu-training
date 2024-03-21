@@ -20,5 +20,5 @@ spec:
       prereleases: {}
   serviceAccountName: tanzu-mission-control-tkg-system-sa
   values:
-  - secretRef:
-      name: tanzu-mission-control-tkg-system-values
+    - secretRef:
+        name: tanzu-mission-control-tkg-system-values
