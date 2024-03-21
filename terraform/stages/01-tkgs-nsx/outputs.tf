@@ -23,6 +23,7 @@ locals {
       url      = "https://idp.${var.domain}"
       username = "admin"
       password = module.keycloak[0].keycloak_admin_password
+      root_ca = tls_locally_signed_cert.idp.ca_cert_pem
     }, null)
   }
 }
