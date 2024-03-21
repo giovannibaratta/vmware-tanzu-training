@@ -1,0 +1,9 @@
+resources:
+  # Reference to the base Kustomization layer
+  - ../../base
+  - tap.yaml
+  - namespaces.yaml
+  - workloads/app-1.yaml
+
+components:
+  - ../shared/tap-gui-access

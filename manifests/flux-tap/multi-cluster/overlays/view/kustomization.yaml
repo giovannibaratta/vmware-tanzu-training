@@ -1,0 +1,4 @@
+resources:
+  # Reference to the base Kustomization layer
+  - ../../base
+  - tap.yaml

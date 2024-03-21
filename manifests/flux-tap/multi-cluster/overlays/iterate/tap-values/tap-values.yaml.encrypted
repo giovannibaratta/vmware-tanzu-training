@@ -1,0 +1,104 @@
+profile: iterate
+ceip_policy_disclosed: true
+excluded_packages:
+  # Excluded due to a conflict when installing TAP using TMC + Flux
+  - fluxcd.source.controller.tanzu.vmware.com
+shared:
+  ingress_domain: tap.h2o-2-23532.h2o.vmware.com
+  ingress_issuer: root-ca
+  image_registry:
+    project_path: harbor.h2o-2-23532.h2o.vmware.com/tap
+    username: admin
+    password: ENC[AES256_GCM,data:kvoQRL8HU1/dhBj/yv24Vw==,iv:2sDQoZGepPvVZNRBYR7FPLdWPqoxvrfDXjPdDsAGrg0=,tag:krkUoxdoDkqFEb6qZ7r4Ng==,type:str]
+  kubernetes_version: 1.26.5
+  ca_cert_data: |-
+    -----BEGIN CERTIFICATE-----
+    MIIFUzCCAzugAwIBAgIQEHu5zm/udoTih4SKWkJqjTANBgkqhkiG9w0BAQsFADA0
+    MRIwEAYDVQQKEwlMb2NhbCBMYWIxHjAcBgNVBAMTFUNlcnRpZmljYXRlIEF1dGhv
+    cml0eTAeFw0yNDAzMjAxMTU0MTBaFw0yOTAzMTkxMTU0MTBaMDQxEjAQBgNVBAoT
+    CUxvY2FsIExhYjEeMBwGA1UEAxMVQ2VydGlmaWNhdGUgQXV0aG9yaXR5MIICIjAN
+    BgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAylp4fNhA2fmlXGZ+lcbe4QWygjFe
+    i4udvfI3PA5JxGT4e5n9xRSh67m2yCJ4YfZTz4erM+IHFFHi9JBanx9vMhCBdBpH
+    29G0tu9Dog10yg0/GwuXErPB4bdkiH5WAOztSo0BmKZERH5CbG5Oib5fg3WrXax0
+    bMgYW7wbWj/sOHvtWDQTyFZgUnb9IzVyd/9jO0xlyylsLzH8npjKh/prCZKg/v/t
+    2aH9ps3/NTb2Ja6I3U3aPP1mtPMrKdQ5rbBJWKrGeID+WS7dnQb2bTISmQqtQbdx
+    3XvVPi9XyYybnzGKBS7uHoiGXWhGFNEvalnroemmSWvF1BgKtL84KRdXDRR1Nadb
+    qiOVT3bZVT4/Qcmg1Aou0tYzbc3L3h3cCtNzQg/MK+GwWBolBSGl3rNZkUEepCJc
+    z2zYfrdNlul84fS7ER7YlDKk+hmIoQuNNTQvr2iOdBb+56dOKKM5rrjWvgqsURxa
+    CaSNzRgW13sOZXoLaPVGUePGuF9PxoY9MyoZ3jdgwSLn3m+fpUwGNUB95UTO3JrP
+    1SYS/T45yc2ktsh4TyRSi1mxlXiQxPfaawbe9XzDPHrjwQOlLo1CUh8eqf6rw7tT
+    SroQHLFXTF3Kg5F8iAAk99XoFQx+Cw+uCwnAzEMORg3e+tUhXy66rcrsswioHKhF
+    YILZ5RyuO4odeh8CAwEAAaNhMF8wDgYDVR0PAQH/BAQDAgGmMB0GA1UdJQQWMBQG
+    CCsGAQUFBwMCBggrBgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBR7
+    7tbMN8QLv1Uz2DCLNhbl9XcoLDANBgkqhkiG9w0BAQsFAAOCAgEAdJ72GcPOtv+t
+    C7y6EMOA4Cg4U1RzoIR0/MzeNduzN2XFLZpPY9CNCKlxWZeBRFp8yJnH8rLTRoHg
+    CAHpYnBjTS84zqs/RgLJf2eUwUtboxJQAzxvlCG0MqTM1RvKaElH2xLCdo3vNz24
+    4EqJeHUePiSdVAxiwhPq30iZRIq5tw0hO50ra65AuS2zYN5icLIRQWIJvUgBpm77
+    q3N32eXvsC9YNkRNU0a7CTlSLsTOw4jNFoxqtywsHImvB6Y8dbj6T6EPFwF7lQ2N
+    rmdaSlLsDnPpHR4IiKXeJn6eES8UEWg1vxrxyGKn46UJVtMqbuiUG6H4A45dm+Zk
+    bS2C/zxl+axhb1LU1DdCZU7fyk+CPq1ehwN7S1I4lbChGkjmOwfa3z6LlHxKV6M/
+    HDZrN7j/T0MlRe5ui7MPDckOakiB/9i9mTGFNB32/7PajMsHfMiXPtsq3o3dzxFn
+    MQhj/STZOdYqHHH59lGfYAfh+i0StHQ+RHq4LaLwfa8quwQZE5bFcPNEtk4ik/8u
+    uhTecq/0H/2o5Kfs4jtrcyzgj14byX6eJ1ADFuxKAMrWkblV/GjtJMvmeeTL7Wz5
+    PosfpkSU8tHzmIZrh+Wc4UHp65rgCjf3+p963vzZnXxpRdaGemjEZbw+IcMuAj8o
+    C2hJ9Ow/Idv4p2re/2gZBFF7iUUeelc=
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIE+DCCAuCgAwIBAgIUacx3atu6Wh0Bh1N+Lcn1VRfztPEwDQYJKoZIhvcNAQEL
+    BQAwFDESMBAGA1UEAwwJSGFyYm9yIENBMB4XDTI0MDMxNTE0NDg0OFoXDTM0MDMx
+    MzE0NDg0OFowFDESMBAGA1UEAwwJSGFyYm9yIENBMIICIjANBgkqhkiG9w0BAQEF
+    AAOCAg8AMIICCgKCAgEAqmSYgpBKP/XVWUz/jaxxbdOb0KqU+pAuVukYCLAr/VH2
+    nrkfBqnQtn54JRH79hUKfhKPiqttpZjBjTXm7o20ziFn+GwC+VmMTMmlXGTThhgc
+    1jk4Xk/cbGWxBpT5/Dsgh7rH76S0DCzN3lX+lcsJ/MrZEMSuZE8/gVaptRdBpD6v
+    LLloB9d8iKXUzH/pylq6nvnxD7qzXZ9YZWugeOuNMo4I8DC0kPTgJ+ivHZO341kW
+    J2WbYCdY0UjFIUKzN+EDABg6AKyvrxJDaG59HcYjzLXiv+d/vEPabAkMouiLilMn
+    Hu6pSqXZIquT5pmOYqZaHdbdPNeeFYc19pWyqKrLbymbpbt4oAeZu3gL5+fyJewF
+    koF06UwBm7fMex/NwUc+lpx4ANZuYRaV1ZtX93168bnYqS/zpqG4zqg9QHapcWon
+    go4Y5zHBV1CCz6JRlWYDoiJCS5BdYbq/6NaaXWMvsJhMyGU+sdcC3+yovXLunLca
+    alz+jkJ+yM/4fgJhkPEB9AB/Awb0ijd9i3tEUQmSGWQh5OYM94zD5uGWrWEN3Vl3
+    Dmmr0xL7AaMFMYa3peemVoQrnOHwu+0GamV0tpd8gtjmsPk6lRAPh4R9lNLyGtVV
+    hFp94ajxJrTzwxFIYou64x7Vbv5yzm+rVv3L6UV0qxGjskM2yv9ChXSPc1N/2H8C
+    AwEAAaNCMEAwDgYDVR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0O
+    BBYEFLHwdxua5+5X/wozMw5gWB9i9KPiMA0GCSqGSIb3DQEBCwUAA4ICAQB4mLJ6
+    n9daXvuoqpRaw221AFJpDiDfSJUoX82Pmeu7Ufypo2QUIK11cCc0qG+BwN9P+DnE
+    0t89/ykYxpNTZXfNkDSZNuFCcOJKBJ2/0yJ3Zbgrb1qdvAfvyomFWqT+xrG9YfLc
+    Tehqo0wrPeFdesMtPXI3a9h3l3zjiiO2QyfJ6AkLlPESi0PvMSUzYH5FYuypdDnU
+    XpYNTb+j1uLbeGCq2oYhnrZ0WIIe4LLM01BJax8tQwzdDTAUex0yfQF63QQeuin5
+    GxmjCNyhEkyyQNkPrRQfXqVwb8SGvIfC/WYRhriQ3lvLk+PG6anZ5hCGnO7JsU+4
+    IElCPlvKSqA47cP3h4Ou5hfHDrFav+PyNFflEVbLv2fXH4uBVKRAOdXB8+M2D40H
+    Qop0xbvm2OBME5en+dEiARBIqAwIV/HOp/jE+nxZ25IJxyXeaIluqwPeSfKKZGLC
+    0wqh76NbwtkOrWs1v6G7KjzFY54oznawlQ5z5BL7AWntR6nyAUplx/YXSb++bmUx
+    ++a8B/Q1bYcif90lZSJK4ka3oyzOVA8ADGhoOdlx/24YKEhyuJSuu3FQcK82C0d4
+    OanlL8QvizEtVBYXI/KHJqeEoW6J4t8gT7kCx/JUGi48PXxMBdG8gnUT+lrHoUPU
+    +q3+nGavIWrASDNeB97Bzmi/f9UkU4z2tBjh+Q==
+    -----END CERTIFICATE-----
+buildservice:
+  kp_default_repository: harbor.h2o-2-23532.h2o.vmware.com/tap/build-service
+supply_chain: basic
+contour:
+  envoy:
+    service:
+      type: LoadBalancer
+image_policy_webhook:
+  allow_unmatched_tags: true
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1l23ht62t62hn9k65ynx0wzxnvksj08kz2ef3lzz0dpc754ylr95qpkk77e
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBVRTNEd1N5ZFNhUGF2VG80
+        Q1Z3U2tJZHdRbmJ3RTZQbXprbVM4UUhDRmxZCnU3MW43L3hwTWJyUHhiWFdna0p4
+        TlV5VlZnZEhhdGh1MTNzeERLR3J2d2sKLS0tIFc4aXNjY1VIaG4xYzJKZy8ybVVW
+        N3NrOXlUUGlkUGYwenhyaUpZZjNBZlkKcOyunpwksiI/AB6Vm+TM7OgdEgxLr1IP
+        Y+KGC6nKSvRidVid5qlrb0DugLnxye6kEI3UUX/T28MBoeKqYXzSuQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2024-03-23T12:16:07Z"
+  mac: ENC[AES256_GCM,data:2COMXydG8YwqWI9DakxJdkCg/ytGtYZZhwO4GQ5bD9yAxZqPPct3ziAVziqZVjRUBTqDV/IdjP6A5k0mQYLJbBre3RM1JRxJvU+TuGAJymDeuvJOR9DrL92KW/TKdr/4497+xr7FDINIgVuULPtyaof2si9bFPCWviZYGeq0C5c=,iv:vl8K+t+nLv/gO0ya/t5hFAtCdGZDwa78ZD6U+u/GQBU=,tag:FpCfk8qlfUPGQBBZrBTHoA==,type:str]
+  pgp: []
+  encrypted_regex: ^.*([pP]assword|[sS]ecret|serviceAccountToken).*$
+  mac_only_encrypted: true
+  version: 3.8.1
