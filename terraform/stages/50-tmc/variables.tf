@@ -58,3 +58,13 @@ variable "age_secret_key" {
     error_message = "Key must start with AGE-SECRET-KEY-"
   }
 }
+
+variable "tap_branch" {
+  type = string
+  default = "main"
+}
+
+variable "supervisor_name" {
+  type = string
+  default = "Name of the supervisor registered in TMC"
+}
