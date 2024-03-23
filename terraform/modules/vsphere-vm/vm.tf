@@ -2,7 +2,7 @@ resource "random_password" "vm_root_user" {
   length           = 6
   upper            = false
   special          = false
-  override_special = "#$%&*()=+[]{}<>:?"
+  override_special = "#%+=!"
 }
 
 locals {
@@ -14,7 +14,7 @@ locals {
   # User data rendered using the Terraform provider produce an invalid configuration
   # See https://github.com/hashicorp/terraform-provider-cloudinit/issues/165
   default_user_data = templatefile("${path.module}/files/default-cloud-config.yml.tftpl", {
-    hostname: local.hostname
+    hostname : local.hostname
     fqdn : var.fqdn
     root_password : local.root_password
     authorized_key : var.vm_authorized_key
@@ -28,12 +28,12 @@ locals {
 }
 
 resource "vsphere_virtual_machine" "vm" {
-  name             = split(".", var.fqdn)[0]
+  name = split(".", var.fqdn)[0]
 
   resource_pool_id = var.vsphere.resource_pool_id
   datastore_id     = var.vsphere.datastore_id
-  num_cpus = var.vm_specs.cpu
-  memory   = var.vm_specs.memory
+  num_cpus         = var.vm_specs.cpu
+  memory           = var.vm_specs.memory
 
   clone {
     template_uuid = var.vsphere.template_id

@@ -1,7 +1,7 @@
 resource "random_password" "tmc_admin" {
   length           = 10
   special          = true
-  override_special = "#$%&*()=+[]{}<>:?"
+  override_special = "#%+=!"
 }
 
 resource "keycloak_user" "tmc_admin" {
@@ -30,7 +30,7 @@ resource "keycloak_user_groups" "tmc_amdin" {
 resource "random_password" "tmc_member" {
   length           = 10
   special          = true
-  override_special = "#$%&*()=+[]{}<>:?"
+  override_special = "#%+=!"
 }
 
 resource "keycloak_user" "tmc_member" {
@@ -59,7 +59,7 @@ resource "keycloak_user_groups" "tmc_member" {
 resource "random_password" "tap_dev" {
   length           = 10
   special          = true
-  override_special = "#$%&*()=+[]{}<>:?"
+  override_special = "#%+=!"
 }
 
 resource "keycloak_user" "tap_dev" {

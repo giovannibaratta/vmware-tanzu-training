@@ -5,12 +5,12 @@ locals {
 resource "random_password" "minio_root_password" {
   length           = 20
   special          = true
-  override_special = "!#$%+<>?"
+  override_special = "#%+=!"
 }
 
 locals {
   ansible_playbook = templatefile("${path.module}/files/setup-playbook.yaml", {
-    minio_root_password    = random_password.minio_root_password.result
+    minio_root_password = random_password.minio_root_password.result
   })
 }
 
@@ -26,13 +26,13 @@ module "vm" {
 }
 
 data "http" "minio_healthcheck" {
-  url    = "https://${module.vm.instance_ip}/minio/health/live"
-  method = "GET"
-  insecure = true
+  url                = "https://${module.vm.instance_ip}/minio/health/live"
+  method             = "GET"
+  insecure           = true
   request_timeout_ms = 5000
 
   retry {
-    attempts = 2 # equals to 3 attempts
+    attempts     = 2     # equals to 3 attempts
     min_delay_ms = 30000 # 30s
     max_delay_ms = 60000 # 60s
   }
@@ -44,5 +44,5 @@ data "http" "minio_healthcheck" {
     }
   }
 
-  depends_on = [ module.vm ]
+  depends_on = [module.vm]
 }

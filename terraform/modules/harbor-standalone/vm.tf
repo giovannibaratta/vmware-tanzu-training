@@ -26,13 +26,13 @@ locals {
 resource "random_password" "admin_password" {
   length           = 10
   special          = true
-  override_special = "#$%*()=+[]{}:?"
+  override_special = "#%+=!"
 }
 
 resource "random_password" "db_root_password" {
   length           = 20
   special          = true
-  override_special = "#$%*()=+[]{}:?"
+  override_special = "#%+=!"
 }
 
 module "vm" {

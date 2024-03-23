@@ -8,10 +8,10 @@ locals {
   ]
 
   ansible_var_file = templatefile("${path.module}/files/keycloak-ansible-vars.yaml.tpl", {
-    keycloak_db_password    = random_password.keycloak_db.result
-    keycloak_admin_password = random_password.keycloak_admin.result
-    keycloak_base64_tls_key = try(var.tls.private_key, null)
-    keycloak_base64_tls_cert = try(var.tls.certificate, null)
+    keycloak_db_password         = random_password.keycloak_db.result
+    keycloak_admin_password      = random_password.keycloak_admin.result
+    keycloak_base64_tls_key      = try(var.tls.private_key, null)
+    keycloak_base64_tls_cert     = try(var.tls.certificate, null)
     keycloak_base64_tls_ca_chain = try(var.tls.ca_chain, null)
   })
 }
@@ -19,13 +19,13 @@ locals {
 resource "random_password" "keycloak_admin" {
   length           = 10
   special          = true
-  override_special = "#$%&*()=+[]{}<>:?"
+  override_special = "#%+=!"
 }
 
 resource "random_password" "keycloak_db" {
   length           = 20
   special          = true
-  override_special = "#$%&*()=+[]{}<>:?"
+  override_special = "#%+=!"
 }
 
 module "vm" {
