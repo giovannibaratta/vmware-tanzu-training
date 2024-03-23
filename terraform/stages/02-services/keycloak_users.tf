@@ -55,3 +55,23 @@ resource "keycloak_user_groups" "tmc_member" {
     keycloak_group.tmc_member.id
   ]
 }
+
+resource "random_password" "tap_dev" {
+  length           = 10
+  special          = true
+  override_special = "#$%&*()=+[]{}<>:?"
+}
+
+resource "keycloak_user" "tap_dev" {
+  realm_id = keycloak_realm.tanzu.id
+  username = "tap-dev"
+  enabled  = true
+
+  email          = "tap-dev@${var.domain}"
+  email_verified = true
+
+  initial_password {
+    value     = random_password.tap_dev.result
+    temporary = false
+  }
+}

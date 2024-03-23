@@ -14,7 +14,16 @@ locals {
     "tmc_member_user" = try({
       username = keycloak_user.tmc_member.username
       password = keycloak_user.tmc_member.initial_password.0.value
-    }, null)
+    }, null),
+    "tap_dev_user" = try({
+      username = keycloak_user.tap_dev.username
+      password = keycloak_user.tap_dev.initial_password.0.value
+    }, null),
+    "tap_oidc_provider" = try({
+      issuer_url    = "${var.idp_provider.url}/realms/${keycloak_realm.tanzu.realm}"
+      client_id     = keycloak_openid_client.tap.client_id
+      client_secret = keycloak_openid_client.tap.client_secret
+    }, null),
   }
 }
 
