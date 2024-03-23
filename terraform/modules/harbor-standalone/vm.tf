@@ -1,88 +1,58 @@
-resource "random_password" "vm_root_user" {
-  length           = 6
-  upper            = false
-  special          = false
-  override_special = "#$%&*()=+[]{}<>:?"
-}
-
-resource "random_password" "admin_password" {
-  length           = 16
-  special          = true
-  override_special = "#$%&*()=+[]{}<>:?"
-}
-
-resource "random_password" "db_root_password" {
-  length           = 16
-  special          = true
-  override_special = "#$%&*()=+[]{}<>:?"
-}
-
 locals {
-  harbor_fqdn = "harbor.${var.domain}"
 
-  harbor_playbook = templatefile("${path.module}/files/harbor-install-playbook.yaml", {
-    harbor_fqdn : local.harbor_fqdn
-  })
-
-  harbor_conf = templatefile("${path.module}/files/harbor-config.yml.tftpl", {
-    fqdn : local.harbor_fqdn
+  harbor_config_file = templatefile("${path.module}/files/harbor-config.yml.tftpl", {
+    fqdn : var.fqdn
     admin_password : random_password.admin_password.result
     db_root_password : random_password.db_root_password.result
   })
+}
 
-  # User data rendered using the Terraform provider produce an invalid configuration
-  # See https://github.com/hashicorp/terraform-provider-cloudinit/issues/165
-  harbor_user_data = templatefile("${path.module}/files/harbor-cloud-config.yml.tftpl", {
-    fqdn : local.harbor_fqdn
-    password : random_password.vm_root_user.result
-    authorized_key : var.vm_authorized_key
-    harbor_install_playbook : base64encode(local.harbor_playbook)
-    harbor_conf : base64encode(local.harbor_conf)
-    harbor_service : base64encode(file("${path.module}/files/harbor-systemd.service"))
+locals {
+  ansible_files = [
+    "harbor-systemd.service",
+    "harbor-tls-ca-chain.j2",
+    "harbor-tls-certificate.j2",
+    "harbor-tls-key.j2"
+  ]
+
+  ansible_var_file = templatefile("${path.module}/files/harbor-ansible-vars.yaml.tpl", {
+    harbor_hostname            = var.fqdn
+    harbor_base64_tls_key      = try(var.tls.private_key, null)
+    harbor_base64_tls_cert     = try(var.tls.certificate, null)
+    harbor_base64_tls_ca_chain = try(var.tls.ca_chain, null)
   })
 }
 
-resource "vsphere_virtual_machine" "harbor" {
-  name             = "harbor"
-  resource_pool_id = var.vsphere.resource_pool_id
-  datastore_id     = var.vsphere.datastore_id
+resource "random_password" "admin_password" {
+  length           = 10
+  special          = true
+  override_special = "#$%*()=+[]{}:?"
+}
 
-  num_cpus = 2
-  memory   = 4096
+resource "random_password" "db_root_password" {
+  length           = 20
+  special          = true
+  override_special = "#$%*()=+[]{}:?"
+}
 
-  clone {
-    template_uuid = var.vsphere.template_id
+module "vm" {
+  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/vsphere-vm?ref=vsphere-vm-v0.0.3&depth=1"
 
-    # Do not customize the clone when using user-data.
-    # See https://github.com/vmware/open-vm-tools/issues/684,
-    # https://github.com/canonical/cloud-init/issues/4188,
-    # https://github.com/canonical/cloud-init/issues/4404
-  }
+  fqdn              = var.fqdn
+  vsphere           = var.vsphere
+  vm_authorized_key = var.vm_authorized_key
 
-  # This is required to load vApp properties correctly
-  cdrom {
-    client_device = true
-  }
+  ansible_playbook = filebase64("${path.module}/files/harbor-install-playbook.yaml")
 
-  disk {
-    label            = "disk0"
-    size             = 200
-    thin_provisioned = true
-  }
-
-  network_interface {
-    network_id = var.vsphere.network_id
-  }
-
-  vapp {
-    properties = {
-      "user-data"   = base64encode(local.harbor_user_data)
-      "public-keys" = var.vm_authorized_key
+  cloud_init_write_files = merge(
+    { for file in local.ansible_files : "/ansible/templates/${file}" => filebase64("${path.module}/files/${file}") },
+    {
+      "/ansible/vars.yaml"         = base64encode(local.ansible_var_file),
+      "/ansible/harbor-config.yml" = base64encode(local.harbor_config_file)
     }
-  }
+  )
 
-  # Perma diff
-  lifecycle {
-    ignore_changes = [ept_rvi_mode, hv_mode, clone]
-  }
+  ansible_galaxy_actions = [
+    ["ansible-galaxy", "role", "install", "geerlingguy.docker"]
+  ]
 }

@@ -3,8 +3,9 @@ variable "vm_authorized_key" {
   type = string
 }
 
-variable "domain" {
+variable "fqdn" {
   type = string
+  description = "Fully qualified domain name of the VM"
 }
 
 variable "vsphere" {
@@ -17,4 +18,16 @@ variable "vsphere" {
     network_id = string
     template_id = string
   })
+}
+
+variable "tls" {
+  type = object({
+    private_key = string
+    certificate = string
+    ca_chain = optional(string, null)
+  })
+
+  nullable = true
+  default = null
+  description = "TLS configuration to use. Private key and certificate must be base64 encoded"
 }

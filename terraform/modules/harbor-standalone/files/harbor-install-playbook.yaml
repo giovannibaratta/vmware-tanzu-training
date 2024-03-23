@@ -12,8 +12,8 @@
   connection: local
   become: true
 
-  vars:
-    harbor_hostname: "${harbor_fqdn}"
+  vars_files:
+    - ./vars.yaml
 
   tasks:
     - name: Create TLS folder
@@ -22,60 +22,85 @@
         state: directory
         mode: "0700"
 
-    # Create self-signed CA
-    # https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html#set-up-the-ca
-    - name: Create CA private key
-      community.crypto.openssl_privatekey:
-        path: /harbor/tls/ca.key
+    - name: Generate TLS artifacts
+      when: harbor_base64_tls_key is undefined or harbor_base64_tls_cert is undefined
+      block:
+        # Create self-signed CA
+        # https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html#set-up-the-ca
+        - name: Create CA private key
+          community.crypto.openssl_privatekey:
+            path: /harbor/tls/ca.key
 
-    - name: Create certificate signing request for CA certificate
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: /harbor/tls/ca.key
-        common_name: Harbor CA
-        use_common_name_for_san: false
-        basic_constraints:
-          - "CA:TRUE"
-        basic_constraints_critical: true
-        key_usage:
-          - keyCertSign
-        key_usage_critical: true
-      register: ca_csr
+        - name: Create certificate signing request for CA certificate
+          community.crypto.openssl_csr_pipe:
+            privatekey_path: /harbor/tls/ca.key
+            common_name: Harbor CA
+            use_common_name_for_san: false
+            basic_constraints:
+              - "CA:TRUE"
+            basic_constraints_critical: true
+            key_usage:
+              - keyCertSign
+            key_usage_critical: true
+          register: ca_csr
 
-    - name: Create self-signed CA certificate from CSR
-      community.crypto.x509_certificate:
-        path: /harbor/tls/ca.pem
-        csr_content: "{{ ca_csr.csr }}"
-        privatekey_path: /harbor/tls/ca.key
-        provider: selfsigned
-        # It must be less than 825 days to work on newer MacOs versions
-        selfsigned_not_after: "+730d"
+        - name: Create self-signed CA certificate from CSR
+          community.crypto.x509_certificate:
+            path: /harbor/tls/ca.pem
+            csr_content: "{{ ca_csr.csr }}"
+            privatekey_path: /harbor/tls/ca.key
+            provider: selfsigned
+            # It must be less than 825 days to work on newer MacOs versions
+            selfsigned_not_after: "+730d"
+            return_content: true
+          register: harbor_ca_cert_task
 
-    # Create Harbor certificate
-    - name: Create Harbor private key
-      community.crypto.openssl_privatekey:
-        path: /harbor/tls/harbor.key
+        # Create Harbor key and certificate
+        - name: Create Harbor private key
+          community.crypto.openssl_privatekey:
+            path: /harbor/tls/harbor.key
+            format: "pkcs1"
+            return_content: true
+          register: harbor_private_key_task
 
-    # Create CSR and sign it with the self-signed cA
-    - name: Create Harbor certificate signing request (CSR)
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: /harbor/tls/harbor.key
-        common_name: "{{ harbor_hostname }}"
-        subject_alt_name:
-          - "DNS:{{ harbor_hostname }}"
-      register: harbor_csr
+        # Create CSR and sign it with the self-signed CA
+        - name: Create Harbor certificate signing request (CSR)
+          community.crypto.openssl_csr_pipe:
+            privatekey_path: /harbor/tls/harbor.key
+            common_name: "{{ harbor_hostname }}"
+            subject_alt_name:
+              - "DNS:{{ harbor_hostname }}"
+          register: harbor_csr
 
-    - name: Create Harbor certificate
-      community.crypto.x509_certificate:
-        path: /harbor/tls/harbor.pem
-        csr_content: "{{ harbor_csr.csr }}"
-        ownca_privatekey_path: /harbor/tls/ca.key
-        ownca_path: /harbor/tls/ca.pem
-        # It must be less than 825 days to work on newer MacOs versions
-        ownca_not_after: "+365d"
-        provider: ownca
-      notify:
-        - Regenerate Harbor configs
-        - Restart Harbor service
+        - name: Create Harbor certificate
+          community.crypto.x509_certificate:
+            path: /harbor/tls/harbor.pem
+            csr_content: "{{ harbor_csr.csr }}"
+            ownca_privatekey_path: /harbor/tls/ca.key
+            ownca_path: /harbor/tls/ca.pem
+            # It must be less than 825 days to work on newer MacOs versions
+            ownca_not_after: "+365d"
+            provider: ownca
+            return_content: true
+          register: harbor_cert_task
+          notify:
+            - Regenerate Harbor configs
+            - Restart Harbor service
+
+        - name: Set TLS facts using variables
+          ansible.builtin.set_fact:
+            harbor_tls_key: "{{ harbor_private_key_task.privatekey }}"
+            harbor_tls_cert: "{{ harbor_cert_task.certificate }}"
+            harbor_tls_ca_chain: "{{ harbor_ca_cert_task.certificate }}"
+
+    - name: Extract TLS artifacts from variables
+      when: harbor_base64_tls_key is defined and harbor_base64_tls_cert is defined
+      block:
+        - name: Set TLS facts using variables
+          ansible.builtin.set_fact:
+            harbor_tls_key: "{{ harbor_base64_tls_key | b64decode }}"
+            harbor_tls_cert: "{{ harbor_base64_tls_cert | b64decode }}"
+            harbor_tls_ca_chain: '{{ harbor_base64_tls_ca_chain | default(None) | b64decode or "" }}'
 
     # Copy certificate and private key in the all the required folders
     - name: Create Docker cert folder
@@ -103,40 +128,50 @@
         mode: "0755"
 
     - name: Copy Harbor private key to Docker certs
-      ansible.builtin.copy:
-        src: /harbor/tls/harbor.key
+      ansible.builtin.template:
+        src: "templates/harbor-tls-key.j2"
         dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname}}.key"
-        remote_src: yes
 
     - name: Copy Harbor certificate to Docker certs
-      ansible.builtin.copy:
-        src: /harbor/tls/harbor.pem
+      ansible.builtin.template:
+        src: "templates/harbor-tls-certificate.j2"
         dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname}}.pem"
-        remote_src: yes
 
     - name: Copy CA certificate
-      ansible.builtin.copy:
-        src: /harbor/tls/ca.pem
+      ansible.builtin.template:
+        src: "templates/harbor-tls-ca-chain.j2"
         dest: "/etc/docker/certs.d/{{ harbor_hostname }}/ca.pem"
-        remote_src: yes
 
     - name: Copy Harbor private key to data volume
-      ansible.builtin.copy:
-        src: /harbor/tls/harbor.key
+      ansible.builtin.template:
+        src: "templates/harbor-tls-key.j2"
         dest: "/data/cert/{{ harbor_hostname}}.key"
-        remote_src: yes
 
     - name: Copy Harbor certificate to data volume
-      ansible.builtin.copy:
-        src: /harbor/tls/harbor.pem
+      ansible.builtin.template:
+        src: "templates/harbor-tls-certificate.j2"
         dest: "/data/cert/{{ harbor_hostname}}.pem"
-        remote_src: yes
 
     - name: Copy CA to data volume
-      ansible.builtin.copy:
-        src: /harbor/tls/ca.pem
+      ansible.builtin.template:
+        src: "templates/harbor-tls-ca-chain.j2"
         dest: "/data/ca_download/ca.crt"
-        remote_src: yes
+
+    - name: Copy Harbor config
+      ansible.builtin.copy:
+        src: "/ansible/harbor-config.yml"
+        dest: "/harbor/harbor.yml"
+      notify:
+        - Regenerate Harbor configs
+        - Restart Harbor service
+
+    - name: Copy Harbor service
+      ansible.builtin.copy:
+        src: "templates/harbor-systemd.service"
+        dest: "/etc/systemd/system/harbor.service"
+      notify:
+        - Regenerate Harbor configs
+        - Restart Harbor service
 
     - name: Check if Harbor is already installed
       ansible.builtin.shell:
