@@ -34,7 +34,7 @@ resource "tls_locally_signed_cert" "idp" {
 
 module "keycloak" {
   count  = local.depoy_keylock ? 1 : 0
-  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/keycloak?ref=keycloak-v0.0.2&depth=1"
+  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/keycloak?ref=keycloak-v0.0.5&depth=1"
 
   fqdn = local.idp_fqdn
 
