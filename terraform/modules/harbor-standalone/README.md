@@ -16,6 +16,6 @@ The module deploys Harbor registry in a VM in a vSphere environment.
 
 | Name | Description |
 |------|-------------|
-| harbor\_admin\_passowrd | n/a |
+| harbor\_admin\_password | n/a |
 | harbor\_instance\_ip | n/a |
 <!-- END_TF_DOCS -->
