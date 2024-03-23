@@ -119,6 +119,8 @@
             privatekey_path: /ansible/tls/ca.key
             provider: selfsigned
             return_content: true
+            # It must be less than 825 days to work on newer MacOs versions
+            selfsigned_not_after: "+730d"
           register: keycloak_ca_cert_task
 
         # Create Keycloak key and certificate
@@ -129,7 +131,7 @@
             return_content: true
           register: keycloak_private_key_task
 
-        # Create CSR and sign it with the self-signed cA
+        # Create CSR and sign it with the self-signed CA
         - name: Create Keycloak certificate signing request (CSR)
           community.crypto.openssl_csr_pipe:
             privatekey_path: /ansible/tls/keycloak.key
@@ -144,6 +146,8 @@
             csr_content: "{{ keycloak_csr.csr }}"
             ownca_privatekey_path: /ansible/tls/ca.key
             ownca_path: /ansible/tls/ca.pem
+            # It must be less than 825 days to work on newer MacOs versions
+            ownca_not_after: "+365d"
             provider: ownca
             return_content: true
           register: keycloak_cert_task

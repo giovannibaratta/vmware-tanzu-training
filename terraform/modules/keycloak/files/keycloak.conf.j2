@@ -1,7 +1,7 @@
 # Database configuration
 db=postgres
 db-username=keycloak
-db-password={{ keycloak_db_password }}
+db-password="{{ keycloak_db_password }}"
 
 # Hostname for the Keycloak server.
 hostname-url=https://{{ keycloak_fqdn }}
@@ -15,5 +15,5 @@ log-file=/var/log/keycloak/logs
 
 # TLS configs
 https-port=443
-https-certificate-file={{ keycloak_dir}}/tls/cert.pem
-https-certificate-key-file={{ keycloak_dir}}/tls/key.pem
+https-certificate-file="{{ keycloak_dir }}/tls/cert.pem"
+https-certificate-key-file="{{ keycloak_dir }}/tls/key.pem"
