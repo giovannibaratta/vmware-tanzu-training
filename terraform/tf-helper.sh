@@ -13,8 +13,8 @@ if [[ -z "${ACTION}" || -z "${STAGE}" ]]; then
   exit 1
 fi
 
-if [[ "${ACTION}" != "plan" && "${ACTION}" != "apply" ]]; then
-  echo "Supported action are plan or apply"
+if [[ "${ACTION}" != "plan" && "${ACTION}" != "apply" && "${ACTION}" != "destroy" ]]; then
+  echo "Supported action are plan, apply or destroy"
   exit 1
 fi
 
