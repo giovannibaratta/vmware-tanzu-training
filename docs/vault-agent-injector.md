@@ -6,7 +6,7 @@
 
 ## Instructions
 
-1. Enable and configure a Kubernetes auth backend in the Vault cluster. A Terraform module is available [here](../terraform/modules/vault-kubernetes/) and an example on how to use it is also available [here](../terraform/stages/03-vault/). These steps can also be performed using the Vault CLI.
+1. Enable and configure a Kubernetes auth backend in the Vault cluster. A Terraform module is available [here](../terraform/modules/vault-kubernetes/) and an example on how to use it is also available [here](../terraform/stages/50-vault/). These steps can also be performed using the Vault CLI.
 1. Deploy the Agent Injector using the official helm chart. An example of values file is available [here](../manifests/vault-injector-helm-values.yaml).
     ```sh
     helm install -f vault-injector-helm-values.yaml vault-injector hashicorp/vault --version 0.27.0  -n vault
