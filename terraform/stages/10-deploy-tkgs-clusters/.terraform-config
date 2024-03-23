@@ -1,0 +1,3 @@
+export TF_IN_AUTOMATION="true"
+export TF_INPUT="false"
+export TF_CLI_ARGS="-var-file=outputs.tfvars -var-file=terraform.tfvars -var-file=\"$TERRAFORM_ROOT/outputs/00-bootstrap/output.json\""
