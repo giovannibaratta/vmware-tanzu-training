@@ -1,7 +1,7 @@
 output "ips" {
   value = {
     for name, ip in {
-      "registry" : try(module.harbor[0].harbor_instance_ip, null),
+      "registry" : try(module.harbor[0].instance_ip, null),
       "bastion" : try(module.jumpbox[0].jumpbox_instance_ip, null),
       "s3" : try(module.minio[0].instance_ip, null),
       "idp" : try(module.keycloak[0].instance_ip, null),
@@ -15,7 +15,7 @@ locals {
   stage_sensitive_output = {
     "minio_root_password" = try(module.minio[0].minio_root_password, null),
     "registry_provider" = try({
-      url      = "https://${module.harbor[0].harbor_instance_ip}"
+      url      = "https://${module.harbor[0].instance_ip}"
       username = "admin"
       password = module.harbor[0].harbor_admin_password
     }, null),
@@ -46,11 +46,4 @@ resource "local_sensitive_file" "stage_sensitive_output" {
   })
 
   filename = "${var.sensitive_output_dir}/sensitive-output.json"
-}
-
-resource "local_sensitive_file" "kubeconfigs" {
-  for_each = local.tkgs_clusters
-
-  content  = yamlencode(module.tkgs_clusters[each.key].kubeconfig)
-  filename = "${var.sensitive_output_dir}/kubeconfigs/${each.value.namespace}_${each.value.name}-kubeconfig"
 }

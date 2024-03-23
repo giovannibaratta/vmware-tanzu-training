@@ -21,6 +21,16 @@ variable "vcenter_data" {
   })
 }
 
+variable "vm_template" {
+  type = object({
+    library_name = string
+    template_name = string
+  })
+  description = "Reference to an existing template. If not set, an Ubuntu ova image will be uploaded."
+  nullable = true
+  default = null
+}
+
 variable "domain" {
   type = string
 }
@@ -62,29 +72,6 @@ variable "services" {
   })
 
   default = {}
-}
-
-variable "supervisor_context_name" {
-  description = "Name of the supervisor context in .kube/config"
-  type        = string
-  nullable = true
-  default = null
-}
-
-variable "tkgs_clusters" {
-  type = list(object({
-    control_plane_replicas = optional(number, 1)
-    worker_node_replicas = optional(number, 3)
-    namespace = string
-    name = string
-  }))
-
-  default = []
-
-  validation {
-    condition = length(toset([ for v in var.tkgs_clusters: "${v.namespace}/${v.name}" ])) == length(var.tkgs_clusters)
-    error_message = "Duplicated namespace/name pair found in the list"
-  }
 }
 
 variable "ca_private_key" {

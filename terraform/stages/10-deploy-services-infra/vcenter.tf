@@ -28,25 +28,36 @@ resource "vsphere_resource_pool" "services" {
   parent_resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
 }
 
+locals {
+  use_existing_template = var.vm_template != null
+}
+
 resource "vsphere_content_library" "templates" {
+  count           = local.use_existing_template ? 0 : 1
   name            = "Templates"
   storage_backing = [data.vsphere_datastore.datastore.id]
 }
 
 resource "vsphere_content_library_item" "ubuntu2204" {
+  count       = local.use_existing_template ? 0 : 1
   name        = "ubuntu-22.04"
   description = "Ubuntu Server LTS OVA Template"
   file_url    = "https://cloud-images.ubuntu.com/releases/jammy/release/ubuntu-22.04-server-cloudimg-amd64.ova"
-  library_id  = vsphere_content_library.templates.id
+  library_id  = vsphere_content_library.templates[0].id
+}
 
-  # If you want to manually upload the image from the UI, import the terraform resource and
-  # uncomment the following lines
-  # lifecycle {
-  #   ignore_changes = [ 
-  #     # Ignore the properties becasue if the file has been uploaded manually and then imported
-  #     # into terraform it will force a replacement
-  #     file_url,
-  #     description
-  #    ]
-  # }
+data "vsphere_content_library" "library" {
+  count = local.use_existing_template ? 1 : 0
+  name  = var.vm_template.library_name
+}
+
+data "vsphere_content_library_item" "template" {
+  count      = local.use_existing_template ? 1 : 0
+  name       = var.vm_template.template_name
+  type       = "ovf"
+  library_id = data.vsphere_content_library.library.0.id
+}
+
+locals {
+  vm_template_id = local.use_existing_template ? data.vsphere_content_library_item.template.0.id : vsphere_content_library_item.ubuntu2204.0.id
 }
