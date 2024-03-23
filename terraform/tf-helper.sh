@@ -6,6 +6,9 @@ set -o pipefail
 
 ACTION="${1-}"
 STAGE="${2-}"
+# The variable can be used in .terraform-config file to know where is the
+# root directory of Terraform
+export TERRAFORM_ROOT=$(pwd)
 
 if [[ -z "${ACTION}" || -z "${STAGE}" ]]; then
   echo "Missing parameter"
