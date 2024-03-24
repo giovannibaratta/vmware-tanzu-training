@@ -1,12 +1,18 @@
-variable "tmc" {
-  description = "Attributes used to configure the TMC provider"
+variable "domain" {
+  type = string
+}
+
+variable "tmc_admin_user" {
   type = object({
-    endpoint    = string
-    oidc_issuer = string
-    username    = string
-    password    = string
-    ca_cert     = string
+    username = string
+    password = string
   })
+
+  sensitive = true
+}
+
+variable "ca_certificate" {
+  type = string
 }
 
 variable "supervisor_context_name" {
@@ -18,6 +24,7 @@ variable "clusters_additional_trusted_cas" {
   type        = string
   description = "Additional CA in PEM encoding. The CAs can be concatenated"
   nullable    = true
+  default = null
 }
 
 variable "git_repo_credentials" {

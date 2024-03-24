@@ -1,13 +1,13 @@
 provider "tanzu-mission-control" {
-  endpoint = var.tmc.endpoint
+  endpoint = "tmc.${var.domain}"
 
   self_managed {
-    oidc_issuer = var.tmc.oidc_issuer
-    username    = var.tmc.username
-    password    = var.tmc.password
+    oidc_issuer = "pinniped-supervisor.tmc.${var.domain}"
+    username    = var.tmc_admin_user.username
+    password    = var.tmc_admin_user.password
   }
 
-  ca_cert = var.tmc.ca_cert
+  ca_cert = var.ca_certificate
 }
 
 provider "kubernetes" {
