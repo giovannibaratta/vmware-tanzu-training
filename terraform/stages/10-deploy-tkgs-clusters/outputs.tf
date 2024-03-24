@@ -2,7 +2,10 @@ locals {
   stage_output = {}
 
   stage_sensitive_output = {
-    for cluster_id, cluster in local.tkgs_clusters : "${cluster_id}-kubeconfig" => yamlencode(module.tkgs_clusters[cluster_id].kubeconfig)
+    kubeconfigs = {
+      for cluster_id, cluster in local.tkgs_clusters :
+      cluster_id => yamlencode(module.tkgs_clusters[cluster_id].kubeconfig)
+    }
   }
 }
 
