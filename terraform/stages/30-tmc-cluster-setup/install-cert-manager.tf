@@ -72,14 +72,12 @@ resource "kubernetes_manifest" "cert_manager_package_install" {
 resource "terraform_data" "wait_for_cert_manager" {
   # Wait for CRDs availability
   provisioner "local-exec" {
-    command    = "kubectl wait -f ${path.module}/files/package-install-cert-manager.yaml --for=condition=ReconcileSucceeded --timeout=10m"
+    command    = "kubectl wait -f ${path.module}/files/package-install-cert-manager.yaml --for=condition=ReconcileSucceeded --timeout=10m --kubeconfig=<( echo \"${local.kubeconfig_yaml}\" )"
+    interpreter = ["bash", "-c"]
     on_failure = fail
-    environment = {
-      "KUBECONFIG" = var.tmc_kubeconfig
-    }
   }
 
-  depends_on = [ kubernetes_manifest.cert_manager_package_install ]
+  depends_on = [kubernetes_manifest.cert_manager_package_install]
 }
 
 resource "kubernetes_secret_v1" "ca_tls" {
@@ -102,25 +100,21 @@ resource "kubernetes_secret_v1" "ca_tls" {
 resource "terraform_data" "cluster_issuer" {
 
   input = {
-    kubeconfig_file = var.tmc_kubeconfig
+    kubeconfig = local.kubeconfig_yaml
   }
 
   # Apply the manifest
   provisioner "local-exec" {
-    command    = "kubectl apply -f ${path.module}/files/cert-manager-issuer.yaml"
+    command    = "kubectl apply -f ${path.module}/files/cert-manager-issuer.yaml --kubeconfig=<( echo '${self.input.kubeconfig}' )"
+    interpreter = ["bash", "-c"]
     on_failure = fail
-    environment = {
-      "KUBECONFIG" = self.input.kubeconfig_file
-    }
   }
 
   provisioner "local-exec" {
     when       = destroy
-    command    = "kubectl delete -f ${path.module}/files/cert-manager-issuer.yaml"
+    command    = "kubectl delete -f ${path.module}/files/cert-manager-issuer.yaml --kubeconfig=<( echo '${self.input.kubeconfig}' )"
+    interpreter = ["bash", "-c"]
     on_failure = continue
-    environment = {
-      "KUBECONFIG" = self.input.kubeconfig_file
-    }
   }
 
   depends_on = [kubernetes_secret_v1.ca_tls]

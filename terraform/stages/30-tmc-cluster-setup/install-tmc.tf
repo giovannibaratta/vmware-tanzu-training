@@ -8,7 +8,7 @@ resource "kubernetes_secret_v1" "kapp_controller_config" {
   }
 
   data = {
-    caCerts = var.private_registry_ca
+    caCerts = var.ca_certificate
   }
 
   type = "Opaque"
@@ -17,25 +17,31 @@ resource "kubernetes_secret_v1" "kapp_controller_config" {
 resource "terraform_data" "restart_kapp_controller" {
   count = var.add_trust_to_kapp_controller ? 1 : 0
 
+  input = {
+    kubeconfig = local.kubeconfig_yaml
+  }
+
   triggers_replace = [
     kubernetes_secret_v1.kapp_controller_config.0.metadata.0.uid
   ]
 
   provisioner "local-exec" {
-    command    = "kubectl delete pod -n tkg-system -l app=kapp-controller"
+    command    = "kubectl delete pod -n tkg-system -l app=kapp-controller --kubeconfig=<( echo '${self.input.kubeconfig}' )"
+    interpreter = ["bash", "-c"]
     on_failure = fail
-    environment = {
-      "KUBECONFIG" = var.tmc_kubeconfig
-    }
   }
 
   depends_on = [kubernetes_secret_v1.kapp_controller_config]
 }
 
+locals {
+  tmc_repo_ref = "registry.${var.domain}/tmc-sm/package-repository:1.1.0"
+}
+
 # Install TMC
 resource "kubernetes_manifest" "tmc_repository" {
   manifest = yamldecode(templatefile("${path.module}/files/package-repo-tmc-sm.yaml.tpl", {
-    tmc_repo_ref = var.tmc_repo_ref
+    tmc_repo_ref = local.tmc_repo_ref
   }))
 
   depends_on = [terraform_data.restart_kapp_controller]
@@ -95,6 +101,32 @@ resource "kubernetes_cluster_role_binding_v1" "tmc_install" {
   }
 }
 
+resource "random_password" "minio" {
+  length           = 10
+  upper            = true
+  special          = true
+  override_special = "#%+=!"
+}
+
+resource "random_password" "postgres" {
+  length           = 10
+  upper            = true
+  special          = true
+  override_special = "#%+=!"
+}
+
+locals {
+  tmc_values = templatefile("${path.module}/files/tmc-values.yaml.tpl", {
+    domain             = var.domain
+    minio_password     = random_password.minio.result
+    oidc_client_id     = var.tmc_oidc_provider.client_id
+    oidc_client_secret = var.tmc_oidc_provider.client_secret
+    oidc_issuer_url    = var.tmc_oidc_provider.issuer_url
+    postgres_password  = random_password.postgres.result
+    root_ca            = var.ca_certificate
+  })
+}
+
 resource "kubernetes_secret_v1" "tmc_values" {
 
   metadata {
@@ -108,7 +140,7 @@ resource "kubernetes_secret_v1" "tmc_values" {
   }
 
   data = {
-    "values.yaml" = var.tmc_values
+    "values.yaml" = local.tmc_values
   }
 
   type = "Opaque"
@@ -131,25 +163,21 @@ locals {
 resource "terraform_data" "tmc_package_install" {
 
   input = {
-    kubeconfig_file = var.tmc_kubeconfig
+    kubeconfig = local.kubeconfig_yaml
   }
 
   # Apply the manifest
   provisioner "local-exec" {
-    command    = "kubectl apply -f - <<< \"${local.manifest}\""
+    command    = "kubectl apply -f - --kubeconfig=<( echo '${self.input.kubeconfig}' ) <<< \"${local.manifest}\""
+    interpreter = ["bash", "-c"]
     on_failure = fail
-    environment = {
-      "KUBECONFIG" = self.input.kubeconfig_file
-    }
   }
 
   provisioner "local-exec" {
     when       = destroy
-    command    = "kubectl delete packageinstall -n tkg-system tanzu-mission-control"
+    command    = "kubectl delete packageinstall -n tkg-system tanzu-mission-control --kubeconfig=<( echo '${self.input.kubeconfig}' )"
+    interpreter = ["bash", "-c"]
     on_failure = continue
-    environment = {
-      "KUBECONFIG" = self.input.kubeconfig_file
-    }
   }
 
   depends_on = [

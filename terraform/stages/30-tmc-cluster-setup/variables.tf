@@ -1,37 +1,33 @@
-variable "tmc_kubeconfig" {
-  type = string
-  description = "Path to a kubeconfig for the tmc cluster"
-}
-
 variable "add_trust_to_kapp_controller" {
-  type = bool
+  type        = bool
   description = "Configure the Kapp controller to trust the private registry"
-  default = true
+  default     = true
 }
 
-variable "private_registry_ca" {
+variable "domain" {
   type = string
-  description = "PEM certificate of the private registry that contains the TMC images"
-}
-
-variable "tmc_repo_ref" {
-  type = string
-  description = "Reference to the private registry that contains the images. Example: harbor.h2o-2-22574.h2o.vmware.com/tmc-sm/package-repository:1.1.0"
-}
-
-variable "tmc_values" {
-  type = string
-  description = "TMC values"
-  sensitive = true
 }
 
 variable "ca_certificate" {
-  type = string
+  type        = string
   description = "Certificate used to configure the cluster issuer"
 }
 
 variable "ca_private_key" {
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
   description = "Private key used to configure the cluster issuer"
+}
+
+variable "tmc_oidc_provider" {
+  type = object({
+    client_id     = string
+    client_secret = string
+    issuer_url    = string
+  })
+}
+
+variable "kubeconfigs" {
+  type      = map(string)
+  sensitive = true
 }
