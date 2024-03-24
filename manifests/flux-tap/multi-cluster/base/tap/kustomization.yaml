@@ -7,18 +7,9 @@ resources:
   - service-account.yaml
   - package-repository.yaml
   - package-install.yaml
-  - cert-manager.yaml
   - registry-credentials-exporter.yaml
 
 secretGenerator:
-  - name: self-signed-root-ca-tls
-    namespace: cert-manager
-    files:
-      - tls.key=root-ca.key.encrypted
-      - tls.crt=root-ca.crt
-    type: kubernetes.io/tls
-    options:
-      disableNameSuffixHash: true
   - name: registry-credentials
     namespace: tap-install
     files:

@@ -3,6 +3,7 @@ ceip_policy_disclosed: true
 excluded_packages:
   # Excluded due to a conflict when installing TAP using TMC + Flux
   - fluxcd.source.controller.tanzu.vmware.com
+  - cert-manager.tanzu.vmware.com
 shared:
   ingress_domain: tap.h2o-2-23532.h2o.vmware.com
   ingress_issuer: root-ca
@@ -85,14 +86,14 @@ sops:
     - recipient: age1l23ht62t62hn9k65ynx0wzxnvksj08kz2ef3lzz0dpc754ylr95qpkk77e
       enc: |
         -----BEGIN AGE ENCRYPTED FILE-----
-        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBqTjhnaWFzaXlDQXRDY2gz
-        aVI0Z3ZxaSthRFZocXZuTEwxaHRucGgzRkR3CmdBdFcwem5hdUtpdk8vRHpMKzM4
-        dGdFcXFETW83VUdDT0x1OUFhdlRueTgKLS0tIEFnY1pKUUZkTzZWNDdIakhzWitW
-        MDBXVEtoN1RTcXVuKzh1UjhhR1c4YWMKHo5gdGcn2lVS+YSPyBFmr95iGvHd6pIh
-        8sLuxk5DNiHLMOLJdQQrAlcwMZpTyxCxH4/2IGaXKAmraLCXHUKNkw==
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBPSm5ReEFtc2hxNGExaGh2
+        Mzhqb00xSW5FeCswdzE4WTczNFZmak53Z1FJCmlGelUwREdjdVdlNXNwRHltOVRW
+        bHBMSUFsWmljbE5lN1VTZkxKaVdoN0kKLS0tIEkwUXdGNzIxWm5Dc2l1S2lJalZN
+        MjJNbS9NVWRXUGg1MENpbkl1eUNtVDAKJvlLCXQJaTPyTWcm6vVe0/uxXwfWCxih
+        rKhhAhub5DJTgeh3h7yLFL+of9G8B8nEAjN5u++nPzU/7C1q/jzIaw==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: "2024-03-23T12:16:07Z"
-  mac: ENC[AES256_GCM,data:8wPTLd+98MxajCJkPIA85b6+WymE5UzII+k9RoKybBnSws+x4BN8Zake+YdiuuwMORRkBRAl1TS1VHqHStTlPTOOS0tgE9cMGTSCIba/12TeayX73PIm8mjOdcHxJ02dP8CHO5uZZuMj1ofPyHBc6Zt8R6QrKVEeA4rrqQRT/R8=,iv:FAbQuuMRkvfMNs59RQ9svsSBUHnglm+mCER9CW6KQ8M=,tag:2x65kK39Ya8HujA0IUlnhg==,type:str]
+  lastmodified: "2024-03-24T23:49:13Z"
+  mac: ENC[AES256_GCM,data:1Ywk8aORsscL3G6q3esn5xxl48lg3nWcWj59m6gNPhyDxqNQfsO5Xu3nZ71L7zwF0LtU8xtQsLGun7Y+a973BsGlOOOwXyiLUQOEipwviCut3hGzO2F2XeRjGY6x0BuW736CkTfEgP01Q4YS7OdFWuGs7tzQ+XjpoPkw/bn1wd8=,iv:hfMXgXCIj3FGjd+8lGwb+a08oKBuGqk8lHZED2jmlHc=,tag:W1wdKtI1T27Jych/Kih3+Q==,type:str]
   pgp: []
   encrypted_regex: ^.*([pP]assword|[sS]ecret|serviceAccountToken).*$
   mac_only_encrypted: true

@@ -2,13 +2,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: tap
+  name: configure-cert-manager
   namespace: tanzu-continuousdelivery-resources
 spec:
   dependsOn:
-    - name: configure-cert-manager
+    - name: deploy-cert-manager
   interval: 1m0s
-  path: manifests/flux-tap/multi-cluster/base/tap
+  path: manifests/flux-tap/multi-cluster/base/configure-cert-manager
   prune: true
   sourceRef:
     kind: GitRepository

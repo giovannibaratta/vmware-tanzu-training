@@ -3,13 +3,14 @@ ceip_policy_disclosed: true
 excluded_packages:
   # Excluded due to a conflict when installing TAP using TMC + Flux
   - fluxcd.source.controller.tanzu.vmware.com
+  - cert-manager.tanzu.vmware.com
 shared:
   ingress_domain: tap.h2o-2-23532.h2o.vmware.com
   ingress_issuer: root-ca
   image_registry:
     project_path: harbor.h2o-2-23532.h2o.vmware.com/tap
     username: admin
-    password: ENC[AES256_GCM,data:kvoQRL8HU1/dhBj/yv24Vw==,iv:2sDQoZGepPvVZNRBYR7FPLdWPqoxvrfDXjPdDsAGrg0=,tag:krkUoxdoDkqFEb6qZ7r4Ng==,type:str]
+    password: ENC[AES256_GCM,data:kGcbKGp26RxYgERDpeXvQQ==,iv:lXigS5JEJxUH8fGBkMvSd1vA29jx7fvoF8bTklpYIG8=,tag:GzG3F7HfGfhxjDCUa+L1JA==,type:str]
   kubernetes_version: 1.26.5
   ca_cert_data: |-
     -----BEGIN CERTIFICATE-----
@@ -90,14 +91,14 @@ sops:
     - recipient: age1l23ht62t62hn9k65ynx0wzxnvksj08kz2ef3lzz0dpc754ylr95qpkk77e
       enc: |
         -----BEGIN AGE ENCRYPTED FILE-----
-        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBVRTNEd1N5ZFNhUGF2VG80
-        Q1Z3U2tJZHdRbmJ3RTZQbXprbVM4UUhDRmxZCnU3MW43L3hwTWJyUHhiWFdna0p4
-        TlV5VlZnZEhhdGh1MTNzeERLR3J2d2sKLS0tIFc4aXNjY1VIaG4xYzJKZy8ybVVW
-        N3NrOXlUUGlkUGYwenhyaUpZZjNBZlkKcOyunpwksiI/AB6Vm+TM7OgdEgxLr1IP
-        Y+KGC6nKSvRidVid5qlrb0DugLnxye6kEI3UUX/T28MBoeKqYXzSuQ==
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBsTWVoSUFsRVJ4Tktrekps
+        ek5oWkxMSW44cWh2YkJmQVh6WDU4VUgvOHdjCm9QendlbHNBL3R5TmlvL0lESlJD
+        cUpQczdMc0dPbm0wbFlGcnc3RGx5TTAKLS0tIFlmZDBnT1B5SlJuS2VjOFZEaFdL
+        QWZnQUp1SjZCQW45Z1hndVR6d0VkMjQKi3qjgQAfXpqpy864wsT4SMZCRJv3+uDC
+        DuOpAMeM1VaRVYV4T1MjCT4TwddBqw2sThsTtmiG/fgxIHWJf/C0Ow==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: "2024-03-23T12:16:07Z"
-  mac: ENC[AES256_GCM,data:2COMXydG8YwqWI9DakxJdkCg/ytGtYZZhwO4GQ5bD9yAxZqPPct3ziAVziqZVjRUBTqDV/IdjP6A5k0mQYLJbBre3RM1JRxJvU+TuGAJymDeuvJOR9DrL92KW/TKdr/4497+xr7FDINIgVuULPtyaof2si9bFPCWviZYGeq0C5c=,iv:vl8K+t+nLv/gO0ya/t5hFAtCdGZDwa78ZD6U+u/GQBU=,tag:FpCfk8qlfUPGQBBZrBTHoA==,type:str]
+  lastmodified: "2024-03-24T23:49:13Z"
+  mac: ENC[AES256_GCM,data:bAujT6+uNxzTzNex3Z4RXA0dL5w7mX7y3PUaY/XYp3qxiMrJk4jjbf/eFG4Tcyt0JVoSP1tTNbojWfDlfi4c96fTViF7On0LUuuiSK1Yy5py1ygifegnkYE8Tu3gLMb62+Sl5kKxmZes+uu6XCetjcprmaQodzMneM9zS5P34gA=,iv:xyhJFcV4F+WZyFi8vzjVz0llba0l8pvRRD5hgpJkJ3k=,tag:REuTRG3ACzHlCprENTp0Ig==,type:str]
   pgp: []
   encrypted_regex: ^.*([pP]assword|[sS]ecret|serviceAccountToken).*$
   mac_only_encrypted: true
