@@ -1,6 +1,7 @@
 locals {
   stage_output = {
     "ca_certificate" = tls_self_signed_cert.ca.cert_pem,
+    "domain" = var.domain
   }
 
   stage_sensitive_output = {

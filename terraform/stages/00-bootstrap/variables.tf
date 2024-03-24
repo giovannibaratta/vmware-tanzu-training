@@ -19,3 +19,7 @@ variable "sensitive_output_dir" {
     error_message = "The path should not end with /"
   }
 }
+
+variable "domain" {
+  type = string
+}
