@@ -19,3 +19,8 @@ spec:
     provider: sops
     secretRef:
       name: sops-keys
+  healthChecks:
+    - apiVersion: packaging.carvel.dev/v1alpha1
+      kind: PackageInstall
+      name: tap
+      namespace: tap-install

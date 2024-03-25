@@ -13,6 +13,11 @@ spec:
     name: tap-installation
     namespace: tanzu-continuousdelivery-resources
   decryption:
-      provider: sops
-      secretRef:
-        name: sops-keys
+    provider: sops
+    secretRef:
+      name: sops-keys
+  healthChecks:
+    - apiVersion: packaging.carvel.dev/v1alpha1
+      kind: PackageInstall
+      name: cert-manager
+      namespace: tkg-system

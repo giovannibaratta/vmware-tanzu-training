@@ -15,6 +15,10 @@ spec:
     name: tap-installation
     namespace: tanzu-continuousdelivery-resources
   decryption:
-      provider: sops
-      secretRef:
-        name: sops-keys
+    provider: sops
+    secretRef:
+      name: sops-keys
+  healthChecks:
+    - apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      name: root-ca
