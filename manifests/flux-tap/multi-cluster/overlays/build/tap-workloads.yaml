@@ -2,14 +2,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: tap
+  name: tap-workloads
   namespace: tanzu-continuousdelivery-resources
 spec:
   dependsOn:
-    - name: configure-cert-manager
-    - name: tap-values
+    - name: tap
   interval: 1m0s
-  path: manifests/flux-tap/multi-cluster/base/tap
+  path: manifests/flux-tap/multi-cluster/overlays/build/workloads
   prune: true
   sourceRef:
     kind: GitRepository

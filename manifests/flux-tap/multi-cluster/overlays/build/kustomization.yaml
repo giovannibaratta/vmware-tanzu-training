@@ -3,7 +3,7 @@ resources:
   - ../../base
   - tap.yaml
   - namespaces.yaml
-  - workloads/app-1.yaml
+  - tap-workloads.yaml
 
 components:
   - ../shared/tap-gui-access
