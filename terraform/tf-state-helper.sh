@@ -76,7 +76,7 @@ MULTIPLE_STATE_FILE_FOUND=2
 function get_state_file_path() {
   local stage="${1:?stage is not defined or is empty}"
   local stage_path=$(get_stage_path "${stage}")
-  local backend_files=$(find "${stage_path}" -name 'backend-*.tf')
+  local backend_files=$(find "${stage_path}" -name 'backend-*.tf' -maxdepth 1)
   # Count non-blank lines to determine the number of backend files found
   local num_backend_files=$(grep -c -E '^.+$' <<< "${backend_files}")
 
