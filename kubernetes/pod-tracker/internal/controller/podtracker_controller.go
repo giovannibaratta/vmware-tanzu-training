@@ -190,7 +190,7 @@ func (r *PodTrackerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		})
 
 	// Instruct the controller to trigger the reconcile loop for objects of type PodTracker and to 
-	// to watch updated for objects of type Pods.
+	// to watch updates for objects of type Pods.
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&podsv1alpha1.PodTracker{}).
 		Watches(
