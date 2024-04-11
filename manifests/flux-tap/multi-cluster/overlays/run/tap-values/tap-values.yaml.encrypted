@@ -70,6 +70,10 @@ shared:
     +q3+nGavIWrASDNeB97Bzmi/f9UkU4z2tBjh+Q==
     -----END CERTIFICATE-----
 supply_chain: basic
+appliveview_connector:
+  # App Live View connector should connect to the backend hosted in the View cluster
+  backend:
+    ingressEnabled: true
 contour:
   envoy:
     service:
