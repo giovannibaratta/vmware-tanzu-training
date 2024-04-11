@@ -48,6 +48,8 @@ Operators are software extensions to Kubernetes that make use of custom resource
 ---
 
 # What is operator-sdk ?
+<br><br>
+<i>"operator-sdk is a component of the Operator Framework, an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way."</i>
 
 ---
 transition: fade-out
