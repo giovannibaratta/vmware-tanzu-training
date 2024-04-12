@@ -23,12 +23,12 @@ variable "vcenter_data" {
 
 variable "vm_template" {
   type = object({
-    library_name = string
+    library_name  = string
     template_name = string
   })
   description = "Reference to an existing template. If not set, an Ubuntu ova image will be uploaded."
-  nullable = true
-  default = null
+  nullable    = true
+  default     = null
 }
 
 variable "domain" {
@@ -45,7 +45,7 @@ variable "output_dir" {
   nullable = true
 
   validation {
-    condition = !endswith(var.output_dir, "/")
+    condition     = !endswith(var.output_dir, "/")
     error_message = "The path should not end with /"
   }
 }
@@ -56,7 +56,7 @@ variable "sensitive_output_dir" {
   nullable = true
 
   validation {
-    condition = !endswith(var.sensitive_output_dir, "/")
+    condition     = !endswith(var.sensitive_output_dir, "/")
     error_message = "The path should not end with /"
   }
 }
@@ -76,11 +76,17 @@ variable "services" {
 
 variable "ca_private_key" {
   description = "Private key in PEM format used to generate certificates"
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
 
 variable "ca_certificate" {
   description = "Certificate in PEM format of the CA"
-  type = string
+  type        = string
+}
+
+variable "docker_daemon_options" {
+  type     = map(any)
+  nullable = true
+  default  = null
 }

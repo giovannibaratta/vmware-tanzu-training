@@ -35,7 +35,7 @@ resource "tls_locally_signed_cert" "registry" {
 
 module "harbor" {
   count  = local.deploy_harbor ? 1 : 0
-  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/harbor-standalone?ref=harbor-standalone-v2.0.0&depth=1"
+  source = "github.com/giovannibaratta/vmware-tanzu-training//terraform/modules/harbor-standalone?ref=harbor-standalone-v2.1.0&depth=1"
 
   vm_authorized_key = var.vm_authorized_key
 
@@ -53,4 +53,6 @@ module "harbor" {
     certificate = base64encode(tls_locally_signed_cert.registry.cert_pem)
     ca_chain    = base64encode(tls_locally_signed_cert.registry.ca_cert_pem)
   }
+
+  docker_daemon_options = var.docker_daemon_options
 }
