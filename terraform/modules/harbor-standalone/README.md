@@ -11,6 +11,7 @@ The module deploys Harbor registry in a VM in a vSphere environment.
 | fqdn | Fully qualified domain name of the VM | `string` | n/a | yes |
 | vm\_authorized\_key | Public key authorized to ssh into the VM | `string` | n/a | yes |
 | vsphere | vSphere related references to deploy the VM | <pre>object({<br>    resource_pool_id = string<br>    datastore_id = string<br>    network_id = string<br>    template_id = string<br>  })</pre> | n/a | yes |
+| docker\_daemon\_options | n/a | `map` | `null` | no |
 | tls | TLS configuration to use. Private key and certificate must be base64 encoded | <pre>object({<br>    private_key = string<br>    certificate = string<br>    ca_chain = optional(string, null)<br>  })</pre> | `null` | no |
 
 ## Outputs

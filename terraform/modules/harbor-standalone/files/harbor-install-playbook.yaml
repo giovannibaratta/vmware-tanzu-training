@@ -3,6 +3,9 @@
   connection: local
   become: true
 
+  vars_files:
+    - ./vars.yaml
+
   roles:
     - geerlingguy.docker
 

@@ -9,3 +9,8 @@ harbor_base64_tls_cert: ${harbor_base64_tls_cert}
 %{ if harbor_base64_tls_ca_chain != null ~}
 harbor_base64_tls_ca_chain: ${harbor_base64_tls_ca_chain}
 %{ endif ~}
+
+%{ if docker_daemon_options != null ~}
+docker_daemon_options:
+  ${indent(2, docker_daemon_options)}
+%{ endif ~}

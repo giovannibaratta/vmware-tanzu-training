@@ -31,3 +31,9 @@ variable "tls" {
   default = null
   description = "TLS configuration to use. Private key and certificate must be base64 encoded"
 }
+
+variable "docker_daemon_options" {
+  type = map
+  nullable = true
+  default = null
+}

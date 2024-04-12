@@ -20,6 +20,7 @@ locals {
     harbor_base64_tls_key      = try(var.tls.private_key, null)
     harbor_base64_tls_cert     = try(var.tls.certificate, null)
     harbor_base64_tls_ca_chain = try(var.tls.ca_chain, null)
+    docker_daemon_options      = var.docker_daemon_options != null ? yamlencode(var.docker_daemon_options) : null
   })
 }
 
