@@ -5,14 +5,20 @@ set -u
 set -o pipefail
 
 function main() {
+  echo "Hello world"
 }
 
-err() {
+function err() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] $*" >&2
 }
 
-info() {
+function info() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] $*"
+}
+
+function err_and_exit() {
+  err "$*"
+  exit 1
 }
 
 #######################################
