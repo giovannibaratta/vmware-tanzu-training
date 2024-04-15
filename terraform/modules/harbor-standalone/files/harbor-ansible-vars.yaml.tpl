@@ -14,3 +14,7 @@ harbor_base64_tls_ca_chain: ${harbor_base64_tls_ca_chain}
 docker_daemon_options:
   ${indent(2, docker_daemon_options)}
 %{ endif ~}
+
+%{ if harbor_subnet_cidr != null ~}
+harbor_subnet_cidr: ${harbor_subnet_cidr}
+%{ endif ~}

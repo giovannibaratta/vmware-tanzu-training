@@ -37,3 +37,10 @@ variable "docker_daemon_options" {
   nullable = true
   default = null
 }
+
+variable "harbor_subnet_cidr" {
+  type = string
+  description = "CIDR block for the subnet that must be used by Docker to create Harbor containers"
+  default = null
+  nullable = true
+}

@@ -173,7 +173,6 @@
         src: "templates/harbor-systemd.service"
         dest: "/etc/systemd/system/harbor.service"
       notify:
-        - Regenerate Harbor configs
         - Restart Harbor service
 
     - name: Check if Harbor is already installed
@@ -200,18 +199,45 @@
         - name: Install harbor
           ansible.builtin.shell:
             cmd: /harbor/install.sh --with-trivy
+          notify:
+            - Regenerate Harbor configs
+            - Restart Harbor service
 
-    # The service file is copied via cloud-init
-    - name: Start Harbor service
+        # Start the service otherwise the stop command will be skipped the first time
+        - name: Start Harbor service
+          when: harbor_subnet_cidr is defined
+          ansible.builtin.systemd:
+            name: harbor
+            state: started
+
+        # Stop the service because the configuration must be updated by the handlers
+        - name: Stop Harbor service
+          when: harbor_subnet_cidr is defined
+          ansible.builtin.systemd:
+            name: harbor
+            state: stopped
+
+    - name: Enable Harbor service
       ansible.builtin.systemd:
         name: harbor
-        state: started
         enabled: true
 
   handlers:
     - name: Regenerate Harbor configs
       ansible.builtin.shell:
         cmd: /harbor/prepare
+      notify: Modify docker-compose subnet
+
+    # The  handler is used to restore the subnet after /harbor/prepare is run.
+    # This is necessary because the prepare script will overwrite the docker-compose.yml file.
+    - name: Modify docker-compose subnet
+      when: harbor_subnet_cidr is defined
+      ansible.builtin.replace:
+        path: /harbor/docker-compose.yml
+        regexp: 'external: false'
+        replace: "external: false\n    ipam:\n      config:\n      - subnet: {{ harbor_subnet_cidr }}"
+      notify:
+        - Restart Harbor service
 
     - name: Restart Harbor service
       ansible.builtin.systemd:
