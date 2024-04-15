@@ -1,15 +1,10 @@
-# TMC
+# TMC
 
-> This Terraform code has been tested with TMC SM v1.1
+> This Terraform code has been tested with TMC SM v1.2
 
 ## Prerequisites
 
 - A supervisor cluster registered in TMC
-
-In order to create resources on clusters that are deployed by this code, we need to use the `exec` option of the `Kubernetes` Terraform provider. The `exec` option will generate an authentication token using the TMC CLI. Unfortunately, the newer version of the plugin `mission-control (or tmc)` shipped with the Tanzu doesn't seem to work, therefore we have to rely on the old CLI.
-
-1. Download the CLI from TMC UI (Automation Center -> TMC CLI)
-1. Authenticate to TMC `tmc system context create --self-managed -e <endpoint>:443 -n <context-name> --basic-auth`
 
 ## Plan/Apply
 
