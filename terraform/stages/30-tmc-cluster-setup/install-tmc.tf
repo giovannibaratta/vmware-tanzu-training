@@ -35,7 +35,7 @@ resource "terraform_data" "restart_kapp_controller" {
 }
 
 locals {
-  tmc_repo_ref = "registry.${var.domain}/tmc-sm/package-repository:1.1.0"
+  tmc_repo_ref = "registry.${var.domain}/tmc-sm/package-repository:1.2.0"
 }
 
 # Install TMC

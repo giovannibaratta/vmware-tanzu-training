@@ -16,7 +16,7 @@ spec:
   packageRef:
     refName: tmc.tanzu.vmware.com
     versionSelection:
-      constraints: 1.1.0
+      constraints: 1.2.0
       prereleases: {}
   serviceAccountName: tanzu-mission-control-tkg-system-sa
   values:
