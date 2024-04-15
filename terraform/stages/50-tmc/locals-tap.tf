@@ -7,11 +7,11 @@ locals {
       "activate" : true,
       "daysBefore" : 30
     },
-    "defaultStorageClass" : "vc01cl01-t0compute",
-    "defaultVolumeSnapshotClass" : "vc01cl01-t0compute",
-    "storageClass" : "vc01cl01-t0compute",
+    "defaultStorageClass" : var.cluster_storage_class,
+    "defaultVolumeSnapshotClass" : var.cluster_storage_class,
+    "storageClass" : var.cluster_storage_class,
     "storageClasses" : [
-      "vc01cl01-t0compute"
+      var.cluster_storage_class
     ],
     "nodePoolVolumes" : [
       {
@@ -20,7 +20,7 @@ locals {
         },
         "mountPath" : "/var/lib/containerd",
         "name" : "containerd",
-        "storageClass" : "vc01cl01-t0compute"
+        "storageClass" : var.cluster_storage_class
       },
       {
         "capacity" : {
@@ -28,10 +28,10 @@ locals {
         },
         "mountPath" : "/var/lib/kubelet",
         "name" : "kubelet",
-        "storageClass" : "vc01cl01-t0compute"
+        "storageClass" : var.cluster_storage_class
       }
     ]
-    "vmClass" : "best-effort-large",
+    "vmClass" : var.cluster_vm_class,
     "trust" : {
       additionalTrustedCAs : [
         {
@@ -42,4 +42,6 @@ locals {
   }
 
   tap_cluster_trusted_ca = var.clusters_additional_trusted_cas != null ? var.clusters_additional_trusted_cas : ""
+
+  kustomization_base_path = var.gitops_repo_cluster_root_folder != "" ? "${var.gitops_repo_cluster_root_folder}/" : ""
 }

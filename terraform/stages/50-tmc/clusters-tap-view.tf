@@ -58,7 +58,7 @@ resource "tanzu-mission-control_tanzu_kubernetes_cluster" "tap_view" {
 
         spec {
           worker_class = "node-pool"
-          replicas     = 4
+          replicas     = 2
 
           os_image {
             arch    = "amd64"
@@ -85,23 +85,25 @@ resource "tanzu-mission-control_tanzu_kubernetes_cluster" "tap_view" {
   }
 }
 
-# TAP values file contains sensitive data that are encrypted with a SOPs key. Ideally we would use
-# the TMC resource to push the key to all clusters, but for now only dockerconfig secrets are supported.
-# hence we have to manually push it. This is a huge limitations because we have to define a Kubernetes
-# provider for each cluster, and this operations must be handled manually.
-resource "kubernetes_secret_v1" "tap_view_cluster_age_key" {
-  provider = kubernetes.tap_view_cluster
+resource "tanzu-mission-control_kubernetes_secret" "tap_view_cluster_age_key" {
+  name           = "sops-keys"
+  namespace_name = "tanzu-continuousdelivery-resources"
 
-  metadata {
-    name      = "sops-keys"
-    namespace = "tanzu-continuousdelivery-resources"
+  scope {
+    cluster {
+      name                    = tanzu-mission-control_tanzu_kubernetes_cluster.tap_view.name
+      provisioner_name        = tanzu-mission-control_tanzu_kubernetes_cluster.tap_view.provisioner_name
+      management_cluster_name = tanzu-mission-control_tanzu_kubernetes_cluster.tap_view.management_cluster_name
+    }
   }
 
-  data = {
-    "age.agekey" = var.age_secret_key
-  }
+  export = false
 
-  type = "Opaque"
+  spec {
+    opaque = {
+      "age.agekey" = var.age_secret_key
+    }
+  }
 }
 
 resource "tanzu-mission-control_repository_credential" "tap_view_cluster_repo" {
@@ -184,7 +186,7 @@ resource "tanzu-mission-control_kustomization" "tap_view_cluster" {
 
   spec {
     # Path in the Git repository. The folder must contain a kustomization.yaml file
-    path     = "manifests/flux-tap/multi-cluster/overlays/view"
+    path     = "${local.kustomization_base_path}overlays/view"
     prune    = true
     interval = "60s"
 

@@ -75,3 +75,11 @@ variable "supervisor_name" {
   type = string
   default = "Name of the supervisor registered in TMC"
 }
+
+variable "cluster_storage_class" {
+  type = string
+}
+
+variable "cluster_vm_class" {
+  type = string
+}
