@@ -5,7 +5,7 @@ excluded_packages:
   - fluxcd.source.controller.tanzu.vmware.com
   - cert-manager.tanzu.vmware.com
 shared:
-  ingress_domain: tap.h2o-2-23532.h2o.vmware.com
+  ingress_domain: tap-view.h2o-2-23532.h2o.vmware.com
   ingress_issuer: root-ca
   kubernetes_version: 1.26.5
   ca_cert_data: |-
