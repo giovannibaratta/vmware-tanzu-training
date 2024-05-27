@@ -1,4 +1,4 @@
-# Terraform
+# Terraform
 
 The folder contains Terraform resources to deploy and build various types of environment.
 
